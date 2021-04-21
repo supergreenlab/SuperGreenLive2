@@ -28,10 +28,8 @@ export default {}
 
 <style module lang=stylus>
 #container
-  margin: 0 auto
-  min-height: 100vh
   display: flex
+  height: 100vh
   justify-content: center
   align-items: center
-  text-align: center
 </style>

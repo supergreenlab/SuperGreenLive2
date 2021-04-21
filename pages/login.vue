@@ -18,7 +18,11 @@
 
 <template>
   <section :id="$style.container">
-    login
+    <div :id='$style.body'>
+      SGL LOGIN
+      <input type='text' />
+      <input type='password' />
+    </div>
   </section>
 </template>
 
@@ -28,10 +32,12 @@ export default {}
 
 <style module lang=stylus>
 #container
-  margin: 0 auto
-  min-height: 100vh
   display: flex
+  height: 100vh
   justify-content: center
   align-items: center
-  text-align: center
+
+#body
+  display: flex
+  flex-direction: column
 </style>

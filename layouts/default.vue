@@ -18,7 +18,12 @@
 
 <template>
   <section :id='$style.container'>
-    <Nuxt />
+    <section :id='$style.header'>
+      <img src='~/assets/logo_sgl_white.svg' />
+    </section>
+    <section :id='$style.body'>
+      <Nuxt />
+    </section>
   </section>
 </template>
 
@@ -52,8 +57,17 @@ html
   margin: 0 auto
   min-height: 100vh
   display: flex
-  justify-content: center
-  align-items: center
+  flex-direction: column
   text-align: center
+
+#header
+  display: flex
+  padding: 10pt
+
+#header > img
+  height: 30pt
+
+#body
+  flex: 1
 
 </style>
