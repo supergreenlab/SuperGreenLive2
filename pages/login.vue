@@ -18,16 +18,47 @@
 
 <template>
   <section :id="$style.container">
-    <div :id='$style.body'>
-      SGL LOGIN
-      <input type='text' />
-      <input type='password' />
-    </div>
+    <form @submit='loginHandler'>
+      <div :id='$style.body'>
+        <div :id='$style.title'>S<span :id='$style.green'>G</span>L LOGIN</div>
+        <input type='text' placeholder='Login' v-model='login' />
+        <input type='password' placeholder='Password' v-model='password' />
+        <div :id='$style.button'>
+          <button @click='loginHandler'>LOGIN</button>
+        </div>
+      </div>
+    </form>
   </section>
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      login: '',
+      password: '',
+    }
+  },
+  watch: {
+    loggedIn(val) {
+      this.$router.replace('/')
+    },
+  },
+  methods: {
+    loginHandler(e) {
+      e.preventDefault()
+      e.stopPropagation()
+      const { login, password } = this.$data
+      this.$store.dispatch('auth/login', { login, password })
+      return false
+    },
+  },
+  computed: {
+    loggedIn() {
+      return this.$store.getters['auth/loggedIn']
+    },
+  },
+}
 </script>
 
 <style module lang=stylus>
@@ -40,4 +71,36 @@ export default {}
 #body
   display: flex
   flex-direction: column
+
+#body > input
+  margin: 3pt 0
+  padding: 3pt 6pt
+
+#green
+  color: #3bb30b
+
+#title
+  color: #454545
+  font-weight: bold
+
+#button
+  display: flex
+  justify-content: flex-end
+  align-items: flex-end
+  padding: 15pt 0 0 0
+
+#button > button
+  border: none
+  color: white
+  border-radius: 2.5px
+  background-color: #3bb30b
+  padding: 2pt 20pt
+  cursor: pointer
+
+#button > button:hover
+  background-color: #4bc31b
+
+#button > button:active
+  background-color: #2ba300
+
 </style>

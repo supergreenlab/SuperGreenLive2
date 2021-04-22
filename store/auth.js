@@ -23,9 +23,13 @@ import axios from 'axios'
 import { loadFromStorage, saveToStorage } from '~/lib/client-side.js'
 
 const STORAGE_ITEM='supergreenlive'
+const API_URL='https://api2.supergreenlab.com'
 
 export const state = () => {
   let defaults = {
+    error: false,
+    loading: false,
+    token: '',
   };
   return defaults
 };
@@ -41,13 +45,33 @@ export const actions = {
       context.commit('setState', JSON.parse(saved))
     }
   },
+  async login({ commit, dispatch }, { login, password }) {
+    commit('setLoading', true)
+    const resp = await axios.post(`${API_URL}/login`, {
+      handle: login,
+      password,
+    })
+    commit('setToken', resp.headers['x-sgl-token'])
+    commit('setLoading', false)
+  },
 }
 
 export const mutations = {
   setState(state, newState) {
     Object.assign(state, newState)
   },
+  setToken(state, token) {
+    state.token = token
+    storeState(state)
+  },
+  setLoading(state, loading) {
+    state.loading = loading
+  },
+  setError(state, error) {
+    state.error = error
+  },
 }
 
 export const getters = {
+  loggedIn: state => !!state.token
 }

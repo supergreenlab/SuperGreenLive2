@@ -58,11 +58,14 @@ html
   min-height: 100vh
   display: flex
   flex-direction: column
-  text-align: center
 
 #header
+  position: absolute
   display: flex
   padding: 10pt
+  width: 100%
+  top: 0
+  left: 0
 
 #header > img
   height: 30pt
