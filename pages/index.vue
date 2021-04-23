@@ -43,6 +43,11 @@
               </div>
             </div>
           </div>
+          <div :class='$style.checkboxcontainer'>
+            <div :class='$style.checkbox'>
+              <Checkbox :checked='selectedPlant == plant' @click='selectPlant(plant)' />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -58,15 +63,17 @@
 import axios from 'axios'
 
 import Loading from '~/components/loading.vue'
+import Checkbox from '~/components/checkbox.vue'
 
 const API_URL='https://api2.supergreenlab.com'
 
 export default {
-  components: {Loading},
+  components: {Loading, Checkbox,},
   data() {
     return {
       loading: true,
       plants: [],
+      selectedPlant: null,
     }
   },
   async mounted() {
@@ -90,6 +97,11 @@ export default {
       return p
     })
     this.$data.loading = false
+  },
+  methods: {
+    selectPlant(plant) {
+      this.$data.selectedPlant = plant
+    },
   },
 }
 </script>
@@ -161,5 +173,10 @@ export default {
 
 .thin
   font-weight: 100
+
+.checkboxcontainer
+  display: flex
+  justify-content: center
+  align-items: center
 
 </style>
