@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021  SuperGreenLab <towelie@supergreenlab.com>
+ * Copyright (C) 2019  SuperGreenLab <towelie@supergreenlab.com>
  * Author: Constantin Clauzel <constantin.clauzel@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main
+package server
 
-func main() {
-	config.Init()
+import (
+	"net/http"
 
-	server.Start()
+	"github.com/SuperGreenLab/AppBackend/internal/services/prometheus"
 
-	log.Info("AppBackend started")
+	"github.com/julienschmidt/httprouter"
+	log "github.com/sirupsen/logrus"
+)
 
-	select {}
+// Start starts the server
+func Start() {
+	router := httprouter.New()
+
+	go func() {
+		log.Fatal(http.ListenAndServe(":8080", prometheus.NewHTTPTiming(router)))
+	}()
 }
