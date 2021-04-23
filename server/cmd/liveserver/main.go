@@ -16,14 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function({ store, redirect, route }) {
-  if (route.path.includes('/login')) {
-    if (store.getters['auth/loggedIn']) {
-      return redirect('/')
-    }
-    return
-  }
-  if (!store.getters['auth/loggedIn']) {
-    return redirect('/login')
-  }
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("vim-go")
 }

@@ -1,0 +1,14 @@
+FROM golang:1.13.3
+
+RUN apt-get update && \
+    apt-get install -y libmagickwand-dev
+COPY assets /usr/local/share/liveserver
+
+RUN go get -u github.com/cosmtrek/air
+
+RUN mkdir /app
+WORKDIR /app
+
+EXPOSE 8080
+
+ENTRYPOINT ["/go/bin/air"]

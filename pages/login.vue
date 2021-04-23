@@ -41,7 +41,7 @@ export default {
   },
   watch: {
     loggedIn(val) {
-      this.$router.replace('/')
+      this.$router.replace('/plant')
     },
   },
   methods: {
