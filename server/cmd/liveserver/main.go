@@ -18,12 +18,18 @@
 
 package main
 
+import (
+	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/config"
+	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/server"
+	"github.com/golang/gddo/log"
+)
+
 func main() {
 	config.Init()
 
 	server.Start()
 
-	log.Info("AppBackend started")
+	log.Info("Liveserver started")
 
 	select {}
 }

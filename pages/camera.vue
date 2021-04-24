@@ -20,9 +20,12 @@
   <section :id='$style.container'>
     <div :id='$style.body'>
       <h1>PLACE YOUR <span :class='$style.green'>CAMERA</span>:</h1>
-    </div>
-    <div :id='$style.button'>
-      <button @click='nextHandler'>NEXT</button>
+      <div :id='$style.videocontainer'>
+        <img src='http://192.168.1.26:8081'/>
+      </div>
+      <div :id='$style.button'>
+        <button @click='nextHandler'>NEXT</button>
+      </div>
     </div>
   </section>
 </template>
@@ -38,6 +41,29 @@ export default {
 </script>
 
 <style module lang=stylus>
+
+#container
+  display: flex
+  justify-content: center
+  height: 100vh
+
+#body
+  display: flex
+  flex-direction: column
+  margin-top: 70pt
+  padding: 0 5pt
+  width: 100%
+  max-width: 600pt
+
+#body > h1
+  margin: 20pt 0
+  color: #454545
+
+.green
+  color: #3bb30b
+  
+#videocontainer
+  flex: 1
 
 #button
   display: flex
@@ -59,25 +85,5 @@ export default {
 
 #button > button:active
   background-color: #2ba300
-
-#container
-  display: flex
-  justify-content: center
-  height: 100vh
-
-#body
-  display: flex
-  flex-direction: column
-  margin-top: 70pt
-  padding: 0 5pt
-  width: 100%
-  max-width: 600pt
-
-#body > h1
-  margin: 20pt 0
-  color: #454545
-
-.green
-  color: #3bb30b
 
 </style>
