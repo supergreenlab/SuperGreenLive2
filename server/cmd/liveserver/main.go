@@ -21,7 +21,7 @@ package main
 import (
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/config"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/server"
-	"github.com/golang/gddo/log"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 
 	server.Start()
 
-	log.Info("Liveserver started")
+	logrus.Info("Liveserver started")
 
 	select {}
 }

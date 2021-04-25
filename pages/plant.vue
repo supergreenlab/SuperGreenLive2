@@ -22,27 +22,7 @@
       <h1>SELECT <span :class='$style.green'>THE PLANT</span> ON THIS TIMELAPSE</h1>
       <div :id='$style.plants'>
         <div :class='$style.plant' v-for='plant in plants'>
-          <div :class='$style.plantinfos'>
-            <div :class='$style.plantid'>
-              <span :class='$style.plantname'>{{ plant.name }}</span>&nbsp;in&nbsp;<span :class='$style.boxname'>{{ plant.box.name }}</span>
-            </div>
-            <div :class='$style.plantsettings'>
-              <div :class='$style.plantsetting'>
-                <img src='~/assets/icon_seeds.svg' />
-                <div>
-                  {{ plant.settings.strain || 'Not set' }}<br/>
-                  <span :class='$style.thin'>from</span>&nbsp;<b :class='$style.green'>{{ plant.settings.seedBank || 'Not set' }}</b>
-                </div>
-              </div>
-              <div :class='$style.plantsetting'>
-                <img src='~/assets/icon_phase.svg' />
-                <div>
-                  <b>Germinated</b>: 34 days ago<br/>
-                  <b>Blooming since</b>: 34 days ago
-                </div>
-              </div>
-            </div>
-          </div>
+          <Plant :plant='plant' />
           <div :class='$style.checkboxcontainer'>
             <div :class='$style.checkbox'>
               <Checkbox :checked='selectedPlant == plant' @click='selectPlant(plant)' />
@@ -67,11 +47,12 @@ import axios from 'axios'
 
 import Loading from '~/components/loading.vue'
 import Checkbox from '~/components/checkbox.vue'
+import Plant from '~/components/plant.vue'
 
 const API_URL='https://api2.supergreenlab.com'
 
 export default {
-  components: {Loading, Checkbox,},
+  components: {Loading, Checkbox, Plant,},
   data() {
     return {
       loading: true,
@@ -106,7 +87,8 @@ export default {
       this.$data.selectedPlant = plant
     },
     nextHandler() {
-      this.$router.push("/camera")
+      this.$store.commit('plant/setPlant', this.$data.selectedPlant)
+      this.$router.push('/camera')
     },
   },
 }
@@ -151,40 +133,6 @@ export default {
 .plant
   display: flex
   border-bottom: 1pt dashed #ababab
-
-.plantname
-  font-weight: bold
-  font-size: 1.2em
-  color: #454545
-
-.boxname
-  font-weight: bold
-  font-size: 1.2em
-  color: #3bb30b
-
-.plantinfos
-  display: flex
-  flex: 1
-  flex-direction: column
-
-.plantsettings
-  display: flex
-  width: 100%
-  margin: 15pt 0 10pt 0
-
-.plantsetting
-  display: flex
-  flex: 1
-  color: #454545
-
-.plantsetting > img
-  padding-right: 5pt
-
-.green
-  color: #3bb30b
-
-.thin
-  font-weight: 100
 
 .checkboxcontainer
   display: flex

@@ -18,11 +18,27 @@
 
 <template>
   <section :id='$style.container'>
+    <div :id='$style.body'>
+      <div :id='$style.header'>
+        <h1>PLANTS ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
+        <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link></div>
+      <Plant :plant='plant' />
+    </div>
   </section>
 </template>
 
 <script>
 export default {
+  methods: {
+    nextHandler() {
+      this.$router.push("/")
+    },
+  },
+  computed: {
+    plant() {
+      return this.$store.state.plant.plant
+    },
+  },
 }
 </script>
 
@@ -30,5 +46,32 @@ export default {
 
 #container
   display: flex
+  justify-content: center
+  height: 100vh
+
+#body
+  display: flex
+  flex-direction: column
+  margin-top: 70pt
+  padding: 0 5pt
+  width: 100%
+  max-width: 600pt
+
+#header
+  display: flex
+  justify-content: space-between
+  align-items: center
+
+#header > h1
+  margin: 20pt 0
+  color: #454545
+
+#change
+  font-weight: 600
+  color: #3bb30b
+  text-decoration: none
+
+.green
+  color: #3bb30b
 
 </style>

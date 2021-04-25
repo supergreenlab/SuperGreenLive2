@@ -22,7 +22,7 @@ import axios from 'axios'
 
 import { loadFromStorage, saveToStorage } from '~/lib/client-side.js'
 
-const STORAGE_ITEM='supergreenlive'
+const STORAGE_ITEM='auth'
 const API_URL='https://api2.supergreenlab.com'
 
 export const state = () => {

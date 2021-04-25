@@ -21,8 +21,6 @@ package server
 import (
 	"net/http"
 
-	"github.com/SuperGreenLab/AppBackend/internal/services/prometheus"
-
 	"github.com/julienschmidt/httprouter"
 	log "github.com/sirupsen/logrus"
 )
@@ -31,7 +29,9 @@ import (
 func Start() {
 	router := httprouter.New()
 
+	router.POST("/motion", motionHandler)
+
 	go func() {
-		log.Fatal(http.ListenAndServe(":8080", prometheus.NewHTTPTiming(router)))
+		log.Fatal(http.ListenAndServe(":8080", router))
 	}()
 }

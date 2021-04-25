@@ -21,6 +21,7 @@
     <div :id='$style.body'>
       <h1>PLACE YOUR <span :class='$style.green'>CAMERA</span>:</h1>
       <div :id='$style.videocontainer'>
+        <span :id='$style.quality'>(don't mind the quality, the timelapse frames will be much better)</span>
         <img src='http://192.168.1.26:8081'/>
       </div>
       <div :id='$style.button'>
@@ -64,6 +65,15 @@ export default {
   
 #videocontainer
   flex: 1
+  height: 100%
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+
+#videocontainer > img
+  max-width: 100%
+  max-height: 50vh
 
 #button
   display: flex
@@ -85,5 +95,9 @@ export default {
 
 #button > button:active
   background-color: #2ba300
+
+#quality
+  color: #676767
+  font-size: 0.8em
 
 </style>

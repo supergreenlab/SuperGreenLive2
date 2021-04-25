@@ -1,0 +1,36 @@
+@import './normalize.css';
+
+html {
+	font-size: 11pt;
+  font-weight: 300;
+	word-spacing: 1px;
+	-ms-text-size-adjust: 100%;
+	-webkit-text-size-adjust: 100%;
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	box-sizing: border-box;
+}
+
+body {
+	font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  background-color: white;
+}
+
+@media only screen and (max-width: 600px) {
+  body {
+    font-size: 0.9em;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 800px) {
+  body {
+    font-size: 0.95em;
+  }
+}
+
+*, *:before, *:after {
+	box-sizing: border-box;
+	margin: 0;
+}
+* { outline: 0 !important }

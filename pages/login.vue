@@ -41,7 +41,11 @@ export default {
   },
   watch: {
     loggedIn(val) {
-      this.$router.replace('/plant')
+      if (this.$store.state.plant.plant == null) {
+        this.$router.replace('/plant')
+      } else {
+        this.$router.replace('/')
+      }
     },
   },
   methods: {

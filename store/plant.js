@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020  SuperGreenLab <towelie@supergreenlab.com>
+ * Copyright (C) 2021  SuperGreenLab <towelie@supergreenlab.com>
  * Author: Constantin Clauzel <constantin.clauzel@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { onNuxtReady } from '~/lib/client-side.js'
+
+import Vue from 'vue'
+import axios from 'axios'
+
+import { loadFromStorage, saveToStorage } from '~/lib/client-side.js'
+
+const STORAGE_ITEM='plant'
+const API_URL='https://api2.supergreenlab.com'
+
+export const state = () => {
+  let defaults = {
+    plant: null
+  };
+  return defaults
+};
+
+const storeState = (state) => {
+  saveToStorage(STORAGE_ITEM, JSON.stringify(state))
+}
 
 export const actions = {
   nuxtClientInit(context) {
-    onNuxtReady(() => {
-      context.dispatch('plant/nuxtClientInit')
-      context.dispatch('auth/nuxtClientInit')
-    })
-  }
+    const saved = loadFromStorage(STORAGE_ITEM)
+    if (saved) {
+      context.commit('setState', JSON.parse(saved))
+    }
+  },
+}
+
+export const mutations = {
+  setState(state, newState) {
+    Object.assign(state, newState)
+  },
+  setPlant(state, plant) {
+    state.plant = plant
+    storeState(state)
+  },
+}
+
+export const getters = {
 }
