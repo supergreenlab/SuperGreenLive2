@@ -22,6 +22,7 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -30,8 +31,9 @@ func Start() {
 	router := httprouter.New()
 
 	router.POST("/motion", motionHandler)
+	router.GET("/capture", captureHandler)
 
 	go func() {
-		log.Fatal(http.ListenAndServe(":8080", router))
+		log.Fatal(http.ListenAndServe(":8080", cors.Default().Handler(router)))
 	}()
 }

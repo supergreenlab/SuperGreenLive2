@@ -3,3 +3,4 @@ bin/liveserver
 air_errors.log
 config/
 tests/node_modules
+cam.jpg

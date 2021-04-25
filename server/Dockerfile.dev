@@ -5,6 +5,7 @@ RUN apt-get update && \
 COPY assets /usr/local/share/liveserver
 
 ADD bin/motion /usr/bin/motion
+ADD bin/raspistill /usr/bin/raspistill
 
 RUN go get -u github.com/cosmtrek/air
 

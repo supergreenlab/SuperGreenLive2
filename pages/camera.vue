@@ -22,7 +22,7 @@
       <h1>PLACE YOUR <span :class='$style.green'>CAMERA</span>:</h1>
       <div :id='$style.videocontainer'>
         <span :id='$style.quality'>(don't mind the quality, the timelapse frames will be much better)</span>
-        <img src='http://192.168.1.26:8081'/>
+        <img v-if='motionStarted' src='http://192.168.1.26:8081'/>
       </div>
       <div :id='$style.button'>
         <button @click='nextHandler'>NEXT</button>
@@ -32,9 +32,23 @@
 </template>
 
 <script>
+import axios from 'axios'
+
+const API_URL='http://192.168.1.52:8080'
+
 export default {
+  data() {
+    return {
+      motionStarted: false,
+    }
+  },
+  async mounted() {
+    await axios.post(`${API_URL}/motion`, {})
+    this.$data.motionStarted = true
+  },
   methods: {
-    nextHandler() {
+    async nextHandler() {
+      await axios.post(`${API_URL}/motion`, {})
       this.$router.push("/")
     }
   },

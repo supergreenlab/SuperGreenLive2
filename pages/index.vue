@@ -23,6 +23,7 @@
         <h1>PLANTS ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
         <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link></div>
       <Plant :plant='plant' />
+      <div :id='$style.capture' :style='{"background-image": "url(http://192.168.1.87:8080/capture)"}'></div>
     </div>
   </section>
 </template>
@@ -73,5 +74,12 @@ export default {
 
 .green
   color: #3bb30b
+
+#capture
+  height: 100%
+  margin: 30pt 0
+  background-position: center
+  background-repeat: center
+  background-size: cover
 
 </style>
