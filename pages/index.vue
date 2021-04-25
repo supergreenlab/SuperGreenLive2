@@ -23,13 +23,26 @@
         <h1>PLANTS ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
         <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link></div>
       <Plant :plant='plant' />
-      <div :id='$style.capture' :style='{"background-image": "url(http://192.168.1.87:8080/capture)"}'></div>
+      <div :id='$style.capture' :style='{"background-image": `url(${src})`}'></div>
     </div>
   </section>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      src: 'http://192.168.1.26:8080/capture'
+    }
+  },
+  mounted() {
+    this.interval = setInterval(() => {
+      this.$data.src = `http://192.168.1.26:8080/capture?rand=${new Date().getTime()}`
+    }, 20000)
+  },
+  destroyed() {
+    clearInterval(this.interval)
+  },
   methods: {
     nextHandler() {
       this.$router.push("/")

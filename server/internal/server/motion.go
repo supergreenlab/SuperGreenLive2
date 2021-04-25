@@ -37,6 +37,7 @@ func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 			log.Fatal("failed to kill process: ", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+		logrus.Info("Motion stopped")
 		fmt.Fprintf(w, "0")
 		cmd = nil
 		return

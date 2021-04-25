@@ -34,7 +34,7 @@
 <script>
 import axios from 'axios'
 
-const API_URL='http://192.168.1.52:8080'
+const API_URL='http://192.168.1.26:8080'
 
 export default {
   data() {
