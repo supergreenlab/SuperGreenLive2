@@ -1,6 +1,6 @@
 tmp
 bin/liveserver
 air_errors.log
-config/
+/config/
 tests/node_modules
 cam.jpg
