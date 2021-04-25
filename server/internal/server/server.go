@@ -30,7 +30,8 @@ import (
 func Start() {
 	router := httprouter.New()
 
-	router.POST("/motion", motionHandler)
+	router.POST("/motion/start", startMotionHandler)
+	router.POST("/motion/stop", stopMotionHandler)
 	router.GET("/capture", captureHandler)
 
 	go func() {

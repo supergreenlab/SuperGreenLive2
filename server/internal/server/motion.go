@@ -31,15 +31,9 @@ import (
 
 var cmd *exec.Cmd
 
-func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	if cmd != nil {
-		if err := cmd.Process.Kill(); err != nil {
-			log.Fatal("failed to kill process: ", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		logrus.Info("Motion stopped")
-		fmt.Fprintf(w, "0")
-		cmd = nil
+		fmt.Fprintf(w, "OK")
 		return
 	}
 	cmd = exec.Command("/usr/bin/motion")
@@ -50,5 +44,19 @@ func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 		return
 	}
 	logrus.Info("Motion started")
-	fmt.Fprintf(w, "1")
+	fmt.Fprintf(w, "OK")
+}
+
+func stopMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	if cmd == nil {
+		fmt.Fprintf(w, "OK")
+		return
+	}
+	if err := cmd.Process.Kill(); err != nil {
+		log.Fatal("failed to kill process: ", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	logrus.Info("Motion stopped")
+	fmt.Fprintf(w, "OK")
+	cmd = nil
 }
