@@ -27,6 +27,7 @@ import (
 
 func Init() {
 	viper.SetConfigName("liveserver")
+	viper.AddConfigPath("/etc")
 	viper.AddConfigPath("/etc/liveserver")
 	viper.AddConfigPath(".")
 
