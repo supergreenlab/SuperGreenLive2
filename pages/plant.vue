@@ -50,6 +50,7 @@ import Checkbox from '~/components/checkbox.vue'
 import Plant from '~/components/plant.vue'
 
 const API_URL='https://api2.supergreenlab.com'
+const RPI_URL='http://192.168.1.26:8080'
 
 export default {
   components: {Loading, Checkbox, Plant,},
@@ -86,8 +87,13 @@ export default {
     selectPlant(plant) {
       this.$data.selectedPlant = plant
     },
-    nextHandler() {
+    async nextHandler() {
       this.$store.commit('plant/setPlant', this.$data.selectedPlant)
+      const token = this.$store.state.auth.token
+      await axios.post(`${RPI_URL}/plant`, {
+        id: this.$data.selectedPlant.id,
+      }, { headers: {Authorization: `Bearer ${token}`}})
+
       this.$router.push('/camera')
     },
   },

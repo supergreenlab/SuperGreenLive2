@@ -39,6 +39,6 @@ func Start() {
 	router.POST("/plant", plantHandler)
 
 	go func() {
-		log.Fatal(http.ListenAndServe(":8080", cors.Default().Handler(router)))
+		log.Fatal(http.ListenAndServe(":8080", cors.AllowAll().Handler(router)))
 	}()
 }

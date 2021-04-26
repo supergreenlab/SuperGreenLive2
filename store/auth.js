@@ -51,7 +51,12 @@ export const actions = {
       handle: login,
       password,
     })
-    commit('setToken', resp.headers['x-sgl-token'])
+    const token = resp.headers['x-sgl-token']
+    await axios.post(`${API_URL}/token`, {
+      token,
+    })
+
+    commit('setToken', token)
     commit('setLoading', false)
   },
 }
