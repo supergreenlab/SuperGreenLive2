@@ -23,7 +23,7 @@
         <h1>PLANTS ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
         <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link></div>
       <Plant :plant='plant' />
-      <div :id='$style.capture' :style='{"background-image": `url(${src})`}'></div>
+      <div :id='$style.capture'><div v-for='src in srcs' v-if='src' :key='src' :style='{"background-image": `url(${src})`}'></div></div>
     </div>
   </section>
 </template>
@@ -32,12 +32,16 @@
 export default {
   data() {
     return {
-      src: 'http://192.168.1.26:8080/capture'
+      n: 0,
+      srcs: [null, 'http://192.168.1.26:8080/capture'],
     }
   },
   mounted() {
     this.interval = setInterval(() => {
-      this.$data.src = `http://192.168.1.26:8080/capture?rand=${new Date().getTime()}`
+      this.$data.srcs = [
+        this.$data.srcs[1],
+        `http://192.168.1.26:8080/capture?rand=${new Date().getTime()}`
+      ]
     }, 20000)
   },
   destroyed() {
@@ -89,8 +93,16 @@ export default {
   color: #3bb30b
 
 #capture
+  position: relative
   height: 100%
   margin: 30pt 0
+
+#capture > div
+  position: absolute
+  top: 0
+  right: 0
+  bottom: 0
+  left: 0
   background-position: center
   background-repeat: center
   background-size: cover

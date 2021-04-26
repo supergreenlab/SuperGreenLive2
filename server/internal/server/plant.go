@@ -16,22 +16,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main
+package server
 
 import (
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/config"
+	"encoding/json"
+	"fmt"
+	"net/http"
+
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/server"
+	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
 
-func main() {
-	config.Init()
-	kv.Init()
+type PlantData struct {
+	ID string `json:"id"`
+}
 
-	server.Start()
+func plantHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	pl := PlantData{}
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&pl); err != nil {
+		logrus.Errorf("decoder.Decode in tokenHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	logrus.Info("Liveserver started")
+	if err := kv.SetString("plant", pl.ID); err != nil {
+		logrus.Errorf("kv.SetString in plantHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	select {}
+	fmt.Fprintf(w, "OK")
 }

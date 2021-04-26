@@ -19,15 +19,18 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
 	"image"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"time"
 
 	"image/jpeg"
-	_ "image/jpeg"
 
+	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
+	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
@@ -52,19 +55,73 @@ func captureHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 	logrus.Info("Taking picture..")
 	cam, err := takePic()
 	if err != nil {
-		log.Println(err)
+		logrus.Errorf("takePic in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	reader, err := os.Open(cam)
 	if err != nil {
 		logrus.Errorf("os.Open in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer reader.Close()
 	img, _, err := image.Decode(reader)
 	if err != nil {
 		logrus.Errorf("image.Decode in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	token, err := kv.GetString("token")
+	if err != nil {
+		logrus.Errorf("kv.GetString(token) in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logrus.Info(token)
+
+	plantID, err := kv.GetString("plant")
+	if err != nil {
+		logrus.Errorf("kv.GetString(plant) in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logrus.Info(plantID)
+
+	plant := appbackend.Plant{}
+
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+
+	request, err := http.NewRequest("GET", fmt.Sprintf("https://api2.supergreenlab.com/plant/%s/", plantID), nil)
+	request.Header.Set("Authentication", fmt.Sprintf("Bearer %s", token))
+
+	if err != nil {
+		logrus.Errorf("http.NewRequest in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := client.Do(request)
+	if err != nil {
+		logrus.Errorf("client.Do in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	defer resp.Body.Close()
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&plant); err != nil {
+		logrus.Errorf("decoder.Decode in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	logrus.Infof("%+v", plant)
+
 	jpeg.Encode(w, img, nil)
 }

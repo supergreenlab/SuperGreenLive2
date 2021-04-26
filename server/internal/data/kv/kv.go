@@ -16,22 +16,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main
+package kv
 
 import (
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/config"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/server"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+	"github.com/syndtr/goleveldb/leveldb"
 )
 
-func main() {
-	config.Init()
-	kv.Init()
+var (
+	_ = pflag.String("leveldbdir", "/tmp/sgllive.leveldb", "LevelDB directory location")
+)
 
-	server.Start()
+func init() {
+	viper.SetDefault("LevelDBDir", "/tmp/sgllive.leveldb")
+}
 
-	logrus.Info("Liveserver started")
+var db *leveldb.DB
 
-	select {}
+func GetString(key string) (string, error) {
+	data, err := db.Get([]byte(key), nil)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+func SetString(key, value string) error {
+	err := db.Put([]byte(key), []byte(value), nil)
+	return err
+}
+
+func Init() {
+	var err error
+	db, err = leveldb.OpenFile(viper.GetString("LevelDBDir"), nil)
+	if err != nil {
+		logrus.Fatalf("leveldb.OpenFile in kv.Init %q", err)
+	}
 }

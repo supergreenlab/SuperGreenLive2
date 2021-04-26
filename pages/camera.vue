@@ -23,7 +23,7 @@
       <div :id='$style.videocontainer'>
         <span :id='$style.quality'>(don't mind the quality, the timelapse frames will be much better)</span>
         <div :id='$style.motion'>
-          <img v-if='motionStarted' :src='src'/>
+          <img v-if='motionStarted' :src='src' @error='imgError'/>
         </div>
       </div>
       <div :id='$style.button'>
@@ -49,13 +49,19 @@ export default {
     await axios.post(`${API_URL}/motion/start`)
     setTimeout(() => {
       this.$data.motionStarted = true
-    }, 10000)
+    }, 1000)
   },
   methods: {
     async nextHandler() {
       await axios.post(`${API_URL}/motion/stop`)
       this.$router.push("/")
-    }
+    },
+    async imgError() {
+      console.log('error')
+    setTimeout(() => {
+      this.$data.src = `http://192.168.1.26:8081?rand=${new Date().getTime()}`
+    }, 1000)
+    },
   },
 }
 </script>

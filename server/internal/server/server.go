@@ -32,7 +32,11 @@ func Start() {
 
 	router.POST("/motion/start", startMotionHandler)
 	router.POST("/motion/stop", stopMotionHandler)
+
 	router.GET("/capture", captureHandler)
+
+	router.POST("/token", tokenHandler)
+	router.POST("/plant", plantHandler)
 
 	go func() {
 		log.Fatal(http.ListenAndServe(":8080", cors.Default().Handler(router)))
