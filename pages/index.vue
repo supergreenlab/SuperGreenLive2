@@ -105,6 +105,7 @@ export default {
   left: 0
   background-position: center
   background-repeat: center
-  background-size: cover
+  background-size: contain
+  background-repeat: no-repeat
 
 </style>
