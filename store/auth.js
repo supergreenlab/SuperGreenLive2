@@ -24,6 +24,7 @@ import { loadFromStorage, saveToStorage } from '~/lib/client-side.js'
 
 const STORAGE_ITEM='auth'
 const API_URL='https://api2.supergreenlab.com'
+const RPI_URL='http://192.168.1.26:8080'
 
 export const state = () => {
   let defaults = {
@@ -52,7 +53,7 @@ export const actions = {
       password,
     })
     const token = resp.headers['x-sgl-token']
-    await axios.post(`${API_URL}/token`, {
+    await axios.post(`${RPI_URL}/token`, {
       token,
     })
 

@@ -73,7 +73,7 @@ export default {
       },
     })
 
-    this.$data.plants = plants.map((p, i) => {
+    this.$data.plants = plants.filter(p => !p.archived && !p.deleted).map((p, i) => {
       p = Object.assign({}, p, {box: boxes.find(b => b.id == p.boxID)})
       p.settings = JSON.parse(p.settings)
       if (typeof p.box.settings == 'string') {
@@ -149,7 +149,7 @@ export default {
   display: flex
   justify-content: flex-end
   align-items: flex-end
-  padding: 15pt 0 0 0
+  padding: 15pt 0 15pt 0
   margin: 20pt 0
 
 #button > button

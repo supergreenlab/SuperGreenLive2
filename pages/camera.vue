@@ -21,7 +21,6 @@
     <div :id='$style.body'>
       <h1>PLACE YOUR <span :class='$style.green'>CAMERA</span>:</h1>
       <div :id='$style.videocontainer'>
-        <span :id='$style.quality'>(don't mind the quality, the timelapse frames will be much better)</span>
         <div :id='$style.motion'>
           <img v-if='motionStarted' :src='src' @error='imgError'/>
         </div>
@@ -36,31 +35,31 @@
 <script>
 import axios from 'axios'
 
-const API_URL='http://192.168.1.26:8080'
+const RPI_URL='http://192.168.1.26:8080'
+const LIVEVIEW_URL='http://192.168.1.26:8081'
 
 export default {
   data() {
     return {
-      src: 'http://192.168.1.26:8081',
+      src: LIVEVIEW_URL,
       motionStarted: false,
     }
   },
   async mounted() {
-    await axios.post(`${API_URL}/motion/start`)
+    await axios.post(`${RPI_URL}/motion/start`)
     setTimeout(() => {
       this.$data.motionStarted = true
     }, 1000)
   },
   methods: {
     async nextHandler() {
-      await axios.post(`${API_URL}/motion/stop`)
+      await axios.post(`${RPI_URL}/motion/stop`)
       this.$router.push("/")
     },
     async imgError() {
-      console.log('error')
-    setTimeout(() => {
-      this.$data.src = `http://192.168.1.26:8081?rand=${new Date().getTime()}`
-    }, 1000)
+      setTimeout(() => {
+        this.$data.src = `${LIVEVIEW_URL}?rand=${new Date().getTime()}`
+      }, 1000)
     },
   },
 }
@@ -98,6 +97,10 @@ export default {
 
 #motion
   flex: 1
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
 
 #motion > img
   max-width: 100%
