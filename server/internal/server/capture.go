@@ -22,7 +22,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"image"
+	"image/jpeg"
 	"net/http"
 	"os"
 	"os/exec"
@@ -30,6 +31,7 @@ import (
 
 	db "github.com/SuperGreenLab/AppBackend/pkg"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
+	"github.com/disintegration/imaging"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
@@ -127,14 +129,27 @@ func captureHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 	}
 	defer reader.Close()
 
-	buffBytes, err := ioutil.ReadAll(reader)
+	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
 	if err != nil {
-		logrus.Errorf("ioutil.ReadAll in captureHandler %q - device: %+v", err, device)
+		logrus.Errorf("image.Decode in captureHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var resized image.Image
+	if img.Bounds().Max.X > img.Bounds().Max.Y {
+		resized = imaging.Resize(img, 1250, 0, imaging.Lanczos)
+	} else {
+		resized = imaging.Resize(img, 0, 1250, imaging.Lanczos)
+	}
+
+	buff := new(bytes.Buffer)
+	err = jpeg.Encode(buff, resized, &jpeg.Options{Quality: 80})
+	if err != nil {
+		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	buff := bytes.NewBuffer(buffBytes)
 	buff, err = db.AddSGLOverlays(box, plant, device, buff)
 	if err != nil {
 		logrus.Errorf("addSGLOverlays in captureHandler %q - device: %+v", err, device)
