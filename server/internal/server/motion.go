@@ -39,7 +39,7 @@ func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 	cmd = exec.Command("/usr/bin/motion")
 	cmd.Stdout = os.Stdout
 	if err := cmd.Start(); err != nil {
-		logrus.Fatal(err)
+		logrus.Errorf("cmd.Start in startMotionHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -53,7 +53,7 @@ func stopMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Para
 		return
 	}
 	if err := cmd.Process.Kill(); err != nil {
-		log.Fatal("failed to kill process: ", err)
+		log.Errorf("cmd.Process.Kill in stopMotionHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	logrus.Info("Motion stopped")

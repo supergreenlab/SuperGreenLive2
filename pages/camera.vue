@@ -46,14 +46,14 @@ export default {
     }
   },
   async mounted() {
-    await axios.post('${API_URL}/motion/start')
+    await axios.post(`${API_URL}/motion/start`)
     setTimeout(() => {
       this.$data.motionStarted = true
     }, 10000)
   },
   methods: {
     async nextHandler() {
-      await axios.post('${API_URL}/motion/stop')
+      await axios.post(`${API_URL}/motion/stop`)
       this.$router.push("/")
     }
   },

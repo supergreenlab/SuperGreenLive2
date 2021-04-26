@@ -57,12 +57,14 @@ func captureHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 
 	reader, err := os.Open(cam)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Errorf("os.Open in captureHandler %q", err)
+		return
 	}
 	defer reader.Close()
 	img, _, err := image.Decode(reader)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Errorf("image.Decode in captureHandler %q", err)
+		return
 	}
 	jpeg.Encode(w, img, nil)
 }
