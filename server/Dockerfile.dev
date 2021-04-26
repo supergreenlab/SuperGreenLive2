@@ -2,7 +2,7 @@ FROM golang:1.15
 
 RUN apt-get update && \
     apt-get install -y libmagickwand-dev
-COPY assets /usr/local/share/liveserver
+COPY assets /usr/local/share/appbackend
 
 ADD bin/motion /usr/bin/motion
 ADD bin/raspistill /usr/bin/raspistill
