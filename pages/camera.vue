@@ -54,6 +54,9 @@ export default {
   methods: {
     async nextHandler() {
       await axios.post(`${RPI_URL}/motion/stop`)
+      await axios.post(`${RPI_URL}/timelapse`, {
+        cron: '0 */10 * * * *',
+      })
       this.$router.push("/")
     },
     async imgError() {

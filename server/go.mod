@@ -6,6 +6,7 @@ require (
 	github.com/SuperGreenLab/AppBackend v0.0.0-20210426142839-978953cb8ae3
 	github.com/disintegration/imaging v1.6.2
 	github.com/julienschmidt/httprouter v1.3.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5

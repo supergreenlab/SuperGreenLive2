@@ -16,24 +16,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main
+package services
 
 import (
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/config"
+	"sync"
+
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/server"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/services"
+	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 )
 
-func main() {
-	config.Init()
-	kv.Init()
-	services.Init()
+var (
+	c                     *cron.Cron
+	timelapseEntryID      *cron.EntryID
+	timelapseEntryIDMutex sync.Mutex
+)
 
-	server.Start()
+func captureTimelapse() {
+	logrus.Info("capture")
+}
 
-	logrus.Info("Liveserver started")
+func ScheduleTimelapse() {
+	if cron, err := kv.GetString("cron"); err != nil {
+		logrus.Errorf("kv.GetString in ScheduleTimelapse %q", err)
+		return
+	} else {
+		timelapseEntryIDMutex.Lock()
+		if timelapseEntryID != nil {
+			c.Remove(*timelapseEntryID)
+		}
+		if entryID, err := c.AddFunc(cron, captureTimelapse); err != nil {
+			logrus.Errorf("c.AddFunc in ScheduleTimelapse %q", err)
+		} else {
+			timelapseEntryID = &entryID
+		}
+		timelapseEntryIDMutex.Unlock()
+	}
+}
 
-	select {}
+func Init() {
+	c = cron.New(cron.WithChain(
+		cron.Recover(cron.DefaultLogger),
+	))
+	ScheduleTimelapse()
+	c.Start()
 }

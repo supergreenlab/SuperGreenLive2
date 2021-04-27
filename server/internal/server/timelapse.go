@@ -16,24 +16,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main
+package server
 
 import (
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/config"
+	"encoding/json"
+	"fmt"
+	"net/http"
+
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/server"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/services"
+	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
 
-func main() {
-	config.Init()
-	kv.Init()
-	services.Init()
+type TimelapseData struct {
+	Cron string `json:"cron"`
+}
 
-	server.Start()
+func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	td := TimelapseData{}
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&td); err != nil {
+		logrus.Errorf("json.Unmarshal in timelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	logrus.Info("Liveserver started")
+	if err := kv.SetString("cron", td.Cron); err != nil {
+		logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	select {}
+	services.ScheduleTimelapse()
+
+	fmt.Fprintf(w, "OK")
 }
