@@ -19,9 +19,11 @@
 package services
 
 import (
+	"bytes"
 	"sync"
 
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
+	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 )
@@ -33,7 +35,11 @@ var (
 )
 
 func captureTimelapse() {
-	logrus.Info("capture")
+	buff := new(bytes.Buffer)
+	if err := tools.CaptureFrame(buff); err != nil {
+		logrus.Errorf("tools.CaptureFrame in captureTimelapse %q", err)
+		return
+	}
 }
 
 func ScheduleTimelapse() {

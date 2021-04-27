@@ -16,24 +16,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package server
+package api
 
 import (
-	"bytes"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
-	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
+	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
 )
 
-func captureHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	buff := new(bytes.Buffer)
-
-	if err := tools.CaptureFrame(buff); err != nil {
-		logrus.Errorf("tools.CaptureFrame in captureHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+func LoadSGLObject(url string, obj interface{}) error {
+	token, err := kv.GetString("token")
+	if err != nil {
+		return err
 	}
-	w.Write(buff.Bytes())
+
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Authentication", fmt.Sprintf("Bearer %s", token))
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(obj); err != nil {
+		return err
+	}
+	return nil
 }
