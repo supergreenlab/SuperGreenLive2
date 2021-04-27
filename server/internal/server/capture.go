@@ -19,7 +19,6 @@
 package server
 
 import (
-	"bytes"
 	"net/http"
 
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
@@ -28,12 +27,11 @@ import (
 )
 
 func captureHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	buff := new(bytes.Buffer)
-
-	if err := tools.CaptureFrame(buff); err != nil {
+	if buff, err := tools.CaptureFrame(); err != nil {
 		logrus.Errorf("tools.CaptureFrame in captureHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	} else {
+		w.Write(buff.Bytes())
 	}
-	w.Write(buff.Bytes())
 }

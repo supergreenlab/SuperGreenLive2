@@ -19,7 +19,6 @@
 package services
 
 import (
-	"bytes"
 	"sync"
 
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
@@ -35,8 +34,7 @@ var (
 )
 
 func captureTimelapse() {
-	buff := new(bytes.Buffer)
-	if err := tools.CaptureFrame(buff); err != nil {
+	if _, err := tools.CaptureFrame(); err != nil {
 		logrus.Errorf("tools.CaptureFrame in captureTimelapse %q", err)
 		return
 	}

@@ -49,51 +49,51 @@ func takePic() (string, error) {
 	return name, err
 }
 
-func CaptureFrame(buff *bytes.Buffer) error {
+func CaptureFrame() (*bytes.Buffer, error) {
 	logrus.Info("Taking picture..")
 
 	plantID, err := kv.GetString("plant")
 	if err != nil {
 		logrus.Errorf("kv.GetString(plant) in captureHandler %q", err)
-		return err
+		return nil, err
 	}
 
 	plant := appbackend.Plant{}
 	if err := api.LoadSGLObject(fmt.Sprintf("https://api2.supergreenlab.com/plant/%s/", plantID), &plant); err != nil {
 		logrus.Errorf("api.LoadSGLObject(plant) in captureHandler %q", err)
-		return err
+		return nil, err
 	}
 	box := appbackend.Box{}
 	if err := api.LoadSGLObject(fmt.Sprintf("https://api2.supergreenlab.com/box/%s/", plant.BoxID), &box); err != nil {
 		logrus.Errorf("api.LoadSGLObject(box) in captureHandler %q", err)
-		return err
+		return nil, err
 	}
 	var device *appbackend.Device = nil
 	if box.DeviceID.Valid == true {
 		device = &appbackend.Device{}
 		if err := api.LoadSGLObject(fmt.Sprintf("https://api2.supergreenlab.com/device/%s/", box.DeviceID.UUID), device); err != nil {
 			logrus.Errorf("api.LoadSGLObject(device) in captureHandler %q", err)
-			return err
+			return nil, err
 		}
 	}
 
 	cam, err := takePic()
 	if err != nil {
 		logrus.Errorf("takePic in captureHandler %q", err)
-		return err
+		return nil, err
 	}
 
 	reader, err := os.Open(cam)
 	if err != nil {
 		logrus.Errorf("os.Open in captureHandler %q", err)
-		return err
+		return nil, err
 	}
 	defer reader.Close()
 
 	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
 	if err != nil {
 		logrus.Errorf("image.Decode in captureHandler %q", err)
-		return err
+		return nil, err
 	}
 	var resized image.Image
 	if img.Bounds().Max.X > img.Bounds().Max.Y {
@@ -102,17 +102,18 @@ func CaptureFrame(buff *bytes.Buffer) error {
 		resized = imaging.Resize(img, 0, 1250, imaging.Lanczos)
 	}
 
+	buff := new(bytes.Buffer)
 	err = jpeg.Encode(buff, resized, &jpeg.Options{Quality: 80})
 	if err != nil {
 		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
-		return err
+		return nil, err
 	}
 
 	buff, err = appbackend.AddSGLOverlays(box, plant, device, buff)
 	if err != nil {
 		logrus.Errorf("addSGLOverlays in captureHandler %q - device: %+v", err, device)
-		return err
+		return nil, err
 	}
 
-	return nil
+	return buff, nil
 }
