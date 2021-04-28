@@ -53,5 +53,11 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-  }
+  },
+
+  env: {
+    API_URL: process.env.API_URL || 'http://192.168.1.87:8080',
+    RPI_URL: process.env.RPI_URL || 'http://192.168.1.26:8081',
+    LIVEVIEW_URL: process.env.LIVEVIEW_URL || 'http://192.168.1.26:8082',
+  },
 }

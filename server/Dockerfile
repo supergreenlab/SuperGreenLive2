@@ -8,7 +8,6 @@ COPY ca-certificates.crt /etc/ssl/certs/
 COPY bin/liveserver /
 COPY db /db
 
-EXPOSE 8080
 EXPOSE 8081
 
 ENTRYPOINT ["/liveserver"]

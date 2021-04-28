@@ -59,19 +59,19 @@ func CaptureFrame() (*bytes.Buffer, error) {
 	}
 
 	plant := appbackend.Plant{}
-	if err := api.LoadSGLObject(fmt.Sprintf("https://api2.supergreenlab.com/plant/%s/", plantID), &plant); err != nil {
+	if err := api.LoadSGLObject(fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
 		logrus.Errorf("api.LoadSGLObject(plant) in captureHandler %q", err)
 		return nil, err
 	}
 	box := appbackend.Box{}
-	if err := api.LoadSGLObject(fmt.Sprintf("https://api2.supergreenlab.com/box/%s/", plant.BoxID), &box); err != nil {
+	if err := api.LoadSGLObject(fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
 		logrus.Errorf("api.LoadSGLObject(box) in captureHandler %q", err)
 		return nil, err
 	}
 	var device *appbackend.Device = nil
 	if box.DeviceID.Valid == true {
 		device = &appbackend.Device{}
-		if err := api.LoadSGLObject(fmt.Sprintf("https://api2.supergreenlab.com/device/%s/", box.DeviceID.UUID), device); err != nil {
+		if err := api.LoadSGLObject(fmt.Sprintf("/device/%s/", box.DeviceID.UUID), device); err != nil {
 			logrus.Errorf("api.LoadSGLObject(device) in captureHandler %q", err)
 			return nil, err
 		}

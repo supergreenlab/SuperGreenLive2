@@ -40,6 +40,6 @@ func Start() {
 	router.POST("/timelapse", timelapseHandler)
 
 	go func() {
-		log.Fatal(http.ListenAndServe(":8080", cors.AllowAll().Handler(router)))
+		log.Fatal(http.ListenAndServe(":8081", cors.AllowAll().Handler(router)))
 	}()
 }

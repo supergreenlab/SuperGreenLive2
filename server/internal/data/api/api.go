@@ -25,9 +25,21 @@ import (
 	"time"
 
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
+var (
+	_ = pflag.String("apiurl", "http://192.168.1.87:8080", "SGL Backend api url")
+)
+
+func init() {
+	viper.SetDefault("ApiUrl", "http://192.168.1.87:8080")
+}
+
 func LoadSGLObject(url string, obj interface{}) error {
+	url = fmt.Sprintf("%s/%s", viper.GetString("ApiUrl"), url)
+
 	token, err := kv.GetString("token")
 	if err != nil {
 		return err

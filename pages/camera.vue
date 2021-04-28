@@ -35,8 +35,8 @@
 <script>
 import axios from 'axios'
 
-const RPI_URL='http://192.168.1.26:8080'
-const LIVEVIEW_URL='http://192.168.1.26:8081'
+const RPI_URL=process.env.RPI_URL
+const LIVEVIEW_URL=process.env.LIVEVIEW_URL
 
 export default {
   data() {

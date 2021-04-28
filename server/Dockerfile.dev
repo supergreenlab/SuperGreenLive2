@@ -12,6 +12,6 @@ RUN go get -u github.com/cosmtrek/air
 RUN mkdir /app
 WORKDIR /app
 
-EXPOSE 8080
+EXPOSE 8081
 
 ENTRYPOINT ["/go/bin/air"]

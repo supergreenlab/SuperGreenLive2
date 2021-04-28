@@ -29,18 +29,20 @@
 </template>
 
 <script>
+const RPI_URL=process.env.RPI_URL
+
 export default {
   data() {
     return {
       n: 0,
-      srcs: [null, 'http://192.168.1.26:8080/capture'],
+      srcs: [null, `${RPI_URL}/capture`],
     }
   },
   mounted() {
     this.interval = setInterval(() => {
       this.$data.srcs = [
         this.$data.srcs[1],
-        `http://192.168.1.26:8080/capture?rand=${new Date().getTime()}`
+        `${RPI_URL}/capture?rand=${new Date().getTime()}`
       ]
     }, 20000)
   },

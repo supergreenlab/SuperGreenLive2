@@ -49,8 +49,8 @@ import Loading from '~/components/loading.vue'
 import Checkbox from '~/components/checkbox.vue'
 import Plant from '~/components/plant.vue'
 
-const API_URL='https://api2.supergreenlab.com'
-const RPI_URL='http://192.168.1.26:8080'
+const API_URL=process.env.API_URL
+const RPI_URL=process.env.RPI_URL
 
 export default {
   components: {Loading, Checkbox, Plant,},

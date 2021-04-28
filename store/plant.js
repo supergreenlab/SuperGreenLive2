@@ -23,7 +23,7 @@ import axios from 'axios'
 import { loadFromStorage, saveToStorage } from '~/lib/client-side.js'
 
 const STORAGE_ITEM='plant'
-const API_URL='https://api2.supergreenlab.com'
+const API_URL=process.env.API_URL
 
 export const state = () => {
   let defaults = {
