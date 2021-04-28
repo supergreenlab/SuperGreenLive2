@@ -19,26 +19,34 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"time"
 
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
 
 var (
 	_ = pflag.String("apiurl", "http://192.168.1.87:8080", "SGL Backend api url")
+	_ = pflag.String("storageurl", "http://192.168.1.87:9000", "SGL Backend storage url")
+	_ = pflag.String("storagehost", "minio:9000", "SGL Backend storage host name")
 )
 
 func init() {
 	viper.SetDefault("ApiUrl", "http://192.168.1.87:8080")
+	viper.SetDefault("StorageUrl", "http://192.168.1.87:9000")
+	viper.SetDefault("StorageHost", "minio:9000")
 }
 
 func GETSGLObject(url string, obj interface{}) error {
-	url = fmt.Sprintf("%s/%s", viper.GetString("ApiUrl"), url)
+	url = fmt.Sprintf("%s%s", viper.GetString("ApiUrl"), url)
 
 	token, err := kv.GetString("token")
 	if err != nil {
@@ -70,7 +78,7 @@ func GETSGLObject(url string, obj interface{}) error {
 }
 
 func POSTSGLObject(url string, obj interface{}, respObj interface{}) error {
-	url = fmt.Sprintf("%s/%s", viper.GetString("ApiUrl"), url)
+	url = fmt.Sprintf("%s%s", viper.GetString("ApiUrl"), url)
 
 	token, err := kv.GetString("token")
 	if err != nil {
@@ -82,11 +90,17 @@ func POSTSGLObject(url string, obj interface{}, respObj interface{}) error {
 		Timeout: timeout,
 	}
 
-	request, err := http.NewRequest("POST", url, nil)
+	jsonStr, err := json.Marshal(obj)
+	if err != nil {
+		return err
+	}
+
+	request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return err
 	}
 	request.Header.Set("Authentication", fmt.Sprintf("Bearer %s", token))
+	request.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.Do(request)
 	if err != nil {
@@ -94,9 +108,42 @@ func POSTSGLObject(url string, obj interface{}, respObj interface{}) error {
 	}
 	defer resp.Body.Close()
 
-	decoder := json.NewDecoder(resp.Body)
-	if err := decoder.Decode(obj); err != nil {
+	if respObj != nil {
+		decoder := json.NewDecoder(resp.Body)
+		if err := decoder.Decode(respObj); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func UploadSGLObject(url string, obj io.Reader, length int64) error {
+	url = fmt.Sprintf("%s%s", viper.GetString("StorageUrl"), url)
+
+	timeout := time.Duration(60 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+
+	request, err := http.NewRequest("PUT", url, obj)
+	if err != nil {
 		return err
 	}
+	request.Host = viper.GetString("StorageHost")
+	request.ContentLength = length
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	content, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		logrus.Errorf("%q", err)
+		return err
+	}
+	logrus.Info(string(content))
+
 	return nil
 }

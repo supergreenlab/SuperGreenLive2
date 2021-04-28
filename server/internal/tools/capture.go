@@ -36,7 +36,7 @@ import (
 // TODO temporary
 var rotate = false
 
-func takePic() (string, error) {
+func TakePic() (string, error) {
 	var cmd *exec.Cmd
 	name := "/tmp/cam.jpg"
 	if rotate {
@@ -59,25 +59,25 @@ func CaptureFrame() (*bytes.Buffer, error) {
 	}
 
 	plant := appbackend.Plant{}
-	if err := api.LoadSGLObject(fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
-		logrus.Errorf("api.LoadSGLObject(plant) in captureHandler %q", err)
+	if err := api.GETSGLObject(fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
+		logrus.Errorf("api.GETSGLObject(plant) in captureHandler %q", err)
 		return nil, err
 	}
 	box := appbackend.Box{}
-	if err := api.LoadSGLObject(fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
-		logrus.Errorf("api.LoadSGLObject(box) in captureHandler %q", err)
+	if err := api.GETSGLObject(fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
+		logrus.Errorf("api.GETSGLObject(box) in captureHandler %q", err)
 		return nil, err
 	}
 	var device *appbackend.Device = nil
 	if box.DeviceID.Valid == true {
 		device = &appbackend.Device{}
-		if err := api.LoadSGLObject(fmt.Sprintf("/device/%s/", box.DeviceID.UUID), device); err != nil {
-			logrus.Errorf("api.LoadSGLObject(device) in captureHandler %q", err)
+		if err := api.GETSGLObject(fmt.Sprintf("/device/%s/", box.DeviceID.UUID), device); err != nil {
+			logrus.Errorf("api.GETSGLObject(device) in captureHandler %q", err)
 			return nil, err
 		}
 	}
 
-	cam, err := takePic()
+	cam, err := TakePic()
 	if err != nil {
 		logrus.Errorf("takePic in captureHandler %q", err)
 		return nil, err

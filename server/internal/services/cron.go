@@ -19,11 +19,15 @@
 package services
 
 import (
+	"os"
+	"strings"
 	"sync"
 
+	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/api"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
+	"github.com/gofrs/uuid"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 )
@@ -34,13 +38,66 @@ var (
 	timelapseEntryIDMutex sync.Mutex
 )
 
+type timelapseUploadURLRequest struct{}
+
+type timelapseUploadURLResult struct {
+	UploadPath string `json:"uploadPath"`
+}
+
 func captureTimelapse() {
-	if _, err := tools.CaptureFrame(); err != nil {
-		logrus.Errorf("tools.CaptureFrame in captureTimelapse %q", err)
+	resp := timelapseUploadURLResult{}
+	if err := api.POSTSGLObject("/timelapseUploadURL", &timelapseUploadURLRequest{}, &resp); err != nil {
+		logrus.Errorf("api.POSTSGLObject in captureTimelapse %q", err)
 		return
 	}
 
-	api.LoadSGLObject("/timelapseUploadURL")
+	cam, err := tools.TakePic()
+	if err != nil {
+		logrus.Errorf("takePic in captureTimelapse %q", err)
+		return
+	}
+	reader, err := os.Open(cam)
+	if err != nil {
+		logrus.Errorf("os.Open in captureTimelapse %q", err)
+		return
+	}
+	defer reader.Close()
+
+	fi, err := reader.Stat()
+	if err != nil {
+		logrus.Errorf("reader.Stat in captureTimelapse %q", err)
+		return
+	}
+
+	err = api.UploadSGLObject(resp.UploadPath, reader, fi.Size())
+	if err != nil {
+		logrus.Errorf("api.UploadSGLObject in captureTimelapse %q", err)
+		return
+	}
+
+	timelapseID, err := kv.GetString("timelapseid")
+	if err != nil {
+		logrus.Errorf("kv.GetString in captureTimelapse %q", err)
+		return
+	}
+
+	timelapseIDUUID, err := uuid.FromString(timelapseID)
+	if err != nil {
+		logrus.Errorf("uuid.FromString in captureTimelapse %q", err)
+		return
+	}
+
+	uploadPath := strings.Split(resp.UploadPath, "?")
+	frame := appbackend.TimelapseFrame{
+		TimelapseID: timelapseIDUUID,
+		FilePath:    uploadPath[0],
+		Meta:        "{}",
+	}
+
+	if err := api.POSTSGLObject("/timelapseframe", &frame, nil); err != nil {
+		logrus.Errorf("api.POSTSGLObject in captureTimelapse %q", err)
+		return
+	}
 }
 
 func ScheduleTimelapse() {
