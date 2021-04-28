@@ -21,6 +21,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -144,7 +145,9 @@ func UploadSGLObject(url string, obj io.Reader, length int64) error {
 		return err
 	}
 	if len(content) != 0 {
-		logrus.Info(string(content))
+		err := errors.New(string(content))
+		logrus.Errorf("Upload error: %q", err)
+		return err
 	}
 
 	return nil
