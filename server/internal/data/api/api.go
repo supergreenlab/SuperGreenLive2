@@ -143,7 +143,9 @@ func UploadSGLObject(url string, obj io.Reader, length int64) error {
 		logrus.Errorf("%q", err)
 		return err
 	}
-	logrus.Info(string(content))
+	if len(content) != 0 {
+		logrus.Info(string(content))
+	}
 
 	return nil
 }
