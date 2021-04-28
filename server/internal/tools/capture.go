@@ -52,7 +52,7 @@ func takePic() (string, error) {
 func CaptureFrame() (*bytes.Buffer, error) {
 	logrus.Info("Taking picture..")
 
-	plantID, err := kv.GetString("plant")
+	plantID, err := kv.GetString("plantid")
 	if err != nil {
 		logrus.Errorf("kv.GetString(plant) in captureHandler %q", err)
 		return nil, err

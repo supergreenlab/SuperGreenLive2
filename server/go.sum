@@ -43,10 +43,8 @@ github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAE
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/SuperGreenLab/AppBackend v0.0.0-20191104062411-4acc649ec8a7/go.mod h1:8jIpM3UisVX7hdiJDg7B/sbzxyEak/Qadcwu08pCHDE=
-github.com/SuperGreenLab/AppBackend v0.0.0-20210426125052-e8ef950afaa3 h1:zsU0iHY4JvpCaNdFeRn9pffKbwCrs1m+ySCLoAu/tJI=
-github.com/SuperGreenLab/AppBackend v0.0.0-20210426125052-e8ef950afaa3/go.mod h1:O8+BZ04sqesBvrsnqcJsI5RJUVaBI5QF23+0mnjzsv8=
-github.com/SuperGreenLab/AppBackend v0.0.0-20210426142839-978953cb8ae3 h1:b4P744teH+rBDNC6TZDiKepHvtAuNUDLZXjHkZDkt74=
-github.com/SuperGreenLab/AppBackend v0.0.0-20210426142839-978953cb8ae3/go.mod h1:O8+BZ04sqesBvrsnqcJsI5RJUVaBI5QF23+0mnjzsv8=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210428082801-06ed9f6e7f6d h1:pdKAg3VxXV7D4M97/egLizwra3cUFsjYVbgyyNrNDwo=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210428082801-06ed9f6e7f6d/go.mod h1:O8+BZ04sqesBvrsnqcJsI5RJUVaBI5QF23+0mnjzsv8=
 github.com/SuperGreenLab/MQTTParser v0.0.0-20191104062431-b1a07e40799f/go.mod h1:dY4OnrIAKXfkbabBB0YGrIx6G9xEU48xozlh5F/4jzU=
 github.com/SuperGreenLab/WebBackend v0.0.0-20191105152239-1a7c2c8088bd/go.mod h1:OsPCYvtFJjlC0gr9zurJli656V6DPAUtm0aXw/j01GA=
 github.com/SuperGreenLab/towelie v0.0.0-20191104062451-32fa3d7ca317/go.mod h1:Bk0zINBVFx+ww9OBoUKMdBRkA3gnHyWSeNgIhDUuPxA=
@@ -443,7 +441,6 @@ github.com/remyoudompheng/bigfft v0.0.0-20170806203942-52369c62f446/go.mod h1:uY
 github.com/remyoudompheng/bigfft v0.0.0-20190512091148-babf20351dd7/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/remyoudompheng/bigfft v0.0.0-20190728182440-6a916e37a237/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
 github.com/rileyr/middleware v0.0.0-20171218202914-adaf4755ca16/go.mod h1:Ayl9/c8KCagmuQHrWR3bpcReY4j1C1TepK1rGAZsGIw=
-github.com/robfig/cron v1.2.0 h1:ZjScXvvxeQ63Dbyxy76Fj3AT3Ut0aKsyd2/tl3DTMuQ=
 github.com/robfig/cron/v3 v3.0.1 h1:WdRxkvbJztn8LMz/QEvLN5sBU+xKpSqwwUO1Pjr4qDs=
 github.com/robfig/cron/v3 v3.0.1/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=

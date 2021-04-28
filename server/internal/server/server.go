@@ -36,7 +36,6 @@ func Start() {
 	router.GET("/capture", captureHandler)
 
 	router.POST("/token", tokenHandler)
-	router.POST("/plant", plantHandler)
 	router.POST("/timelapse", timelapseHandler)
 
 	go func() {

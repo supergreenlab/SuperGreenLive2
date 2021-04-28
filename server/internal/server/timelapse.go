@@ -30,7 +30,9 @@ import (
 )
 
 type TimelapseData struct {
-	Cron string `json:"cron"`
+	ID      string `json:id`
+	PlantID string `json:plantID`
+	Cron    string `json:"cron"`
 }
 
 func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -38,6 +40,18 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&td); err != nil {
 		logrus.Errorf("json.Unmarshal in timelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := kv.SetString("timelapseid", td.ID); err != nil {
+		logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := kv.SetString("plantid", td.PlantID); err != nil {
+		logrus.Errorf("kv.SetString in timelapseHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

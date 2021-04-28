@@ -3,7 +3,7 @@ module github.com/SuperGreenLab/SuperGreenLivePI2/server
 go 1.15
 
 require (
-	github.com/SuperGreenLab/AppBackend v0.0.0-20210426142839-978953cb8ae3
+	github.com/SuperGreenLab/AppBackend v0.0.0-20210428082801-06ed9f6e7f6d
 	github.com/disintegration/imaging v1.6.2
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/robfig/cron/v3 v3.0.1
