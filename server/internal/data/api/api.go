@@ -37,7 +37,7 @@ func init() {
 	viper.SetDefault("ApiUrl", "http://192.168.1.87:8080")
 }
 
-func LoadSGLObject(url string, obj interface{}) error {
+func GETSGLObject(url string, obj interface{}) error {
 	url = fmt.Sprintf("%s/%s", viper.GetString("ApiUrl"), url)
 
 	token, err := kv.GetString("token")
@@ -51,6 +51,38 @@ func LoadSGLObject(url string, obj interface{}) error {
 	}
 
 	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	request.Header.Set("Authentication", fmt.Sprintf("Bearer %s", token))
+
+	resp, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(obj); err != nil {
+		return err
+	}
+	return nil
+}
+
+func POSTSGLObject(url string, obj interface{}, respObj interface{}) error {
+	url = fmt.Sprintf("%s/%s", viper.GetString("ApiUrl"), url)
+
+	token, err := kv.GetString("token")
+	if err != nil {
+		return err
+	}
+
+	timeout := time.Duration(5 * time.Second)
+	client := http.Client{
+		Timeout: timeout,
+	}
+
+	request, err := http.NewRequest("POST", url, nil)
 	if err != nil {
 		return err
 	}

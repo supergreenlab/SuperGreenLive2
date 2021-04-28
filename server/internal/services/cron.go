@@ -21,6 +21,7 @@ package services
 import (
 	"sync"
 
+	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/api"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
 	"github.com/robfig/cron/v3"
@@ -38,6 +39,8 @@ func captureTimelapse() {
 		logrus.Errorf("tools.CaptureFrame in captureTimelapse %q", err)
 		return
 	}
+
+	api.LoadSGLObject("/timelapseUploadURL")
 }
 
 func ScheduleTimelapse() {

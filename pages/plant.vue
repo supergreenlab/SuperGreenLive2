@@ -90,9 +90,16 @@ export default {
     async nextHandler() {
       this.$store.commit('plant/setPlant', this.$data.selectedPlant)
       const token = this.$store.state.auth.token
-      await axios.post(`${RPI_URL}/plant`, {
-        id: this.$data.selectedPlant.id,
+      const { data: { id } } = await axios.post(`${API_URL}/timelapse`, {
+        plantID: this.$data.selectedPlant.id,
+        type: 'sglstorage',
+        settings: JSON.stringify({}),
       }, { headers: {Authorization: `Bearer ${token}`}})
+      await axios.post(`${RPI_URL}/timelapse`, {
+        id,
+        plantID: this.$data.selectedPlant.id,
+        cron: '@every 10m',
+      })
 
       this.$router.push('/camera')
     },
