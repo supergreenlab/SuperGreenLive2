@@ -20,7 +20,7 @@
   <section :id='$style.container'>
     <div :id='$style.body'>
       <div :id='$style.header'>
-        <h1>PLANTS ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
+        <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
         <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link></div>
       <Plant :plant='plant' />
       <div :id='$style.capture'><div v-for='src in srcs' v-if='src' :key='src' :style='{"background-image": `url(${src})`}'></div></div>

@@ -19,6 +19,9 @@
 package services
 
 import (
+	"bytes"
+	"image"
+	"image/jpeg"
 	"os"
 	"strings"
 	"sync"
@@ -27,6 +30,7 @@ import (
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/api"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
+	"github.com/disintegration/imaging"
 	"github.com/gofrs/uuid"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
@@ -63,13 +67,27 @@ func captureTimelapse() {
 	}
 	defer reader.Close()
 
-	fi, err := reader.Stat()
+	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
 	if err != nil {
-		logrus.Errorf("reader.Stat in captureTimelapse %q", err)
+		logrus.Errorf("image.Decode in captureHandler %q", err)
 		return
 	}
 
-	err = api.UploadSGLObject(resp.UploadPath, reader, fi.Size())
+	var resized image.Image
+	if img.Bounds().Max.X > img.Bounds().Max.Y {
+		resized = imaging.Resize(img, 1250, 0, imaging.Lanczos)
+	} else {
+		resized = imaging.Resize(img, 0, 1250, imaging.Lanczos)
+	}
+
+	buff := new(bytes.Buffer)
+	err = jpeg.Encode(buff, resized, &jpeg.Options{Quality: 80})
+	if err != nil {
+		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
+		return
+	}
+
+	err = api.UploadSGLObject(resp.UploadPath, bytes.NewReader(buff.Bytes()), int64(buff.Len()))
 	if err != nil {
 		logrus.Errorf("api.UploadSGLObject in captureTimelapse %q", err)
 		return
@@ -87,10 +105,10 @@ func captureTimelapse() {
 		return
 	}
 
-	uploadPath := strings.Split(resp.UploadPath, "?")
+	uploadPath := strings.Split(resp.UploadPath, "/")
 	frame := appbackend.TimelapseFrame{
 		TimelapseID: timelapseIDUUID,
-		FilePath:    uploadPath[0],
+		FilePath:    uploadPath[2],
 		Meta:        "{}",
 	}
 
