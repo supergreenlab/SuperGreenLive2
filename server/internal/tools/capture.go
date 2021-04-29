@@ -37,6 +37,8 @@ import (
 var rotate = false
 
 func TakePic() (string, error) {
+	logrus.Info("Taking picture..")
+
 	var cmd *exec.Cmd
 	name := "/tmp/cam.jpg"
 	if rotate {
@@ -50,8 +52,6 @@ func TakePic() (string, error) {
 }
 
 func CaptureFrame() (*bytes.Buffer, error) {
-	logrus.Info("Taking picture..")
-
 	plantID, err := kv.GetString("plantid")
 	if err != nil {
 		logrus.Errorf("kv.GetString(plant) in captureHandler %q", err)
