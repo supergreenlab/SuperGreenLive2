@@ -30,9 +30,9 @@ import (
 )
 
 type TimelapseData struct {
-	ID      string `json:id`
-	PlantID string `json:plantID`
-	Cron    string `json:"cron"`
+	ID      *string `json:"id,omitempty"`
+	PlantID *string `json:"plantID,omitempty"`
+	Cron    *string `json:"cron,omitempty"`
 }
 
 func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -44,22 +44,28 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 		return
 	}
 
-	if err := kv.SetString("timelapseid", td.ID); err != nil {
-		logrus.Errorf("kv.SetString in timelapseHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if td.ID != nil {
+		if err := kv.SetString("timelapseid", *td.ID); err != nil {
+			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
-	if err := kv.SetString("plantid", td.PlantID); err != nil {
-		logrus.Errorf("kv.SetString in timelapseHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if td.PlantID != nil {
+		if err := kv.SetString("plantid", *td.PlantID); err != nil {
+			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
-	if err := kv.SetString("cron", td.Cron); err != nil {
-		logrus.Errorf("kv.SetString in timelapseHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if td.Cron != nil {
+		if err := kv.SetString("cron", *td.Cron); err != nil {
+			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	services.ScheduleTimelapse()
