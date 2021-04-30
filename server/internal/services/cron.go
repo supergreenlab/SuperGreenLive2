@@ -106,9 +106,10 @@ func captureTimelapse() {
 	}
 
 	uploadPath := strings.Split(resp.UploadPath, "/")
+	uploadPath = strings.Split(uploadPath[2], "?")
 	frame := appbackend.TimelapseFrame{
 		TimelapseID: timelapseIDUUID,
-		FilePath:    uploadPath[2],
+		FilePath:    uploadPath[0],
 		Meta:        "{}",
 	}
 

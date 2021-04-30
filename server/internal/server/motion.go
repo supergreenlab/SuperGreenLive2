@@ -38,6 +38,7 @@ func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 	}
 	cmd = exec.Command("/usr/bin/motion")
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
 		logrus.Errorf("cmd.Start in startMotionHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
