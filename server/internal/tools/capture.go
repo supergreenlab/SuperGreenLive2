@@ -26,7 +26,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
@@ -45,16 +44,13 @@ type DeviceParamsResult struct {
 
 func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedBox, error) {
 	deviceParams := DeviceParamsResult{}
-	keys := []string{}
-	for i := 0; i < 6; i += 1 {
-		keys = append(keys, fmt.Sprintf("params=LED_%d_BOX"))
-	}
-	if err := api.GETSGLObject(fmt.Sprintf("/device/%s/params?", box.DeviceID.UUID, strings.Join(keys, "&")), &deviceParams); err != nil {
+	if err := api.GETSGLObject(fmt.Sprintf("/device/%s/params?params=LED_*_BOX", box.DeviceID.UUID.String()), &deviceParams); err != nil {
 		logrus.Errorf("api.GETSGLObject(device/params) in captureHandler %q", err)
 		return nil, err
 	}
+	logrus.Infof("%+v", deviceParams)
 	return func(i int) (int, error) {
-		v := deviceParams.Params[fmt.Sprintf("%s.KV.LED_%d_BOX", box.DeviceID.UUID, i)].(string)
+		v := deviceParams.Params[fmt.Sprintf("%s.KV.LED_%d_BOX", box.DeviceID.UUID.String(), i)].(string)
 		return strconv.Atoi(v)
 	}, nil
 }

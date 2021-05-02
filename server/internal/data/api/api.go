@@ -53,6 +53,7 @@ func GETSGLObject(url string, obj interface{}) error {
 	if err != nil {
 		return err
 	}
+	logrus.Infof("%s %s", url, token)
 
 	timeout := time.Duration(5 * time.Second)
 	client := http.Client{
