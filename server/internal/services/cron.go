@@ -142,7 +142,7 @@ func captureTimelapse() {
 		to := t
 		meta := appbackend.LoadMetricsMeta(device, box, from, to, appbackend.LoadGraphValue, getLedBox)
 		if j, err := json.Marshal(meta); err != nil {
-			logrus.Errorf("json.Marshal in captureTimelapse %q", err)
+			logrus.Errorf("json.Marshal in captureHandler %q", err)
 			metaStr = "{}"
 		} else {
 			metaStr = string(j)
