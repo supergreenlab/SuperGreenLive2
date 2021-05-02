@@ -49,7 +49,7 @@ func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedB
 	for i := 0; i < 6; i += 1 {
 		keys = append(keys, fmt.Sprintf("params=LED_%d_BOX"))
 	}
-	if err := api.GETSGLObject(fmt.Sprintf("/device/%s/params?", box.DeviceID.UUID, strings.Join(keys, "&")), &device); err != nil {
+	if err := api.GETSGLObject(fmt.Sprintf("/device/%s/params?", box.DeviceID.UUID, strings.Join(keys, "&")), &deviceParams); err != nil {
 		logrus.Errorf("api.GETSGLObject(device/params) in captureHandler %q", err)
 		return nil, err
 	}
