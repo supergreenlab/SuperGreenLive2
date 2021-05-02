@@ -20,6 +20,7 @@ package tools
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"image"
 	"image/jpeg"
@@ -39,7 +40,7 @@ import (
 var rotate = false
 
 type DeviceParamsResult struct {
-	Params map[string]interface{}
+	Params map[string]interface{} `json:"params"`
 }
 
 func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedBox, error) {
@@ -48,9 +49,12 @@ func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedB
 		logrus.Errorf("api.GETSGLObject(device/params) in captureHandler %q", err)
 		return nil, err
 	}
-	logrus.Infof("%+v", deviceParams)
 	return func(i int) (int, error) {
-		v := deviceParams.Params[fmt.Sprintf("%s.KV.LED_%d_BOX", box.DeviceID.UUID.String(), i)].(string)
+		k := fmt.Sprintf("%s.KV.LED_%d_BOX", device.Identifier, i)
+		v, ok := deviceParams.Params[k].(string)
+		if !ok {
+			return 0, errors.New(fmt.Sprintf("Key %s not found", k))
+		}
 		return strconv.Atoi(v)
 	}, nil
 }
