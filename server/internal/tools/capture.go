@@ -25,6 +25,7 @@ import (
 	"image/jpeg"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -39,7 +40,7 @@ import (
 var rotate = false
 
 type DeviceParamsResult struct {
-	Params map[string]int
+	Params map[string]interface{}
 }
 
 func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedBox, error) {
@@ -53,7 +54,8 @@ func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedB
 		return nil, err
 	}
 	return func(i int) (int, error) {
-		return deviceParams.Params[fmt.Sprintf("%s.KV.LED_%d_BOX", box.DeviceID.UUID, i)], nil
+		v := deviceParams.Params[fmt.Sprintf("%s.KV.LED_%d_BOX", box.DeviceID.UUID, i)].(string)
+		return strconv.Atoi(v)
 	}, nil
 }
 
