@@ -20,11 +20,14 @@ package services
 
 import (
 	"bytes"
+	"encoding/json"
+	"fmt"
 	"image"
 	"image/jpeg"
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/api"
@@ -51,7 +54,7 @@ type timelapseUploadURLResult struct {
 func captureTimelapse() {
 	resp := timelapseUploadURLResult{}
 	if err := api.POSTSGLObject("/timelapseUploadURL", &timelapseUploadURLRequest{}, &resp); err != nil {
-		logrus.Errorf("api.POSTSGLObject in captureTimelapse %q", err)
+		logrus.Errorf("api.POSTSGLObject(timelapseUploadURL) in captureTimelapse %q", err)
 		return
 	}
 
@@ -105,16 +108,57 @@ func captureTimelapse() {
 		return
 	}
 
+	plantID, err := kv.GetString("plantid")
+	if err != nil {
+		logrus.Errorf("kv.GetString(plant) in captureHandler %q", err)
+		return
+	}
+
+	plant := appbackend.Plant{}
+	if err := api.GETSGLObject(fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
+		logrus.Errorf("api.GETSGLObject(plant) in captureHandler %q", err)
+		return
+	}
+	box := appbackend.Box{}
+	if err := api.GETSGLObject(fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
+		logrus.Errorf("api.GETSGLObject(box) in captureHandler %q", err)
+		return
+	}
+	metaStr := "{}"
+	if box.DeviceID.Valid == true {
+		device := appbackend.Device{}
+		if err := api.GETSGLObject(fmt.Sprintf("/device/%s/", box.DeviceID.UUID), &device); err != nil {
+			logrus.Errorf("api.GETSGLObject(device) in captureHandler %q", err)
+			return
+		}
+
+		getLedBox, err := tools.GetLedBox(box, device)
+		if err != nil {
+			logrus.Errorf("tools.GetLedBox in captureHandler %q", err)
+			return
+		}
+		t := time.Now()
+		from := t.Add(-24 * time.Hour)
+		to := t
+		meta := appbackend.LoadMetricsMeta(device, box, from, to, appbackend.LoadGraphValue, getLedBox)
+		if j, err := json.Marshal(meta); err != nil {
+			logrus.Errorf("json.Marshal in captureTimelapse %q", err)
+			metaStr = "{}"
+		} else {
+			metaStr = string(j)
+		}
+	}
+
 	uploadPath := strings.Split(resp.UploadPath, "/")
 	uploadPath = strings.Split(uploadPath[2], "?")
 	frame := appbackend.TimelapseFrame{
 		TimelapseID: timelapseIDUUID,
 		FilePath:    uploadPath[0],
-		Meta:        "{}",
+		Meta:        metaStr,
 	}
 
 	if err := api.POSTSGLObject("/timelapseframe", &frame, nil); err != nil {
-		logrus.Errorf("api.POSTSGLObject in captureTimelapse %q", err)
+		logrus.Errorf("api.POSTSGLObject(timelapseframe) in captureTimelapse %q", err)
 		return
 	}
 }

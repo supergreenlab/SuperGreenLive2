@@ -25,6 +25,8 @@ import (
 	"image/jpeg"
 	"os"
 	"os/exec"
+	"strings"
+	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/api"
@@ -35,6 +37,25 @@ import (
 
 // TODO temporary
 var rotate = false
+
+type DeviceParamsResult struct {
+	Params map[string]int
+}
+
+func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedBox, error) {
+	deviceParams := DeviceParamsResult{}
+	keys := []string{}
+	for i := 0; i < 6; i += 1 {
+		keys = append(keys, fmt.Sprintf("params=LED_%d_BOX"))
+	}
+	if err := api.GETSGLObject(fmt.Sprintf("/device/%s/params?", box.DeviceID.UUID, strings.Join(keys, "&")), &device); err != nil {
+		logrus.Errorf("api.GETSGLObject(device/params) in captureHandler %q", err)
+		return nil, err
+	}
+	return func(i int) (int, error) {
+		return deviceParams.Params[fmt.Sprintf("%s.KV.LED_%d_BOX", box.DeviceID.UUID, i)], nil
+	}, nil
+}
 
 func TakePic() (string, error) {
 	logrus.Info("Taking picture..")
@@ -109,7 +130,22 @@ func CaptureFrame() (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	buff, err = appbackend.AddSGLOverlays(box, plant, device, buff)
+	var meta *appbackend.MetricsMeta
+	if device != nil {
+		getLedBox, err := GetLedBox(box, *device)
+		if err != nil {
+			logrus.Errorf("tools.GetLedBox in captureHandler %q", err)
+			return nil, err
+		}
+
+		t := time.Now()
+		from := t.Add(-24 * time.Hour)
+		to := t
+		m := appbackend.LoadMetricsMeta(*device, box, from, to, appbackend.LoadGraphValue, getLedBox)
+		meta = &m
+	}
+
+	buff, err = appbackend.AddSGLOverlays(box, plant, meta, buff)
 	if err != nil {
 		logrus.Errorf("addSGLOverlays in captureHandler %q - device: %+v", err, device)
 		return nil, err
