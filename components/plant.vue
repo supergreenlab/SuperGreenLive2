@@ -32,8 +32,8 @@
       <div :class='$style.setting'>
         <img src='~/assets/icon_phase.svg' />
         <div>
-          <b>Germinated</b>: 34 days ago<br/>
-          <b>Blooming since</b>: 34 days ago
+          <b>Germinated</b>: {{ germinated }}<br/>
+          <b>{{ phase[0] }}</b>: {{ phase[1] }}
         </div>
       </div>
     </div>
@@ -42,8 +42,50 @@
 
 <script>
 
+import { DateTime, Interval } from 'luxon'
+
 export default {
   props: ['plant',],
+  computed: {
+    germinated() {
+      const { germinationDate } = this.$props.plant.settings
+      if (!germinationDate) {
+        return 'Not set'
+      }
+      const d = DateTime.fromString(germinationDate)
+      const i = Interval.fromDateTimes(d, DateTime.now())
+      return `${i.days} days ago`
+    },
+    phase() {
+      const { germinationDate, veggingStart, bloomingStart } = this.$props.plant.settings
+      if (bloomingStart) {
+        const d = DateTime.fromString(bloomingStart)
+        const i = Interval.fromDateTimes(d, DateTime.now())
+        return [
+          'Blooming since',
+          `${i.days} days ago`
+        ]
+      } else if (veggingStart) {
+        const d = DateTime.fromString(veggingStart)
+        const i = Interval.fromDateTimes(d, DateTime.now())
+        return [
+          'Vegging since',
+          `${i.days} days ago`
+        ]
+      } else if (germinationDate) {
+        const d = DateTime.fromString(germinationDate)
+        const i = Interval.fromDateTimes(d, DateTime.now())
+        return [
+          'Started',
+          `${i.days} days ago`
+        ]
+      }
+      return [
+        'Phase',
+        'Not set'
+      ]
+    }
+  },
 }
 
 </script>

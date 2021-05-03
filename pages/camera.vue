@@ -21,6 +21,10 @@
     <div :id='$style.body'>
       <h1>PLACE YOUR <span :class='$style.green'>CAMERA</span>:</h1>
       <div :id='$style.videocontainer'>
+        <div :id='$style.loading'>
+          <div><Loading label='loading live view..' /></div>
+        </div>
+
         <div :id='$style.motion'>
           <img v-if='motionStarted' :src='src' @error='imgError'/>
         </div>
@@ -130,5 +134,17 @@ export default {
 #quality
   color: #676767
   font-size: 0.8em
+
+#loading
+  position: absolute
+  display: flex
+  align-items: center
+  justify-content: center
+  z-index: -1
+
+#loading > div
+  position: relative
+  width: 100pt
+  height: 100pt
 
 </style>

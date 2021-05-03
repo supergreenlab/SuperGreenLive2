@@ -169,15 +169,15 @@ func ScheduleTimelapse() {
 		return
 	} else {
 		timelapseEntryIDMutex.Lock()
+		defer timelapseEntryIDMutex.Unlock()
 		if timelapseEntryID != nil {
 			c.Remove(*timelapseEntryID)
 		}
 		if entryID, err := c.AddFunc(cron, captureTimelapse); err != nil {
 			logrus.Errorf("c.AddFunc in ScheduleTimelapse %q", err)
-		} else {
-			timelapseEntryID = &entryID
+			return
 		}
-		timelapseEntryIDMutex.Unlock()
+		timelapseEntryID = &entryID
 	}
 }
 

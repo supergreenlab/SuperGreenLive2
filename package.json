@@ -11,10 +11,10 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.13.1",
     "core-js": "^3.9.1",
+    "luxon": "^1.26.0",
     "nuxt": "^2.15.3",
     "nuxt-client-init-module": "^0.3.0",
     "stylus": "^0.54.8",
     "stylus-loader": "^4.3.3"
-  },
-  "devDependencies": {}
+  }
 }

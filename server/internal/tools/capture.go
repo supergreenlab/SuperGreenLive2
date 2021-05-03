@@ -27,6 +27,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"sync"
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
@@ -34,6 +35,10 @@ import (
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
 	"github.com/disintegration/imaging"
 	"github.com/sirupsen/logrus"
+)
+
+var (
+	camMutex sync.Mutex
 )
 
 // TODO temporary
@@ -60,6 +65,8 @@ func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedB
 }
 
 func TakePic() (string, error) {
+	camMutex.Lock()
+	defer camMutex.Unlock()
 	logrus.Info("Taking picture..")
 
 	var cmd *exec.Cmd

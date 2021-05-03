@@ -23,12 +23,20 @@
         <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
         <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link></div>
       <Plant :plant='plant' />
-      <div :id='$style.capture'><div v-for='src in srcs' v-if='src' :key='src' :style='{"background-image": `url(${src})`}'></div></div>
+      <div :id='$style.capture'>
+        <div :id='$style.loading'>
+          <div><Loading label='Capturing pic..' /></div>
+        </div>
+        <div v-for='src in srcs' v-if='src' :key='src' :style='{"background-image": `url(${src})`}'></div>
+      </div>
     </div>
   </section>
 </template>
 
 <script>
+import axios from 'axios'
+import Loading from '~/components/loading.vue'
+
 const RPI_URL=process.env.RPI_URL
 
 export default {
@@ -39,6 +47,7 @@ export default {
     }
   },
   mounted() {
+    axios.post(`${RPI_URL}/motion/stop`) // in case the page was reloaded and motion never stopped
     this.interval = setInterval(() => {
       this.$data.srcs = [
         this.$data.srcs[1],
@@ -106,8 +115,17 @@ export default {
   bottom: 0
   left: 0
   background-position: center
-  background-repeat: center
   background-size: contain
   background-repeat: no-repeat
+
+#loading
+  display: flex
+  align-items: center
+  justify-content: center
+
+#loading > div
+  position: relative
+  width: 100pt
+  height: 100pt
 
 </style>
