@@ -52,32 +52,32 @@ export default {
       if (!germinationDate) {
         return 'Not set'
       }
-      const d = DateTime.fromString(germinationDate)
+      const d = DateTime.fromISO(germinationDate)
       const i = Interval.fromDateTimes(d, DateTime.now())
-      return `${i.days} days ago`
+      return `${Math.round(i.toDuration('days').toObject().days)} days ago`
     },
     phase() {
       const { germinationDate, veggingStart, bloomingStart } = this.$props.plant.settings
       if (bloomingStart) {
-        const d = DateTime.fromString(bloomingStart)
+        const d = DateTime.fromISO(bloomingStart)
         const i = Interval.fromDateTimes(d, DateTime.now())
         return [
           'Blooming since',
-          `${i.days} days ago`
+          `${Math.round(i.toDuration('days').toObject().days)} days ago`
         ]
       } else if (veggingStart) {
-        const d = DateTime.fromString(veggingStart)
+        const d = DateTime.fromISO(veggingStart)
         const i = Interval.fromDateTimes(d, DateTime.now())
         return [
           'Vegging since',
-          `${i.days} days ago`
+          `${Math.round(i.toDuration('days').toObject().days)} days ago`
         ]
       } else if (germinationDate) {
-        const d = DateTime.fromString(germinationDate)
+        const d = DateTime.fromISO(germinationDate)
         const i = Interval.fromDateTimes(d, DateTime.now())
         return [
           'Started',
-          `${i.days} days ago`
+          `${Math.round(i.toDuration('days').toObject().days)} days ago`
         ]
       }
       return [

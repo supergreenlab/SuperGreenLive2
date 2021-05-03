@@ -173,7 +173,8 @@ func ScheduleTimelapse() {
 		if timelapseEntryID != nil {
 			c.Remove(*timelapseEntryID)
 		}
-		if entryID, err := c.AddFunc(cron, captureTimelapse); err != nil {
+		entryID, err := c.AddFunc(cron, captureTimelapse)
+		if err != nil {
 			logrus.Errorf("c.AddFunc in ScheduleTimelapse %q", err)
 			return
 		}

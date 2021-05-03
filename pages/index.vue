@@ -21,8 +21,11 @@
     <div :id='$style.body'>
       <div :id='$style.header'>
         <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
-        <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link></div>
-      <Plant :plant='plant' />
+        <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link>
+      </div>
+      <div :id='$style.plantInfos'>
+        <Plant :plant='plant' />
+      </div>
       <div :id='$style.capture'>
         <div :id='$style.loading'>
           <div><Loading label='Capturing pic..' /></div>
@@ -82,9 +85,11 @@ export default {
   display: flex
   flex-direction: column
   margin-top: 70pt
-  padding: 0 5pt
+  padding: 0 20pt
   width: 100%
   max-width: 600pt
+  @media only screen and (max-width: 1000pt)
+    margin-top: 60pt
 
 #header
   display: flex
@@ -94,6 +99,9 @@ export default {
 #header > h1
   margin: 20pt 0
   color: #454545
+  @media only screen and (max-width: 1000pt)
+    font-size: 1.2em
+    margin: 10pt 0
 
 #change
   font-weight: 600
@@ -107,6 +115,8 @@ export default {
   position: relative
   height: 100%
   margin: 30pt 0
+  @media only screen and (max-width: 1000pt)
+    margin: 15pt 0
 
 #capture > div
   position: absolute
@@ -127,5 +137,9 @@ export default {
   position: relative
   width: 100pt
   height: 100pt
+
+#plantInfos
+  @media only screen and (max-width: 1000pt)
+    font-size: 0.8em
 
 </style>
