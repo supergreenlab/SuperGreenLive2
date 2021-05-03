@@ -41,9 +41,6 @@ var (
 	camMutex sync.Mutex
 )
 
-// TODO temporary
-var rotate = false
-
 type DeviceParamsResult struct {
 	Params map[string]interface{} `json:"params"`
 }
@@ -69,6 +66,14 @@ func TakePic() (string, error) {
 	defer camMutex.Unlock()
 	logrus.Info("Taking picture..")
 
+	rotate := false
+	rotateStr, err := kv.GetString("rotate")
+	if err != nil {
+		logrus.Errorf("kv.GetString(rotate) in captureHandler %q", err)
+	} else if rotateStr == "true" {
+		rotate = true
+	}
+
 	var cmd *exec.Cmd
 	name := "/tmp/cam.jpg"
 	if rotate {
@@ -77,7 +82,8 @@ func TakePic() (string, error) {
 		cmd = exec.Command("/usr/bin/raspistill", "-q", "50", "-o", name)
 	}
 	cmd.Stdout = os.Stdout
-	err := cmd.Run()
+	cmd.Stderr = os.Stderr
+	err = cmd.Run()
 	return name, err
 }
 
