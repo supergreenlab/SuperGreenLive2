@@ -1,6 +1,6 @@
 module github.com/SuperGreenLab/SuperGreenLivePI2/server
 
-go 1.15
+go 1.16
 
 require (
 	github.com/SuperGreenLab/AppBackend v0.0.0-20210504064721-654b1497ed0f

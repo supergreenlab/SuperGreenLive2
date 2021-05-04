@@ -30,6 +30,8 @@ import (
 func Start() {
 	router := httprouter.New()
 
+	router.NotFound = http.FileServer(http.Dir("/usr/local/share/appbackend_static"))
+
 	router.POST("/motion/start", startMotionHandler)
 	router.POST("/motion/stop", stopMotionHandler)
 

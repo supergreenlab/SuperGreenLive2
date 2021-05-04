@@ -1,8 +1,9 @@
-FROM golang:1.15
+FROM golang:1.16
 
 RUN apt-get update && \
     apt-get install -y libmagickwand-dev
 COPY assets /usr/local/share/appbackend
+COPY static /usr/local/share/appbackend_static
 
 ADD bin/motion /usr/bin/motion
 ADD bin/raspistill /usr/bin/raspistill

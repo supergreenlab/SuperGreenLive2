@@ -5,3 +5,4 @@ air_errors.log
 tests/node_modules
 cam.jpg
 /assets/plume.otf
+/internal/server/static
