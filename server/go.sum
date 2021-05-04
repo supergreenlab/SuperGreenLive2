@@ -43,8 +43,8 @@ github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAE
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/SuperGreenLab/AppBackend v0.0.0-20191104062411-4acc649ec8a7/go.mod h1:8jIpM3UisVX7hdiJDg7B/sbzxyEak/Qadcwu08pCHDE=
-github.com/SuperGreenLab/AppBackend v0.0.0-20210502060955-cfc540022ec5 h1:rm5fkKVJMfzwZOrTxmu0u8MeeiXzY1uJ7Js1DGkfTJE=
-github.com/SuperGreenLab/AppBackend v0.0.0-20210502060955-cfc540022ec5/go.mod h1:p1jcE5chB4cHVnZ2PKY/NBqlPsQCt9JYyU2f67U4Fug=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210504064721-654b1497ed0f h1:U59ak/a7xIVnCEaTFMJR0GbgTTPpxsaRzwY+V+3m7/Y=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210504064721-654b1497ed0f/go.mod h1:p1jcE5chB4cHVnZ2PKY/NBqlPsQCt9JYyU2f67U4Fug=
 github.com/SuperGreenLab/MQTTParser v0.0.0-20191104062431-b1a07e40799f/go.mod h1:dY4OnrIAKXfkbabBB0YGrIx6G9xEU48xozlh5F/4jzU=
 github.com/SuperGreenLab/WebBackend v0.0.0-20191105152239-1a7c2c8088bd/go.mod h1:OsPCYvtFJjlC0gr9zurJli656V6DPAUtm0aXw/j01GA=
 github.com/SuperGreenLab/towelie v0.0.0-20191104062451-32fa3d7ca317/go.mod h1:Bk0zINBVFx+ww9OBoUKMdBRkA3gnHyWSeNgIhDUuPxA=

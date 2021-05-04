@@ -31,7 +31,6 @@ import (
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/api"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
 	"github.com/disintegration/imaging"
 	"github.com/sirupsen/logrus"
@@ -46,9 +45,15 @@ type DeviceParamsResult struct {
 }
 
 func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedBox, error) {
+	token, err := kv.GetString("token")
+	if err != nil {
+		logrus.Errorf("kv.GetString(token) in GetLedBox %q", err)
+		return nil, err
+	}
+
 	deviceParams := DeviceParamsResult{}
-	if err := api.GETSGLObject(fmt.Sprintf("/device/%s/params?params=LED_*_BOX", box.DeviceID.UUID.String()), &deviceParams); err != nil {
-		logrus.Errorf("api.GETSGLObject(device/params) in captureHandler %q", err)
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s/params?params=LED_*_BOX", box.DeviceID.UUID.String()), &deviceParams); err != nil {
+		logrus.Errorf("appbackend.GETSGLObject(device/params) in captureHandler %q", err)
 		return nil, err
 	}
 	return func(i int) (int, error) {
@@ -88,6 +93,12 @@ func TakePic() (string, error) {
 }
 
 func CaptureFrame() (*bytes.Buffer, error) {
+	token, err := kv.GetString("token")
+	if err != nil {
+		logrus.Errorf("kv.GetString(token) in CaptureFrame %q", err)
+		return nil, err
+	}
+
 	plantID, err := kv.GetString("plantid")
 	if err != nil {
 		logrus.Errorf("kv.GetString(plant) in captureHandler %q", err)
@@ -95,20 +106,20 @@ func CaptureFrame() (*bytes.Buffer, error) {
 	}
 
 	plant := appbackend.Plant{}
-	if err := api.GETSGLObject(fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
-		logrus.Errorf("api.GETSGLObject(plant) in captureHandler %q", err)
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
+		logrus.Errorf("appbackend.GETSGLObject(plant) in captureHandler %q", err)
 		return nil, err
 	}
 	box := appbackend.Box{}
-	if err := api.GETSGLObject(fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
-		logrus.Errorf("api.GETSGLObject(box) in captureHandler %q", err)
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
+		logrus.Errorf("appbackend.GETSGLObject(box) in captureHandler %q", err)
 		return nil, err
 	}
 	var device *appbackend.Device = nil
 	if box.DeviceID.Valid == true {
 		device = &appbackend.Device{}
-		if err := api.GETSGLObject(fmt.Sprintf("/device/%s/", box.DeviceID.UUID), device); err != nil {
-			logrus.Errorf("api.GETSGLObject(device) in captureHandler %q", err)
+		if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s/", box.DeviceID.UUID), device); err != nil {
+			logrus.Errorf("appbackend.GETSGLObject(device) in captureHandler %q", err)
 			return nil, err
 		}
 	}

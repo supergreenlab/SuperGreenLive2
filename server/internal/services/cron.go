@@ -30,7 +30,6 @@ import (
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/api"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
 	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
 	"github.com/disintegration/imaging"
@@ -52,9 +51,15 @@ type timelapseUploadURLResult struct {
 }
 
 func captureTimelapse() {
+	token, err := kv.GetString("token")
+	if err != nil {
+		logrus.Errorf("kv.GetString(token) in captureTimelapse %q", err)
+		return
+	}
+
 	resp := timelapseUploadURLResult{}
-	if err := api.POSTSGLObject("/timelapseUploadURL", &timelapseUploadURLRequest{}, &resp); err != nil {
-		logrus.Errorf("api.POSTSGLObject(timelapseUploadURL) in captureTimelapse %q", err)
+	if err := appbackend.POSTSGLObject(token, "/timelapseUploadURL", &timelapseUploadURLRequest{}, &resp); err != nil {
+		logrus.Errorf("appbackend.POSTSGLObject(timelapseUploadURL) in captureTimelapse %q", err)
 		return
 	}
 
@@ -90,9 +95,9 @@ func captureTimelapse() {
 		return
 	}
 
-	err = api.UploadSGLObject(resp.UploadPath, bytes.NewReader(buff.Bytes()), int64(buff.Len()))
+	err = appbackend.UploadSGLObject(resp.UploadPath, bytes.NewReader(buff.Bytes()), int64(buff.Len()))
 	if err != nil {
-		logrus.Errorf("api.UploadSGLObject in captureTimelapse %q", err)
+		logrus.Errorf("appbackend.UploadSGLObject in captureTimelapse %q", err)
 		return
 	}
 
@@ -115,20 +120,20 @@ func captureTimelapse() {
 	}
 
 	plant := appbackend.Plant{}
-	if err := api.GETSGLObject(fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
-		logrus.Errorf("api.GETSGLObject(plant) in captureHandler %q", err)
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
+		logrus.Errorf("appbackend.GETSGLObject(plant) in captureHandler %q", err)
 		return
 	}
 	box := appbackend.Box{}
-	if err := api.GETSGLObject(fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
-		logrus.Errorf("api.GETSGLObject(box) in captureHandler %q", err)
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
+		logrus.Errorf("appbackend.GETSGLObject(box) in captureHandler %q", err)
 		return
 	}
 	metaStr := "{}"
 	if box.DeviceID.Valid == true {
 		device := appbackend.Device{}
-		if err := api.GETSGLObject(fmt.Sprintf("/device/%s/", box.DeviceID.UUID), &device); err != nil {
-			logrus.Errorf("api.GETSGLObject(device) in captureHandler %q", err)
+		if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s/", box.DeviceID.UUID), &device); err != nil {
+			logrus.Errorf("appbackend.GETSGLObject(device) in captureHandler %q", err)
 			return
 		}
 
@@ -157,8 +162,8 @@ func captureTimelapse() {
 		Meta:        metaStr,
 	}
 
-	if err := api.POSTSGLObject("/timelapseframe", &frame, nil); err != nil {
-		logrus.Errorf("api.POSTSGLObject(timelapseframe) in captureTimelapse %q", err)
+	if err := appbackend.POSTSGLObject(token, "/timelapseframe", &frame, nil); err != nil {
+		logrus.Errorf("appbackend.POSTSGLObject(timelapseframe) in captureTimelapse %q", err)
 		return
 	}
 }
