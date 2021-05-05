@@ -24,8 +24,8 @@ EOF
 scp pi@$RPI:SuperGreenLive2/server/liveserver liveserver/
 
 cp -r server/assets liveserver/assets
-cp server/config/motion.conf liveserver/
-cp server/config/liveserver.toml liveserver/
-cp server/config/liveserver.service liveserver/
+cp server/etc/motion.conf liveserver/
+cp server/etc/liveserver.toml liveserver/
+cp server/etc/liveserver.service liveserver/
 
 zip -r liveserver.zip liveserver
