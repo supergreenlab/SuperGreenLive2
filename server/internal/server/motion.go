@@ -20,8 +20,9 @@ package server
 
 import (
 	"fmt"
-	"io"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"os"
 	"os/exec"
 
@@ -29,6 +30,7 @@ import (
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -36,20 +38,20 @@ var (
 )
 
 func init() {
+	viper.SetDefault("MotionUrl", "http://localhost:8082")
 }
 
 var cmd *exec.Cmd
 
 func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	resp, err := http.Get("http://localhost:8082")
+	url, err := url.Parse(viper.GetString("MotionUrl"))
 	if err != nil {
-		logrus.Errorf("http.Get in motionHandler %q", err)
+		logrus.Errorf("url.Parse in motionHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer resp.Body.Close()
-	w.Header().Add("Content-Type", "multipart/x-mixed-replace; boundary=BoundaryString")
-	io.Copy(w, resp.Body)
+	proxy := httputil.NewSingleHostReverseProxy(url)
+	proxy.ServeHTTP(w, r)
 }
 
 func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
