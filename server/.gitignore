@@ -1,8 +1,7 @@
 tmp
 bin/liveserver
 air_errors.log
-/config/
 tests/node_modules
 cam.jpg
 /assets/plume.otf
-/internal/server/static
+/static/

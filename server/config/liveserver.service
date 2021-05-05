@@ -1,0 +1,10 @@
+[Unit]
+Description=SGL Liveserver
+
+[Service]
+ExecStart=/usr/local/bin/liveserver
+Restart=on-failure
+WorkingDirectory=/tmp/
+
+[Install]
+WantedBy=multi-user.target

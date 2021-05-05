@@ -1,0 +1,4 @@
+ApiUrl="http://api2.supergreenlab.com"
+StorageUrl="http://storage.supergreenlab.com"
+StorageHost="storage.supergreenlab.com"
+LevelDBDir="/var/liveserver/sgllive.leveldb"

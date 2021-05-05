@@ -1,0 +1,4 @@
+ApiUrl="http://192.168.1.87:8080"
+StorageUrl="http://192.168.1.87:9000"
+StorageHost="minio:9000"
+LevelDBDir="/tmp/sgllive.leveldb"

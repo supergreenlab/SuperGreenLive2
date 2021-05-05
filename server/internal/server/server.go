@@ -34,6 +34,7 @@ func Start() {
 
 	router.POST("/motion/start", startMotionHandler)
 	router.POST("/motion/stop", stopMotionHandler)
+	router.GET("/motion", motionHandler)
 
 	router.GET("/capture", captureHandler)
 

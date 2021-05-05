@@ -20,6 +20,7 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"os/exec"
@@ -27,9 +28,28 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
 )
 
+var (
+	_ = pflag.String("motionurl", "http://localhost:8082", "Motion url")
+)
+
+func init() {
+}
+
 var cmd *exec.Cmd
+
+func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	resp, err := http.Get("http://localhost:8082")
+	if err != nil {
+		logrus.Errorf("http.Get in motionHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
+	io.Copy(w, resp.Body)
+}
 
 func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	if cmd != nil {

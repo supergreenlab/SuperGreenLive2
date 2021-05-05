@@ -40,12 +40,11 @@
 import axios from 'axios'
 
 const RPI_URL=process.env.RPI_URL
-const LIVEVIEW_URL=process.env.LIVEVIEW_URL
 
 export default {
   data() {
     return {
-      src: LIVEVIEW_URL,
+      src: `${RPI_URL}/motion`,
       motionStarted: false,
     }
   },
@@ -62,7 +61,7 @@ export default {
     },
     async imgError() {
       setTimeout(() => {
-        this.$data.src = `${LIVEVIEW_URL}?rand=${new Date().getTime()}`
+        this.$data.src = `${RPI_URL}/motion?rand=${new Date().getTime()}`
       }, 1000)
     },
   },
