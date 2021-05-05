@@ -48,6 +48,7 @@ func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 		return
 	}
 	defer resp.Body.Close()
+	w.Header().Add("Content-Type", "multipart/x-mixed-replace; boundary=BoundaryString")
 	io.Copy(w, resp.Body)
 }
 
