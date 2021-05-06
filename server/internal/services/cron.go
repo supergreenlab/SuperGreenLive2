@@ -129,7 +129,7 @@ func captureTimelapse() {
 		logrus.Errorf("appbackend.GETSGLObject(box) in captureHandler %q", err)
 		return
 	}
-	metaStr := "{}"
+	meta := appbackend.MetricsMeta{Date: time.Now()}
 	if box.DeviceID.Valid == true {
 		device := appbackend.Device{}
 		if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s/", box.DeviceID.UUID), &device); err != nil {
@@ -145,13 +145,15 @@ func captureTimelapse() {
 		t := time.Now()
 		from := t.Add(-24 * time.Hour)
 		to := t
-		meta := appbackend.LoadMetricsMeta(device, box, from, to, appbackend.LoadGraphValue, getLedBox)
-		if j, err := json.Marshal(meta); err != nil {
-			logrus.Errorf("json.Marshal in captureHandler %q", err)
-			metaStr = "{}"
-		} else {
-			metaStr = string(j)
-		}
+		meta = appbackend.LoadMetricsMeta(device, box, from, to, appbackend.LoadGraphValue, getLedBox)
+	}
+
+	var metaStr string
+	if j, err := json.Marshal(meta); err != nil {
+		logrus.Errorf("json.Marshal in captureHandler %q", err)
+		return
+	} else {
+		metaStr = string(j)
 	}
 
 	uploadPath := strings.Split(resp.UploadPath, "/")
