@@ -43,8 +43,10 @@ github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAE
 github.com/Shopify/sarama v1.19.0/go.mod h1:FVkBWblsNy7DGZRfXLU0O9RCGt5g3g3yEuWXgklEdEo=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
 github.com/SuperGreenLab/AppBackend v0.0.0-20191104062411-4acc649ec8a7/go.mod h1:8jIpM3UisVX7hdiJDg7B/sbzxyEak/Qadcwu08pCHDE=
-github.com/SuperGreenLab/AppBackend v0.0.0-20210504064721-654b1497ed0f h1:U59ak/a7xIVnCEaTFMJR0GbgTTPpxsaRzwY+V+3m7/Y=
-github.com/SuperGreenLab/AppBackend v0.0.0-20210504064721-654b1497ed0f/go.mod h1:p1jcE5chB4cHVnZ2PKY/NBqlPsQCt9JYyU2f67U4Fug=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210505155227-fc4414648748 h1:Azviz7RjHslXE80eWy9Eao7/DcmTnghc+yGRN2c6KUg=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210505155227-fc4414648748/go.mod h1:p1jcE5chB4cHVnZ2PKY/NBqlPsQCt9JYyU2f67U4Fug=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210506054932-9827731c61a5 h1:og8Ks0AyFymz3sna6ETvkQDoxTlWgkBEKKr97jnOAXw=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210506054932-9827731c61a5/go.mod h1:p1jcE5chB4cHVnZ2PKY/NBqlPsQCt9JYyU2f67U4Fug=
 github.com/SuperGreenLab/MQTTParser v0.0.0-20191104062431-b1a07e40799f/go.mod h1:dY4OnrIAKXfkbabBB0YGrIx6G9xEU48xozlh5F/4jzU=
 github.com/SuperGreenLab/WebBackend v0.0.0-20191105152239-1a7c2c8088bd/go.mod h1:OsPCYvtFJjlC0gr9zurJli656V6DPAUtm0aXw/j01GA=
 github.com/SuperGreenLab/towelie v0.0.0-20191104062451-32fa3d7ca317/go.mod h1:Bk0zINBVFx+ww9OBoUKMdBRkA3gnHyWSeNgIhDUuPxA=
@@ -200,7 +202,6 @@ github.com/golang/protobuf v1.3.1/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5y
 github.com/golang/protobuf v1.3.2/go.mod h1:6lQm79b+lXiMfvg/cZm0SGofjICqVBUtrP5yJMmIC1U=
 github.com/golang/protobuf v1.3.3/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=
 github.com/golang/protobuf v1.3.4/go.mod h1:vzj43D7+SQXF/4pzW/hwtAqwc6iTitCiVSaWz5lYuqw=
-github.com/golang/protobuf v1.3.5 h1:F768QJ1E9tib+q5Sc8MkdJi1RxLTbRcTf8LJV56aRls=
 github.com/golang/protobuf v1.3.5/go.mod h1:6O5/vntMXwX2lRkT1hjjk0nAC1IDOTvTlVgjlRvqsdk=
 github.com/golang/snappy v0.0.0-20170215233205-553a64147049/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
 github.com/golang/snappy v0.0.0-20180518054509-2e65f85255db/go.mod h1:/XxbfmMg8lxefKM7IXC3fBNl/7bRcc72aCRzEWrmP2Q=
