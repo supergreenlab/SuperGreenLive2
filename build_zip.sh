@@ -28,4 +28,5 @@ cp server/etc/motion.conf liveserver/
 cp server/etc/liveserver.toml liveserver/
 cp server/etc/liveserver.service liveserver/
 
+rm liveserver.zip
 zip -r liveserver.zip liveserver
