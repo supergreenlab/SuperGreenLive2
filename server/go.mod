@@ -3,7 +3,7 @@ module github.com/SuperGreenLab/SuperGreenLivePI2/server
 go 1.16
 
 require (
-	github.com/SuperGreenLab/AppBackend v0.0.0-20210507073039-1010a72f87bf
+	github.com/SuperGreenLab/AppBackend v0.0.0-20210507170357-ef0f46db0a72
 	github.com/disintegration/imaging v1.6.2
 	github.com/gofrs/uuid v3.2.0+incompatible
 	github.com/julienschmidt/httprouter v1.3.0
