@@ -156,7 +156,8 @@ func CaptureFrame() (*bytes.Buffer, error) {
 		return nil, err
 	}
 
-	var meta *appbackend.MetricsMeta
+	// TODO DRY this with timelapse service
+	meta := appbackend.MetricsMeta{Date: time.Now()}
 	if device != nil {
 		getLedBox, err := GetLedBox(box, *device)
 		if err != nil {
@@ -167,8 +168,7 @@ func CaptureFrame() (*bytes.Buffer, error) {
 		t := time.Now()
 		from := t.Add(-24 * time.Hour)
 		to := t
-		m := appbackend.LoadMetricsMeta(*device, box, from, to, appbackend.LoadGraphValue, getLedBox)
-		meta = &m
+		meta = appbackend.LoadMetricsMeta(*device, box, from, to, appbackend.LoadGraphValue, getLedBox)
 	}
 
 	buff, err = appbackend.AddSGLOverlays(box, plant, meta, buff)
