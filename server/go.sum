@@ -51,6 +51,8 @@ github.com/SuperGreenLab/AppBackend v0.0.0-20210507073039-1010a72f87bf h1:JKVszB
 github.com/SuperGreenLab/AppBackend v0.0.0-20210507073039-1010a72f87bf/go.mod h1:p1jcE5chB4cHVnZ2PKY/NBqlPsQCt9JYyU2f67U4Fug=
 github.com/SuperGreenLab/AppBackend v0.0.0-20210507170357-ef0f46db0a72 h1:pEnPccfBp/I4kvQLRbUZ3VF8u6okaldf5s9+FB2LKc8=
 github.com/SuperGreenLab/AppBackend v0.0.0-20210507170357-ef0f46db0a72/go.mod h1:p1jcE5chB4cHVnZ2PKY/NBqlPsQCt9JYyU2f67U4Fug=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210508042358-cf15bdac6bbe h1:EztVDfvf8k/FSdAli4d9Tb+Pte198KQM0uWh6ES7iTo=
+github.com/SuperGreenLab/AppBackend v0.0.0-20210508042358-cf15bdac6bbe/go.mod h1:p1jcE5chB4cHVnZ2PKY/NBqlPsQCt9JYyU2f67U4Fug=
 github.com/SuperGreenLab/MQTTParser v0.0.0-20191104062431-b1a07e40799f/go.mod h1:dY4OnrIAKXfkbabBB0YGrIx6G9xEU48xozlh5F/4jzU=
 github.com/SuperGreenLab/WebBackend v0.0.0-20191105152239-1a7c2c8088bd/go.mod h1:OsPCYvtFJjlC0gr9zurJli656V6DPAUtm0aXw/j01GA=
 github.com/SuperGreenLab/towelie v0.0.0-20191104062451-32fa3d7ca317/go.mod h1:Bk0zINBVFx+ww9OBoUKMdBRkA3gnHyWSeNgIhDUuPxA=
