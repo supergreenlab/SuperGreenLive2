@@ -56,7 +56,7 @@ export default {
         this.$data.srcs[1],
         `${RPI_URL}/capture?rand=${new Date().getTime()}`
       ]
-    }, 20000)
+    }, 120000)
   },
   destroyed() {
     clearInterval(this.interval)
