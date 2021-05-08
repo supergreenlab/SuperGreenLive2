@@ -5,7 +5,7 @@ set -e
 sudo apt-get update
 sudo apt-get install -y ffmpeg motion libmagickwand-dev
 
-curl -O https://github.com/supergreenlab/SuperGreenLive2/releases/download/0.1/liveserver.zip
+curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/0.1/liveserver.zip
 unzip liveserver.zip
 
 mkdir -p /usr/local/share/appbackend /usr/local/share/appbackend_static
