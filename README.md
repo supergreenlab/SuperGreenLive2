@@ -73,7 +73,7 @@ First follow the raspbian [official quickstart](https://projects.raspberrypi.org
 You'll need an interface connection setup with wifi or ethernet.
 Open a terminal either through a screen+keyboard or a ssh session.
 
-First thing is to enable camera interface, this is done throuhg `raspi-config`, type in the terminal:
+First thing is to enable camera interface, this is done through `raspi-config`, type in the terminal:
 
 ```sh
 sudo raspi-config
