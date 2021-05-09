@@ -19,6 +19,8 @@ Remote live cam companion that goes with the [SuperGreenApp2](https://github.com
 
 Check your grow in real time. Posts daily and weekly timelapses to your diary feed.
 
+![Example](docs/screenshot-live.png?raw=true "Example")
+
 ## Why timelapses?
 
 One thing we tend to ignore for obvious reasons, is the plant's movements.
