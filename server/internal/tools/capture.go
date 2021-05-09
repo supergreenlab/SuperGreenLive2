@@ -40,8 +40,18 @@ var (
 	camMutex sync.Mutex
 )
 
+// TODO move this to api
 type DeviceParamsResult struct {
 	Params map[string]interface{} `json:"params"`
+}
+
+func (dpr DeviceParamsResult) GetInt(device appbackend.Device, key string) (int, error) {
+	k := fmt.Sprintf("%s.KV.%s", device.Identifier, key)
+	v, ok := dpr.Params[k].(string)
+	if !ok {
+		return 0, errors.New("Not found")
+	}
+	return strconv.Atoi(v)
 }
 
 func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedBox, error) {
@@ -57,14 +67,12 @@ func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedB
 		return nil, err
 	}
 	return func(i int) (int, error) {
-		k := fmt.Sprintf("%s.KV.LED_%d_BOX", device.Identifier, i)
-		v, ok := deviceParams.Params[k].(string)
-		if !ok {
-			return 0, errors.New(fmt.Sprintf("Key %s not found", k))
-		}
-		return strconv.Atoi(v)
+		k := fmt.Sprintf("LED_%d_BOX", i)
+		return deviceParams.GetInt(device, k)
 	}, nil
 }
+
+var lastPic time.Time
 
 func TakePic() (string, error) {
 	camMutex.Lock()

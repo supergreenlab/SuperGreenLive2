@@ -137,6 +137,32 @@ func captureTimelapse() {
 			return
 		}
 
+		skipNight, err := kv.GetStringWithDefault("skipnight", "true")
+		if err != nil {
+			logrus.Errorf("kv.GetStringWithDefault(skipnight) in CaptureFrame %q", err)
+			return
+		}
+		if skipNight == "true" {
+			deviceParams := tools.DeviceParamsResult{}
+			if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s/params?params=BOX_%d_*_HOUR&params=BOX_%d_*_MIN", box.DeviceID.UUID, box.DeviceBox, box.DeviceBox), &deviceParams); err != nil {
+				logrus.Errorf("appbackend.GETSGLObject(device/params) in captureHandler %q", err)
+				return
+			}
+			onHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_HOUR", box.DeviceBox))
+			onMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_MIN", box.DeviceBox))
+			offHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_HOUR", box.DeviceBox))
+			offMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_MIN", box.DeviceBox))
+			t := time.Now()
+			on := time.Date(t.Year(), t.Month(), t.Day(), onHour, onMin, 0, 0, time.UTC)
+			off := time.Date(t.Year(), t.Month(), t.Day(), offHour, offMin, 0, 0, time.UTC)
+			isOnNow := (on.Before(off) && t.After(on) && t.Before(off)) ||
+				(on.After(off) && (t.Before(off) || t.After(on)))
+			if !isOnNow {
+				logrus.Infof("Skipping night time")
+				return
+			}
+		}
+
 		getLedBox, err := tools.GetLedBox(box, device)
 		if err != nil {
 			logrus.Errorf("tools.GetLedBox in captureHandler %q", err)

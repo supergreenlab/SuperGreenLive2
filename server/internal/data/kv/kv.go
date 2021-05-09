@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/errors"
 )
 
 var (
@@ -38,6 +39,17 @@ var db *leveldb.DB
 func GetString(key string) (string, error) {
 	data, err := db.Get([]byte(key), nil)
 	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+func GetStringWithDefault(key, defaultValue string) (string, error) {
+	data, err := db.Get([]byte(key), nil)
+	if err != nil {
+		if err == errors.ErrNotFound {
+			return defaultValue, nil
+		}
 		return "", err
 	}
 	return string(data), nil

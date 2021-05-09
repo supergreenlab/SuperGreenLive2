@@ -30,10 +30,11 @@ import (
 )
 
 type TimelapseData struct {
-	ID      *string `json:"id,omitempty"`
-	PlantID *string `json:"plantID,omitempty"`
-	Cron    *string `json:"cron,omitempty"`
-	Rotate  *string `json:"rotate,omitempty"`
+	ID        *string `json:"id,omitempty"`
+	PlantID   *string `json:"plantID,omitempty"`
+	Cron      *string `json:"cron,omitempty"`
+	Rotate    *string `json:"rotate,omitempty"`
+	SkipNight *string `json:"skipNight,omitempty"`
 }
 
 func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -71,6 +72,14 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 
 	if td.Rotate != nil {
 		if err := kv.SetString("rotate", *td.Rotate); err != nil {
+			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if td.SkipNight != nil {
+		if err := kv.SetString("skipNight", *td.SkipNight); err != nil {
 			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
