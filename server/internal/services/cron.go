@@ -144,7 +144,8 @@ func captureTimelapse() {
 		}
 		if skipNight == "true" {
 			deviceParams := tools.DeviceParamsResult{}
-			if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s/params?params=BOX_%d_*_HOUR&params=BOX_%d_*_MIN", box.DeviceID.UUID, box.DeviceBox, box.DeviceBox), &deviceParams); err != nil {
+			url := fmt.Sprintf("/device/%s/params?params=BOX_%d_*_HOUR&params=BOX_%d_*_MIN", box.DeviceID.UUID, *box.DeviceBox, *box.DeviceBox)
+			if err := appbackend.GETSGLObject(token, url, &deviceParams); err != nil {
 				logrus.Errorf("appbackend.GETSGLObject(device/params) in captureHandler %q", err)
 				return
 			}
