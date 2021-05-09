@@ -149,10 +149,10 @@ func captureTimelapse() {
 				logrus.Errorf("appbackend.GETSGLObject(device/params) in captureHandler %q", err)
 				return
 			}
-			onHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_HOUR", box.DeviceBox))
-			onMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_MIN", box.DeviceBox))
-			offHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_HOUR", box.DeviceBox))
-			offMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_MIN", box.DeviceBox))
+			onHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_HOUR", *box.DeviceBox))
+			onMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_MIN", *box.DeviceBox))
+			offHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_HOUR", *box.DeviceBox))
+			offMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_MIN", *box.DeviceBox))
 			t := time.Now()
 			on := time.Date(t.Year(), t.Month(), t.Day(), onHour, onMin, 0, 0, time.UTC)
 			off := time.Date(t.Year(), t.Month(), t.Day(), offHour, offMin, 0, 0, time.UTC)
