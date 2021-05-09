@@ -1,4 +1,4 @@
-![SuperGreenLab](docs/sgl.png?raw=true "SuperGreenLab")
+![SuperGreenLab](docs/sgl.png?raw=true)
 
 Table of Contents
 =================
@@ -19,7 +19,7 @@ Remote live cam companion that goes with the [SuperGreenApp2](https://github.com
 
 Check your grow in real time. Posts daily and weekly timelapses to your diary feed.
 
-![Example](docs/screenshot-live.png?raw=true "Example")
+![Example](docs/screenshot-live.png?raw=true)
 
 ## Why timelapses?
 
@@ -44,21 +44,21 @@ In normal conditions, the plant kind of "breathes", as seen in this [timelapse](
 
 ### Linked to your SGL account
 
-![Login screen](docs/screen-login.png)
+![Login screen](docs/screen-login.png?raw=true)
 
 ### Select you plant diary
 
-![Plant screen](docs/screen-plant.png)
+![Plant screen](docs/screen-plant.png?raw=true)
 
 ### Easy installation
 
 Low latency live feed for easier installation and focus tuning.
 
-![Camera screen](docs/screen-camera.png)
+![Camera screen](docs/screen-camera.png?raw=true)
 
 ### Live status view
 
-![Index screen](docs/screen-index.png)
+![Index screen](docs/screen-index.png?raw=true)
 (please don't mind the missing temperature and humidity graph on the lower left:P)
 
 # Hardware requirements
