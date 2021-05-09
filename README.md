@@ -36,6 +36,7 @@ Low latency live feed for easier installation and focus tuning.
 ### Live status view
 
 ![Index screen](docs/screen-index.png)
+(please don't mind the missing temperature and humidity graph on the lower left:P)
 
 # Hardware requirements
 
