@@ -142,6 +142,7 @@ export default {
 
 #plants
   flex: 1 
+  overflow: auto
 
 .plant
   display: flex
@@ -151,6 +152,7 @@ export default {
   display: flex
   justify-content: center
   align-items: center
+  margin: 0 10pt
 
 #button
   display: flex
