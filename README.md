@@ -1,3 +1,18 @@
+![SuperGreenLab](docs/sgl.png?raw=true "SuperGreenLab")
+
+Table of Contents
+=================
+
+* [SuperGreenLivePI2](#supergreenlivepi2)
+   * [Why timelapses?](#why-timelapses)
+   * [Features](#features)
+      * [Linked to your SGL account](#linked-to-your-sgl-account)
+      * [Select you plant diary](#select-you-plant-diary)
+      * [Easy installation](#easy-installation)
+      * [Live status view](#live-status-view)
+* [Hardware requirements](#hardware-requirements)
+* [Installation](#installation)
+
 # SuperGreenLivePI2
 
 Remote live cam companion that goes with the [SuperGreenApp2](https://github.com/supergreenlab/SuperGreenApp2)
