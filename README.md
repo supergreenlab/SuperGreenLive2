@@ -26,7 +26,7 @@ Plants actually move a lot during the day, it's too slow for us to notice, but b
 
 So that's the point of this, take a pic every 10 minutes, then compile all those pics into videos, daily and weekly.
 
-One of the thing with movements, is they can allow to spot something wrong before is shows up.
+One of the thing with movements, is they can allow to spot something wrong before it shows up.
 
 In normal conditions, the plant kind of "breathes", as seen in this [timelapse](https://www.instagram.com/p/BvMcC_oH94E/).
 
@@ -86,4 +86,7 @@ curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/late
 ```
 
 Once this is done, open the page at http://localhost:8081 if using a pi with screen+keyboard, or http://raspberrypi.local:8081 from another computer (to get a live view).
-On windows you might need to install [the Bonjour protocol from Apple](https://support.apple.com/kb/DL999?locale=en_US) to be able to find by name (needs reboot). You can also replace the raspberrypi.local part by the rpi's IP address if you can find it from your router's interface.
+
+On windows you might need to install [the Bonjour protocol from Apple](https://support.apple.com/kb/DL999?locale=en_US) to be able to find by name (needs reboot).
+
+You can also replace the raspberrypi.local part by the rpi's IP address if you can find it from your router's interface.
