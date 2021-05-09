@@ -19,6 +19,24 @@ In normal conditions, the plant kind of "breathes", as seen in this [timelapse](
 
 ## Features
 
+### Linked to your SGL account
+
+![Login screen](docs/screen-login.png)
+
+### Select you plant diary
+
+![Plant screen](docs/screen-plant.png)
+
+### Easy installation
+
+Low latency live feed for easier installation and focus tuning.
+
+![Camera screen](docs/screen-camera.png)
+
+### Live status view
+
+![Index screen](docs/screen-index.png)
+
 # Hardware requirements
 
 - [RaspberryPI](https://www.raspberrypi.org/products/) + [Wifi (optional, most rpi have integrated wifi now)](https://www.raspberrypi.org/products/raspberry-pi-usb-wifi-dongle/)
