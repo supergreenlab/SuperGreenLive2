@@ -19,6 +19,12 @@ In normal conditions, the plant kind of "breathes", as seen in this [timelapse](
 
 ## Features
 
+- Easy installation for raspberry pi
+- Web interface for easier setup
+- Takes pictures every 10 minutes
+- Adds controller sensor metrics as meta data for later analysis
+- Posts daily and weekly timelapses to your plant diary feed
+
 ### Linked to your SGL account
 
 ![Login screen](docs/screen-login.png)
