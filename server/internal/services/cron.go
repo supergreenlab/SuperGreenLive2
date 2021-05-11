@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -36,13 +37,20 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 var (
 	c                     *cron.Cron
 	timelapseEntryID      *cron.EntryID
 	timelapseEntryIDMutex sync.Mutex
+	_                     = pflag.String("storagedir", "/tmp/storage", "location for the latest pics")
 )
+
+func init() {
+	viper.SetDefault("StorageDir", "/tmp/storage")
+}
 
 type timelapseUploadURLRequest struct{}
 
@@ -195,6 +203,56 @@ func captureTimelapse() {
 		logrus.Errorf("appbackend.POSTSGLObject(timelapseframe) in captureTimelapse %q", err)
 		return
 	}
+
+	if err := storePic(buff, frame); err != nil {
+		logrus.Errorf("storePic in captureTimelapse %q", err)
+		return
+	}
+}
+
+func storePic(buff *bytes.Buffer, frame appbackend.TimelapseFrame) error {
+	storageDir := viper.Get("StorageDir")
+	name := strings.Split(frame.FilePath, "/")[1]
+	path := fmt.Sprintf("%s/%s", storageDir, name)
+
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	if _, err := f.Write(buff.Bytes()); err != nil {
+		return err
+	}
+
+	return removeOldFiles()
+}
+
+func removeOldFiles() error {
+	storageDir := viper.Get("StorageDir").(string)
+	storageDuration, err := kv.GetIntWithDefault("storageDuration", 86400)
+	files, err := os.ReadDir(storageDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	t := time.Now().Add(time.Duration(-storageDuration) * time.Second)
+	for _, file := range files {
+		path := fmt.Sprintf("%s/%s", storageDir, file.Name())
+		f, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		s, err := f.Stat()
+		if err != nil {
+			return err
+		}
+		if s.ModTime().Before(t) {
+			err := os.Remove(path)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func ScheduleTimelapse() {
@@ -217,6 +275,11 @@ func ScheduleTimelapse() {
 }
 
 func Init() {
+	if _, err := os.Stat(viper.GetString("StorageDir")); os.IsNotExist(err) {
+		if err := os.Mkdir(viper.GetString("StorageDir"), 0755); err != nil {
+			logrus.Fatalf("%q", err)
+		}
+	}
 	c = cron.New(cron.WithChain(
 		cron.Recover(cron.DefaultLogger),
 	))

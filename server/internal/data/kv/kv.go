@@ -19,6 +19,8 @@
 package kv
 
 import (
+	"strconv"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -53,6 +55,25 @@ func GetStringWithDefault(key, defaultValue string) (string, error) {
 		return "", err
 	}
 	return string(data), nil
+}
+
+func GetInt(key string) (int, error) {
+	dataStr, err := GetString(key)
+	if err != nil {
+		return 0, nil
+	}
+	return strconv.Atoi(dataStr)
+}
+
+func GetIntWithDefault(key string, defaultValue int) (int, error) {
+	data, err := GetInt(key)
+	if err != nil {
+		if err == errors.ErrNotFound {
+			return defaultValue, nil
+		}
+		return 0, err
+	}
+	return data, nil
 }
 
 func SetString(key, value string) error {
