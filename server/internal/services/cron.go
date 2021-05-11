@@ -204,23 +204,29 @@ func captureTimelapse() {
 		return
 	}
 
-	if err := storePic(buff, frame); err != nil {
+	if err := storePic(buff, box, plant, meta, frame); err != nil {
 		logrus.Errorf("storePic in captureTimelapse %q", err)
 		return
 	}
 }
 
-func storePic(buff *bytes.Buffer, frame appbackend.TimelapseFrame) error {
+func storePic(buff *bytes.Buffer, box appbackend.Box, plant appbackend.Plant, meta appbackend.MetricsMeta, frame appbackend.TimelapseFrame) error {
 	storageDir := viper.Get("StorageDir")
-	name := strings.Split(frame.FilePath, "/")[1]
-	path := fmt.Sprintf("%s/%s", storageDir, name)
+	path := fmt.Sprintf("%s/%s", storageDir, frame.FilePath)
 
 	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 	if _, err := f.Write(buff.Bytes()); err != nil {
 		return err
+	}
+
+	buff, err = appbackend.AddSGLOverlays(box, plant, meta, buff)
+	if err != nil {
+		logrus.Errorf("addSGLOverlays in captureHandler %q", err)
+		return nil
 	}
 
 	return removeOldFiles()
@@ -234,10 +240,11 @@ func removeOldFiles() error {
 		log.Fatal(err)
 	}
 
-	t := time.Now().Add(time.Duration(-storageDuration) * time.Second)
+	t := time.Now().Add(-time.Duration(storageDuration) * time.Second)
 	for _, file := range files {
 		path := fmt.Sprintf("%s/%s", storageDir, file.Name())
 		f, err := os.Open(path)
+		defer f.Close()
 		if err != nil {
 			return err
 		}
@@ -246,6 +253,7 @@ func removeOldFiles() error {
 			return err
 		}
 		if s.ModTime().Before(t) {
+			logrus.Infof("removing %s %s %s %d", path, s.ModTime(), t, storageDuration)
 			err := os.Remove(path)
 			if err != nil {
 				return err

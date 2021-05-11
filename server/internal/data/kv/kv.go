@@ -46,6 +46,14 @@ func GetString(key string) (string, error) {
 	return string(data), nil
 }
 
+func GetStringOrNil(key string) *string {
+	data, err := GetString(key)
+	if err != nil {
+		return nil
+	}
+	return &data
+}
+
 func GetStringWithDefault(key, defaultValue string) (string, error) {
 	data, err := db.Get([]byte(key), nil)
 	if err != nil {
@@ -60,7 +68,7 @@ func GetStringWithDefault(key, defaultValue string) (string, error) {
 func GetInt(key string) (int, error) {
 	dataStr, err := GetString(key)
 	if err != nil {
-		return 0, nil
+		return 0, err
 	}
 	return strconv.Atoi(dataStr)
 }

@@ -99,3 +99,20 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 
 	fmt.Fprintf(w, "OK")
 }
+
+func getTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	td := TimelapseData{
+		ID:              kv.GetStringOrNil("timelapseid"),
+		PlantID:         kv.GetStringOrNil("plantid"),
+		Cron:            kv.GetStringOrNil("cron"),
+		Rotate:          kv.GetStringOrNil("rotate"),
+		SkipNight:       kv.GetStringOrNil("skipNight"),
+		StorageDuration: kv.GetStringOrNil("storageDuration"),
+	}
+	encoder := json.NewEncoder(w)
+	if err := encoder.Encode(td); err != nil {
+		logrus.Errorf("encoder.Encode in getTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}

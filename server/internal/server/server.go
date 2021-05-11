@@ -41,6 +41,8 @@ func Start() {
 	router.POST("/token", tokenHandler)
 	router.POST("/timelapse", timelapseHandler)
 
+	router.GET("/timelapse", getTimelapseHandler)
+
 	go func() {
 		log.Fatal(http.ListenAndServe(":8081", cors.AllowAll().Handler(router)))
 	}()

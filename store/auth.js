@@ -53,9 +53,12 @@ export const actions = {
       password,
     })
     const token = resp.headers['x-sgl-token']
-    await axios.post(`${RPI_URL}/token`, {
+    const { data: respToken } = await axios.post(`${RPI_URL}/token`, {
       token,
     })
+    if (respToken == 'ALREADY_LOGGED_IN') {
+      await dispatch('plant/restorePlant', { token }, { root: true })
+    }
 
     commit('setToken', token)
     commit('setLoading', false)

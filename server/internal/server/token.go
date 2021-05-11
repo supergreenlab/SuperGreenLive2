@@ -33,6 +33,11 @@ type TokenData struct {
 }
 
 func tokenHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	if _, err := kv.GetString("token"); err == nil {
+		fmt.Fprintf(w, "ALREADY_LOGGED_IN")
+		return
+	}
+
 	td := TokenData{}
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&td); err != nil {
