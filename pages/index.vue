@@ -21,7 +21,7 @@
     <div :id='$style.body'>
       <div :id='$style.header'>
         <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
-        <!--<nuxt-link to='/plant' :id='$style.change'>change</nuxt-link>-->
+        <a :href='storage' target='_blank' :id='$style.change'>storage.zip</a>
       </div>
       <div :id='$style.plantInfos'>
         <Plant :plant='plant' />
@@ -47,6 +47,7 @@ export default {
     return {
       n: 0,
       srcs: [null, `${RPI_URL}/capture`],
+      storage: `${RPI_URL}/storage.zip`,
     }
   },
   mounted() {
