@@ -91,3 +91,11 @@ Once this is done, open the page at http://localhost:8081 if using a pi with scr
 On windows you might need to install [the Bonjour protocol from Apple](https://support.apple.com/kb/DL999?locale=en_US) to be able to find by name (needs reboot).
 
 You can also replace the raspberrypi.local part by the rpi's IP address if you can find it from your router's interface.
+
+# Upgrade
+
+To upgrade the timelapse installation, run this command in a terminal:
+
+```sh
+curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/update.sh | sudo bash
+```
