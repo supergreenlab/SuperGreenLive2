@@ -21,8 +21,9 @@
     <form @submit='loginHandler'>
       <div :id='$style.body'>
         <div :id='$style.title'>S<span :id='$style.green'>G</span>L LOGIN</div>
-        <input type='text' placeholder='Login' v-model='login' />
+        <input type='text' placeholder='Login' v-model='login' @change=''/>
         <input type='password' placeholder='Password' v-model='password' />
+        <span :id='$style.error' v-if='error'>Wrong login/password</span>
         <div :id='$style.button'>
           <button @click='loginHandler'>LOGIN</button>
         </div>
@@ -60,6 +61,9 @@ export default {
   computed: {
     loggedIn() {
       return this.$store.getters['auth/loggedIn']
+    },
+    error() {
+      return this.$store.getters['auth/error']
     },
   },
 }
@@ -106,5 +110,8 @@ export default {
 
 #button > button:active
   background-color: #2ba300
+
+#error
+  color: red
 
 </style>

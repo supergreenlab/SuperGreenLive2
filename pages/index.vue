@@ -21,7 +21,7 @@
     <div :id='$style.body'>
       <div :id='$style.header'>
         <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
-        <nuxt-link to='/plant' :id='$style.change'>change</nuxt-link>
+        <!--<nuxt-link to='/plant' :id='$style.change'>change</nuxt-link>-->
       </div>
       <div :id='$style.plantInfos'>
         <Plant :plant='plant' />

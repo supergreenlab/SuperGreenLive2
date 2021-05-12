@@ -80,7 +80,7 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 	}
 
 	if td.SkipNight != nil {
-		if err := kv.SetString("skipNight", *td.SkipNight); err != nil {
+		if err := kv.SetString("skipnight", *td.SkipNight); err != nil {
 			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -88,7 +88,7 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 	}
 
 	if td.StorageDuration != nil {
-		if err := kv.SetString("storageDuration", *td.StorageDuration); err != nil {
+		if err := kv.SetString("storageduration", *td.StorageDuration); err != nil {
 			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -106,8 +106,8 @@ func getTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 		PlantID:         kv.GetStringOrNil("plantid"),
 		Cron:            kv.GetStringOrNil("cron"),
 		Rotate:          kv.GetStringOrNil("rotate"),
-		SkipNight:       kv.GetStringOrNil("skipNight"),
-		StorageDuration: kv.GetStringOrNil("storageDuration"),
+		SkipNight:       kv.GetStringOrNil("skipnight"),
+		StorageDuration: kv.GetStringOrNil("storageduration"),
 	}
 	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(td); err != nil {

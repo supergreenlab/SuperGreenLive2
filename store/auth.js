@@ -48,6 +48,7 @@ export const actions = {
   },
   async login({ commit, dispatch }, { login, password }) {
     commit('setLoading', true)
+    try {
     const resp = await axios.post(`${API_URL}/login`, {
       handle: login,
       password,
@@ -61,6 +62,9 @@ export const actions = {
     }
 
     commit('setToken', token)
+    } catch(e) {
+      commit('setError', true)
+    }
     commit('setLoading', false)
   },
 }
@@ -82,5 +86,6 @@ export const mutations = {
 }
 
 export const getters = {
-  loggedIn: state => !!state.token
+  loggedIn: state => !!state.token,
+  error: state => state.error,
 }

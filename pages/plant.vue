@@ -88,6 +88,7 @@ export default {
       this.$data.selectedPlant = plant
     },
     async nextHandler() {
+      this.$data.loading = true
       this.$store.commit('plant/setPlant', this.$data.selectedPlant)
       const token = this.$store.state.auth.token
       const { data: { id } } = await axios.post(`${API_URL}/timelapse`, {

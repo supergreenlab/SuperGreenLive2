@@ -214,6 +214,12 @@ func storePic(buff *bytes.Buffer, box appbackend.Box, plant appbackend.Plant, me
 	storageDir := viper.Get("StorageDir")
 	path := fmt.Sprintf("%s/%s", storageDir, frame.FilePath)
 
+	buff, err := appbackend.AddSGLOverlays(box, plant, meta, buff)
+	if err != nil {
+		logrus.Errorf("addSGLOverlays in captureHandler %q", err)
+		return nil
+	}
+
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -223,18 +229,12 @@ func storePic(buff *bytes.Buffer, box appbackend.Box, plant appbackend.Plant, me
 		return err
 	}
 
-	buff, err = appbackend.AddSGLOverlays(box, plant, meta, buff)
-	if err != nil {
-		logrus.Errorf("addSGLOverlays in captureHandler %q", err)
-		return nil
-	}
-
 	return removeOldFiles()
 }
 
 func removeOldFiles() error {
 	storageDir := viper.Get("StorageDir").(string)
-	storageDuration, err := kv.GetIntWithDefault("storageDuration", 86400)
+	storageDuration, err := kv.GetIntWithDefault("storageduration", 86400)
 	files, err := os.ReadDir(storageDir)
 	if err != nil {
 		log.Fatal(err)

@@ -42,6 +42,7 @@ func Start() {
 	router.POST("/timelapse", timelapseHandler)
 
 	router.GET("/timelapse", getTimelapseHandler)
+	router.GET("/storage.zip", zipHandler)
 
 	go func() {
 		log.Fatal(http.ListenAndServe(":8081", cors.AllowAll().Handler(router)))
