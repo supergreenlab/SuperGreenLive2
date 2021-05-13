@@ -12,6 +12,7 @@ Table of Contents
       * [Live status view](#live-status-view)
 * [Hardware requirements](#hardware-requirements)
 * [Installation](#installation)
+* [Upgrade](#upgrade)
 
 # SuperGreenLivePI2
 

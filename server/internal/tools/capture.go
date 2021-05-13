@@ -79,21 +79,14 @@ func TakePic() (string, error) {
 	defer camMutex.Unlock()
 	logrus.Info("Taking picture..")
 
-	rotate := false
-	rotateStr, err := kv.GetString("rotate")
+	rotation, err := kv.GetString("rotation")
 	if err != nil {
-		logrus.Errorf("kv.GetString(rotate) in captureHandler %q", err)
-	} else if rotateStr == "true" {
-		rotate = true
+		logrus.Errorf("kv.GetString(rotation) in captureHandler %q", err)
 	}
 
 	var cmd *exec.Cmd
 	name := "/tmp/cam.jpg"
-	if rotate {
-		cmd = exec.Command("/usr/bin/raspistill", "-vf", "-hf", "-q", "50", "-o", name)
-	} else {
-		cmd = exec.Command("/usr/bin/raspistill", "-q", "50", "-o", name)
-	}
+	cmd = exec.Command("/usr/bin/raspistill", "-rot", rotation, "-q", "50", "-o", name)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
