@@ -23,8 +23,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/services"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/services"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )

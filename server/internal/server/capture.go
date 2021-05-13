@@ -21,7 +21,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )

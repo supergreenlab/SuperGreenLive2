@@ -31,8 +31,8 @@ import (
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/tools"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
 	"github.com/disintegration/imaging"
 	"github.com/gofrs/uuid"
 	"github.com/robfig/cron/v3"

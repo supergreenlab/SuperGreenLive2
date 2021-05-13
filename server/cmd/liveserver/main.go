@@ -19,10 +19,10 @@
 package main
 
 import (
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/config"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/server"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/services"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/config"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/server"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/services"
 	"github.com/sirupsen/logrus"
 )
 

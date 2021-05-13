@@ -1,4 +1,4 @@
-module github.com/SuperGreenLab/SuperGreenLivePI2/server
+module github.com/SuperGreenLab/SuperGreenLive2/server
 
 go 1.16
 

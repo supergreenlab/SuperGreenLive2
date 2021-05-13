@@ -31,7 +31,7 @@ import (
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
-	"github.com/SuperGreenLab/SuperGreenLivePI2/server/internal/data/kv"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
 	"github.com/disintegration/imaging"
 	"github.com/sirupsen/logrus"
 )
