@@ -107,19 +107,19 @@ func CaptureFrame() (*bytes.Buffer, error) {
 	}
 
 	plant := appbackend.Plant{}
-	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/plant/%s/", plantID), &plant); err != nil {
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/plant/%s", plantID), &plant); err != nil {
 		logrus.Errorf("appbackend.GETSGLObject(plant) in captureHandler %q", err)
 		return nil, err
 	}
 	box := appbackend.Box{}
-	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/box/%s/", plant.BoxID), &box); err != nil {
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/box/%s", plant.BoxID), &box); err != nil {
 		logrus.Errorf("appbackend.GETSGLObject(box) in captureHandler %q", err)
 		return nil, err
 	}
 	var device *appbackend.Device = nil
 	if box.DeviceID.Valid == true {
 		device = &appbackend.Device{}
-		if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s/", box.DeviceID.UUID), device); err != nil {
+		if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s", box.DeviceID.UUID), device); err != nil {
 			logrus.Errorf("appbackend.GETSGLObject(device) in captureHandler %q", err)
 			return nil, err
 		}
