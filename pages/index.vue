@@ -21,6 +21,7 @@
     <div :id='$style.body'>
       <div :id='$style.header'>
         <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
+        <nuxt-link to='/camera' :id='$style.change'>readjust cam</nuxt-link>
         <a :href='storage' target='_blank' :id='$style.change'>storage.zip</a>
       </div>
       <div :id='$style.plantInfos'>

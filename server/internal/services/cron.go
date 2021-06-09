@@ -204,29 +204,72 @@ func captureTimelapse() {
 		return
 	}
 
-	if err := storePic(buff, box, plant, meta, frame); err != nil {
+	if err := storePic(img, box, plant, meta, frame); err != nil {
 		logrus.Errorf("storePic in captureTimelapse %q", err)
 		return
 	}
 }
 
-func storePic(buff *bytes.Buffer, box appbackend.Box, plant appbackend.Plant, meta appbackend.MetricsMeta, frame appbackend.TimelapseFrame) error {
+func storePic(img image.Image, box appbackend.Box, plant appbackend.Plant, meta appbackend.MetricsMeta, frame appbackend.TimelapseFrame) error {
+	buff := new(bytes.Buffer)
+	if err := jpeg.Encode(buff, img, &jpeg.Options{Quality: 80}); err != nil {
+		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
+		return err
+	}
+
 	storageDir := viper.Get("StorageDir")
-	path := fmt.Sprintf("%s/%s", storageDir, frame.FilePath)
 
-	buff, err := appbackend.AddSGLOverlays(box, plant, meta, buff)
-	if err != nil {
-		logrus.Errorf("addSGLOverlays in captureHandler %q", err)
-		return nil
+	{
+		path := fmt.Sprintf("%s/%d-%s", storageDir, time.Now().Unix(), frame.FilePath)
+
+		buff, err := appbackend.AddSGLOverlays(box, plant, meta, buff)
+		if err != nil {
+			logrus.Errorf("addSGLOverlays in captureHandler %q", err)
+			return nil
+		}
+
+		f, err := os.Create(path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		if _, err := f.Write(buff.Bytes()); err != nil {
+			return err
+		}
 	}
 
-	f, err := os.Create(path)
-	if err != nil {
-		return err
+	{
+		path := fmt.Sprintf("%s/raw-%d-%s", storageDir, time.Now().Unix(), frame.FilePath)
+
+		f, err := os.Create(path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+		if _, err := f.Write(buff.Bytes()); err != nil {
+			return err
+		}
 	}
-	defer f.Close()
-	if _, err := f.Write(buff.Bytes()); err != nil {
-		return err
+
+	{
+		path := fmt.Sprintf("%s/raw-%d-%s.json", storageDir, time.Now().Unix(), frame.FilePath)
+
+		f, err := os.Create(path)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		j := map[string]interface{}{
+			"box":   box,
+			"plant": plant,
+			"meta":  meta,
+			"frame": frame,
+		}
+		encoder := json.NewEncoder(f)
+		if err := encoder.Encode(j); err != nil {
+			return err
+		}
 	}
 
 	return removeOldFiles()
