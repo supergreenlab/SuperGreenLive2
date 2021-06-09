@@ -36,6 +36,7 @@ type TimelapseData struct {
 	Rotation        *string `json:"rotation,omitempty"`
 	SkipNight       *string `json:"skipNight,omitempty"`
 	StorageDuration *string `json:"storageDuration,omitempty"`
+	RaspiParams     *string `json:"raspiParams,omitempty"`
 }
 
 func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -95,6 +96,14 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 		}
 	}
 
+	if td.RaspiParams != nil {
+		if err := kv.SetString("raspiparams", *td.RaspiParams); err != nil {
+			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
 	services.ScheduleTimelapse()
 
 	fmt.Fprintf(w, "OK")
@@ -108,6 +117,7 @@ func getTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 		Rotation:        kv.GetStringOrNil("rotation"),
 		SkipNight:       kv.GetStringOrNil("skipnight"),
 		StorageDuration: kv.GetStringOrNil("storageduration"),
+		RaspiParams:     kv.GetStringOrNil("raspiparams"),
 	}
 	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(td); err != nil {

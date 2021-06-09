@@ -49,19 +49,19 @@ export const actions = {
   async login({ commit, dispatch }, { login, password }) {
     commit('setLoading', true)
     try {
-    const resp = await axios.post(`${API_URL}/login`, {
-      handle: login,
-      password,
-    })
-    const token = resp.headers['x-sgl-token']
-    const { data: respToken } = await axios.post(`${RPI_URL}/token`, {
-      token,
-    })
-    if (respToken == 'ALREADY_LOGGED_IN') {
-      await dispatch('plant/restorePlant', { token }, { root: true })
-    }
+      const resp = await axios.post(`${API_URL}/login`, {
+        handle: login,
+        password,
+      })
+      const token = resp.headers['x-sgl-token']
+      const { data: respToken } = await axios.post(`${RPI_URL}/token`, {
+        token,
+      })
+      if (respToken == 'ALREADY_LOGGED_IN') {
+        await dispatch('plant/restorePlant', { token }, { root: true })
+      }
 
-    commit('setToken', token)
+      commit('setToken', token)
     } catch(e) {
       commit('setError', true)
     }

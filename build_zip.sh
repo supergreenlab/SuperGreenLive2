@@ -15,9 +15,11 @@ rm -rf liveserver/*
 npm run generate
 cp -r dist liveserver/static
 
+./sync_pi.sh $PI 
+
 ssh pi@$RPI bash <<EOF
 cd SuperGreenLive2/server
-git pull
+#git pull
 /usr/local/go/bin/go build -o liveserver -v cmd/liveserver/main.go
 EOF
 

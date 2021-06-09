@@ -27,6 +27,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -82,11 +83,19 @@ func TakePic() (string, error) {
 	rotation, err := kv.GetString("rotation")
 	if err != nil {
 		logrus.Errorf("kv.GetString(rotation) in captureHandler %q", err)
+		rotation = "0"
 	}
 
+	raspiParams, err := kv.GetString("raspiparams")
+	if err != nil {
+		logrus.Errorf("kv.GetString(raspiparams) in captureHandler %q", err)
+	}
+
+	params := strings.Split(raspiParams, " ")
 	var cmd *exec.Cmd
 	name := "/tmp/cam.jpg"
-	cmd = exec.Command("/usr/bin/raspistill", "-rot", rotation, "-q", "50", "-o", name)
+	params = append(params, []string{"-rot", rotation, "-q", "50", "-o", name}...)
+	cmd = exec.Command("/usr/bin/raspistill", params...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()

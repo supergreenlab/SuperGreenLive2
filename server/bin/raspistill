@@ -7,4 +7,8 @@ fi
 
 sleep 1
 
-curl https://i.imgur.com/nSPKWQY.jpg -o "$PIC"
+curl -L https://i.imgur.com/nSPKWQY.jpg -o "$PIC"
+
+for i; do 
+  echo \"$i\"
+done
