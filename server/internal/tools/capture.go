@@ -91,10 +91,13 @@ func TakePic() (string, error) {
 		logrus.Errorf("kv.GetString(raspiparams) in captureHandler %q", err)
 	}
 
-	params := strings.Split(raspiParams, " ")
+	params := strings.FieldsFunc(raspiParams, func(c rune) bool {
+		return c == ' '
+	})
 	var cmd *exec.Cmd
 	name := "/tmp/cam.jpg"
 	params = append(params, []string{"-rot", rotation, "-q", "50", "-o", name}...)
+
 	cmd = exec.Command("/usr/bin/raspistill", params...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
