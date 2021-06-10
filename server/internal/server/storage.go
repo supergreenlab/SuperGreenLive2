@@ -50,9 +50,21 @@ func zipHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fz, err := zw.Create(file.Name())
+		fileInfos, err := f.Stat()
 		if err != nil {
-			logrus.Errorf("w.Create in zipHandler %q", err)
+			logrus.Errorf("fs.Stat in zipHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fileInfoHeaders, err := zip.FileInfoHeader(fileInfos)
+		if err != nil {
+			logrus.Errorf("zip.FileInfoHeader in zipHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		fz, err := zw.CreateHeader(fileInfoHeaders)
+		if err != nil {
+			logrus.Errorf("w.CreateHeader in zipHandler %q", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

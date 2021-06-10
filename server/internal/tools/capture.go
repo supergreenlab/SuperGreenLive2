@@ -96,7 +96,7 @@ func TakePic() (string, error) {
 	})
 	var cmd *exec.Cmd
 	name := "/tmp/cam.jpg"
-	params = append(params, []string{"-rot", rotation, "-q", "50", "-o", name}...)
+	params = append(params, []string{"-rot", rotation, "-q", "100", "-o", name}...)
 
 	cmd = exec.Command("/usr/bin/raspistill", params...)
 	cmd.Stdout = os.Stdout

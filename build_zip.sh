@@ -15,7 +15,7 @@ rm -rf liveserver/*
 npm run generate
 cp -r dist liveserver/static
 
-./sync_pi.sh $PI 
+./sync_pi.sh "$RPI"
 
 ssh pi@$RPI bash <<EOF
 cd SuperGreenLive2/server
