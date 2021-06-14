@@ -100,3 +100,14 @@ To upgrade the timelapse installation, run this command in a terminal:
 ```sh
 curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/update.sh | sudo bash
 ```
+
+# Reset to default
+
+You might want to reset the installation to default.
+To do so, run this command:
+
+```sh
+
+sudo rm -rf /var/liveserver
+
+```
