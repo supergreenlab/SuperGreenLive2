@@ -82,23 +82,43 @@ func TakePic() (string, error) {
 
 	rotation, err := kv.GetString("rotation")
 	if err != nil {
-		logrus.Errorf("kv.GetString(rotation) in captureHandler %q", err)
 		rotation = "0"
 	}
 
-	raspiParams, err := kv.GetString("raspiparams")
-	if err != nil {
-		logrus.Errorf("kv.GetString(raspiparams) in captureHandler %q", err)
+	execPath := "/usr/bin/raspistill"
+	usbCam, err := kv.GetString("usbcam")
+	if err == nil || usbCam == "true" {
+		execPath = "/usr/bin/fswebcam"
+	} else if err != nil {
+		usbCam = "false"
 	}
 
-	params := strings.FieldsFunc(raspiParams, func(c rune) bool {
-		return c == ' '
-	})
-	var cmd *exec.Cmd
-	name := "/tmp/cam.jpg"
-	params = append(params, []string{"-rot", rotation, "-q", "100", "-o", name}...)
+	params := []string{}
 
-	cmd = exec.Command("/usr/bin/raspistill", params...)
+	name := "/tmp/cam.jpg"
+	if usbCam == "false" {
+		raspiParams, err := kv.GetString("raspiparams")
+		if err != nil {
+			logrus.Errorf("kv.GetString(raspiparams) in captureHandler %q", err)
+		}
+
+		params = strings.FieldsFunc(raspiParams, func(c rune) bool {
+			return c == ' '
+		})
+		params = append(params, []string{"-rot", rotation, "-q", "100", "-o", name}...)
+	} else {
+		fswebcamParams, err := kv.GetString("fswebcamparams")
+		if err != nil {
+			logrus.Errorf("kv.GetString(fswebcamparams) in captureHandler %q", err)
+		}
+
+		params = strings.FieldsFunc(fswebcamParams, func(c rune) bool {
+			return c == ' '
+		})
+		params = append(params, []string{"--rotate", rotation, "--resolution", "2592x1944", name}...)
+	}
+
+	cmd := exec.Command(execPath, params...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()

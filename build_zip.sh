@@ -17,13 +17,13 @@ cp -r dist liveserver/static
 
 ./sync_pi.sh "$RPI"
 
-ssh pi@$RPI bash <<EOF
+ssh -i ~/.ssh/raspi/id_rsa pi@$RPI bash <<EOF
 cd SuperGreenLive2/server
 #git pull
 /usr/local/go/bin/go build -o liveserver -v cmd/liveserver/main.go
 EOF
 
-scp pi@$RPI:SuperGreenLive2/server/liveserver liveserver/
+scp -i ~/.ssh/raspi/id_rsa pi@$RPI:SuperGreenLive2/server/liveserver liveserver/
 
 cp -r server/assets liveserver/assets
 cp server/etc/motion.conf liveserver/

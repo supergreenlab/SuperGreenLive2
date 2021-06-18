@@ -3,7 +3,7 @@
 set -e
 
 sudo apt-get update
-sudo apt-get install -y ffmpeg motion libmagickwand-dev
+sudo apt-get install -y fswebcam ffmpeg motion libmagickwand-dev
 
 curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
 unzip -o liveserver.zip

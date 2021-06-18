@@ -9,4 +9,4 @@ fi
 
 RPI="$1"
 
-rsync -avz --exclude 'SuperGreenLive2/server/storage' --delete -e "ssh" $(pwd)/ pi@$RPI:SuperGreenLive2
+rsync -avz --exclude 'SuperGreenLive2/server/storage' --delete -e "ssh -i ~/.ssh/raspi/id_rsa" $(pwd)/ pi@$RPI:SuperGreenLive2

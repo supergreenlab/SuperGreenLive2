@@ -37,6 +37,8 @@ type TimelapseData struct {
 	SkipNight       *string `json:"skipNight,omitempty"`
 	StorageDuration *string `json:"storageDuration,omitempty"`
 	RaspiParams     *string `json:"raspiParams,omitempty"`
+	FSWebCamParams  *string `json:"fswebcamParams,omitempty"`
+	USBCam          *string `json:"usbcam,omitempty"`
 }
 
 func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -104,6 +106,22 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 		}
 	}
 
+	if td.FSWebCamParams != nil {
+		if err := kv.SetString("fswebcamparams", *td.FSWebCamParams); err != nil {
+			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	if td.USBCam != nil {
+		if err := kv.SetString("usbcam", *td.USBCam); err != nil {
+			logrus.Errorf("kv.SetString in timelapseHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
 	services.ScheduleTimelapse()
 
 	fmt.Fprintf(w, "OK")
@@ -118,6 +136,8 @@ func getTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Pa
 		SkipNight:       kv.GetStringOrNil("skipnight"),
 		StorageDuration: kv.GetStringOrNil("storageduration"),
 		RaspiParams:     kv.GetStringOrNil("raspiparams"),
+		FSWebCamParams:  kv.GetStringOrNil("fswebcamparams"),
+		USBCam:          kv.GetStringOrNil("usbcam"),
 	}
 	encoder := json.NewEncoder(w)
 	if err := encoder.Encode(td); err != nil {
