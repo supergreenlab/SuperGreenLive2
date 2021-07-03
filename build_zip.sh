@@ -15,15 +15,7 @@ rm -rf liveserver/*
 npm run generate
 cp -r dist liveserver/static
 
-./sync_pi.sh "$RPI"
-
-ssh -i ~/.ssh/raspi/id_rsa pi@$RPI bash <<EOF
-cd SuperGreenLive2/server
-#git pull
-/usr/local/go/bin/go build -o liveserver -v cmd/liveserver/main.go
-EOF
-
-scp -i ~/.ssh/raspi/id_rsa pi@$RPI:SuperGreenLive2/server/liveserver liveserver/
+./build_rpi.sh $RPI
 
 cp -r server/assets liveserver/assets
 cp server/etc/motion.conf liveserver/
