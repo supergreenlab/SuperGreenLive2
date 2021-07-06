@@ -26,6 +26,7 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
@@ -59,6 +60,7 @@ func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 		fmt.Fprintf(w, "OK")
 		return
 	}
+	tools.WaitCamAvailable()
 	cmd = exec.Command("/usr/bin/motion")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

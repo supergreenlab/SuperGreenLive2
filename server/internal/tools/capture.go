@@ -75,6 +75,11 @@ func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedB
 
 var lastPic time.Time
 
+func WaitCamAvailable() {
+	camMutex.Lock()
+	defer camMutex.Unlock()
+}
+
 func TakePic() (string, error) {
 	camMutex.Lock()
 	defer camMutex.Unlock()

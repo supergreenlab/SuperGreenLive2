@@ -126,6 +126,8 @@ export default {
 #body > h1
   margin: 20pt 0
   color: #454545
+  @media only screen and (max-width: 900pt)
+    font-size: 1.6em
 
 #loading
   position: absolute

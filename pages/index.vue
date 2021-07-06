@@ -21,8 +21,11 @@
     <div :id='$style.body'>
       <div :id='$style.header'>
         <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
-        <nuxt-link to='/camera' :id='$style.change'>readjust cam</nuxt-link>
-        <a :href='storage' target='_blank' :id='$style.change'>storage.zip</a>
+        <div :id='$style.buttons'>
+          <div><nuxt-link to='/camera' :class='$style.button'><img src='~assets/icon_livecam.svg' /><span>Live cam</span></nuxt-link></div>
+          <div><a :href='storage' target='_blank' :class='$style.button'><img src='~assets/icon_download.svg' /><span>Download</span></a></div>
+          <div><a href='javascript:void(0)' :class='$style.button' @click='reset'><img src='~assets/icon_reset.svg' /><span>Reset</span></a></div>
+        </div>
       </div>
       <div :id='$style.plantInfos'>
         <Plant :plant='plant' />
@@ -64,8 +67,9 @@ export default {
     clearInterval(this.interval)
   },
   methods: {
-    nextHandler() {
-      this.$router.push("/")
+    reset() {
+      const c = confirm('Start new timelapse? This is not reversible.')
+      this.$router.push("/plant")
     },
   },
   computed: {
@@ -97,6 +101,8 @@ export default {
   display: flex
   justify-content: space-between
   align-items: center
+  @media only screen and (max-width: 900pt)
+    flex-direction: column
 
 #header > h1
   margin: 20pt 0
@@ -105,10 +111,31 @@ export default {
     font-size: 1.2em
     margin: 10pt 0
 
-#change
+#buttons
+  display: flex
+  @media only screen and (max-width: 900pt)
+    margin-bottom: 15pt
+
+#buttons > div
+  height: 40px
+  text-align: center
+
+.button
+  display: flex
+  flex-direction: column
+  justify-content: space-between
   font-weight: 600
   color: #3bb30b
   text-decoration: none
+  margin: 0 4pt
+  font-size: 0.7em
+
+.button:hover
+  text-decoration: underline
+
+.button > img
+  height: 25px
+  margin-bottom: 4pt
 
 .green
   color: #3bb30b
