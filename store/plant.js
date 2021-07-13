@@ -23,7 +23,6 @@ import axios from 'axios'
 import { loadFromStorage, saveToStorage } from '~/lib/client-side.js'
 
 const STORAGE_ITEM='plant'
-const API_URL=process.env.API_URL
 const RPI_URL=process.env.RPI_URL
 
 export const state = () => {
@@ -43,24 +42,15 @@ export const actions = {
     if (saved) {
       context.commit('setState', JSON.parse(saved))
     }
-  },
-  async restorePlant(context, { token }) {
     const { data: timelapse } = await axios.get(`${RPI_URL}/timelapse`)
     if (timelapse.plantID) {
-      const { data: plant } = await axios.get(`${API_URL}/plant/${timelapse.plantID}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-      const { data: box } = await axios.get(`${API_URL}/box/${plant.boxID}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
+      const { data: plant } = await axios.get(`${RPI_URL}/api/plant/${timelapse.plantID}`)
+      const { data: box } = await axios.get(`${RPI_URL}/api/box/${plant.boxID}`)
       plant.box = box
 
       context.commit('setPlant', plant)
     }
+
   },
 }
 

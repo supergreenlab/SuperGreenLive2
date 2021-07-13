@@ -69,6 +69,7 @@ export default {
   methods: {
     reset() {
       const c = confirm('Start new timelapse? This is not reversible.')
+      if (!c) return;
       this.$router.push("/plant")
     },
   },

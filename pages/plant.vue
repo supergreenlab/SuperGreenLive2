@@ -49,7 +49,6 @@ import Loading from '~/components/loading.vue'
 import Checkbox from '~/components/checkbox.vue'
 import Plant from '~/components/plant.vue'
 
-const API_URL=process.env.API_URL
 const RPI_URL=process.env.RPI_URL
 
 export default {
@@ -59,22 +58,19 @@ export default {
       loading: true,
       plants: [],
       selectedPlant: null,
+      selectedTimelapse: null,
     }
   },
   async mounted() {
-    const { data: { plants } } = await axios.get(`${API_URL}/plants?offset=0&limit=100`, {
-      headers: {
-        'Authorization': `Bearer ${this.$store.state.auth.token}`,
-      },
-    })
-    const { data: { boxes } } = await axios.get(`${API_URL}/boxes?offset=0&limit=100`, {
-      headers: {
-        'Authorization': `Bearer ${this.$store.state.auth.token}`,
-      },
-    })
+    const { data: { plants } } = await axios.get(`${RPI_URL}/api/plants?offset=0&limit=100`)
+    const { data: { boxes } } = await axios.get(`${RPI_URL}/api/boxes?offset=0&limit=100`)
+    const { data: { timelapses } } = await axios.get(`${RPI_URL}/api/timelapses?offset=0&limit=100`)
 
     this.$data.plants = plants.filter(p => !p.archived && !p.deleted).map((p, i) => {
-      p = Object.assign({}, p, {box: boxes.find(b => b.id == p.boxID)})
+      p = Object.assign({}, p, {
+        box: boxes.find(b => b.id == p.boxID),
+        timelapses: timelapses.filter(t => !t.deleted && t.plantID == p.id),
+      })
       p.settings = JSON.parse(p.settings)
       if (typeof p.box.settings == 'string') {
         p.box.settings = JSON.parse(p.box.settings)
@@ -90,14 +86,18 @@ export default {
     async nextHandler() {
       this.$data.loading = true
       this.$store.commit('plant/setPlant', this.$data.selectedPlant)
-      const token = this.$store.state.auth.token
-      const { data: { id } } = await axios.post(`${API_URL}/timelapse`, {
-        plantID: this.$data.selectedPlant.id,
-        type: 'sglstorage',
-        settings: JSON.stringify({}),
-      }, { headers: {Authorization: `Bearer ${token}`}})
+      if (this.$data.selectedTimelapse) {
+        timelapseID = this.$data.selectedTimelapse.id
+      } else {
+        const { data: { id } } = await axios.post(`${RPI_URL}/api/timelapse`, {
+          plantID: this.$data.selectedPlant.id,
+          type: 'sglstorage',
+          settings: JSON.stringify({}),
+        })
+        timelapseID = id
+      }
       await axios.post(`${RPI_URL}/timelapse`, {
-        id,
+        timelapseID,
         plantID: this.$data.selectedPlant.id,
         cron: '@every 10m',
       })
