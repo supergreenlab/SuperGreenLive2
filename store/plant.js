@@ -37,7 +37,7 @@ const storeState = (state) => {
 }
 
 export const actions = {
-  nuxtClientInit(context) {
+  async nuxtClientInit(context) {
     const saved = loadFromStorage(STORAGE_ITEM)
     if (saved) {
       context.commit('setState', JSON.parse(saved))
@@ -50,7 +50,6 @@ export const actions = {
 
       context.commit('setPlant', plant)
     }
-
   },
 }
 
@@ -60,7 +59,7 @@ export const mutations = {
   },
   setPlant(state, plant) {
     state.plant = plant
-    storeState(state)
+    //storeState(state)
   },
 }
 

@@ -48,7 +48,7 @@ func getPlantHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params
 	}
 
 	encoder := json.NewEncoder(w)
-	if err := encoder.Encode(p); err != nil {
+	if err := encoder.Encode(plant); err != nil {
 		logrus.Errorf("encoder.Encode in getPlantHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -65,15 +65,15 @@ func getBoxHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 
 	bid := p.ByName("id")
 
-	b := appbackend.Box{}
-	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/box/%s", bid), &b); err != nil {
+	box := appbackend.Box{}
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/box/%s", bid), &box); err != nil {
 		logrus.Errorf("appbackend.GETSGLObject(/box/:id) in getBoxHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	encoder := json.NewEncoder(w)
-	if err := encoder.Encode(b); err != nil {
+	if err := encoder.Encode(box); err != nil {
 		logrus.Errorf("encoder.Encode in getBoxHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -86,7 +86,7 @@ type GetPlantsParams struct {
 }
 
 type GetPlantsResult struct {
-	plants []appbackend.Plant
+	Plants []appbackend.Plant `json:"plants"`
 }
 
 func getPlantsHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -106,7 +106,7 @@ func getPlantsHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 		return
 	}
 
-	plants := GetPlantsParams{}
+	plants := GetPlantsResult{}
 	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/plants?offset=%d&limit=%d", gpp.Offset, gpp.Limit), &plants); err != nil {
 		logrus.Errorf("appbackend.GETSGLObject(/plants) in getPlantHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -127,7 +127,7 @@ type GetBoxesParams struct {
 }
 
 type GetBoxesResult struct {
-	boxes []appbackend.Box
+	Boxes []appbackend.Box `json:"boxes"`
 }
 
 func getBoxesHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -155,7 +155,7 @@ func getBoxesHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params
 	}
 
 	encoder := json.NewEncoder(w)
-	if err := encoder.Encode(p); err != nil {
+	if err := encoder.Encode(boxes); err != nil {
 		logrus.Errorf("encoder.Encode in getBoxesHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -167,8 +167,14 @@ type GetTimelapsesParams struct {
 	Limit  int
 }
 
+type SelectTimelapsesResult struct {
+	appbackend.Timelapse
+
+	NFrames int `json:"nFrames"`
+}
+
 type GetTimelapsesResult struct {
-	plants []appbackend.Plant
+	Timelapses []SelectTimelapsesResult `json:"timelapses"`
 }
 
 func getTimelapsesHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -188,15 +194,15 @@ func getTimelapsesHandler(w http.ResponseWriter, r *http.Request, p httprouter.P
 		return
 	}
 
-	plants := GetTimelapsesParams{}
-	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/plants?offset=%d&limit=%d", gpp.Offset, gpp.Limit), &plants); err != nil {
-		logrus.Errorf("appbackend.GETSGLObject(/plants) in getTimelapsesHandler %q", err)
+	timelapses := GetTimelapsesResult{}
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/timelapses?addNFrames=true&offset=%d&limit=%d", gpp.Offset, gpp.Limit), &timelapses); err != nil {
+		logrus.Errorf("appbackend.GETSGLObject(/timelapses) in getTimelapsesHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	encoder := json.NewEncoder(w)
-	if err := encoder.Encode(plants); err != nil {
+	if err := encoder.Encode(timelapses); err != nil {
 		logrus.Errorf("encoder.Encode in getTimelapsesHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

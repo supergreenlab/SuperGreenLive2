@@ -41,6 +41,7 @@ func Start() {
 	router.POST("/token", tokenHandler)
 	router.POST("/timelapse", timelapseHandler)
 
+	router.GET("/loggedIn", loggedInHandler)
 	router.GET("/timelapse", getTimelapseHandler)
 	router.GET("/storage.zip", zipHandler)
 
@@ -48,7 +49,7 @@ func Start() {
 	router.GET("/api/box/:id", getBoxHandler)
 	router.GET("/api/plants", getPlantsHandler)
 	router.GET("/api/boxes", getBoxesHandler)
-	router.GET("/api/timelapses", getBoxesHandler)
+	router.GET("/api/timelapses", getTimelapsesHandler)
 	router.POST("/api/timelapse", createTimelapseHandler)
 
 	go func() {

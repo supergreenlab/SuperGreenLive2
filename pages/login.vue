@@ -42,10 +42,8 @@ export default {
   },
   watch: {
     loggedIn(val) {
-      if (this.$store.state.plant.plant == null) {
+      if (val == true) {
         this.$router.replace('/plant')
-      } else {
-        this.$router.replace('/')
       }
     },
   },
@@ -60,10 +58,10 @@ export default {
   },
   computed: {
     loggedIn() {
-      return this.$store.getters['auth/loggedIn']
+      return this.$store.state.auth.loggedIn
     },
     error() {
-      return this.$store.getters['auth/error']
+      return this.$store.state.auth.error
     },
   },
 }

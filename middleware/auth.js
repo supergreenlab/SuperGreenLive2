@@ -18,12 +18,12 @@
 
 export default function({ store, redirect, route }) {
   if (route.path.includes('/login')) {
-    if (store.getters['auth/loggedIn']) {
+    if (store.state.auth.loggedIn) {
       return redirect('/')
     }
     return
   }
-  if (!store.getters['auth/loggedIn']) {
+  if (!store.state.auth.loggedIn) {
     return redirect('/login')
   }
 }

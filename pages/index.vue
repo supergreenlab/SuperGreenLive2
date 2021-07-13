@@ -70,6 +70,7 @@ export default {
     reset() {
       const c = confirm('Start new timelapse? This is not reversible.')
       if (!c) return;
+      this.$store.commit('plant/setPlant', null)
       this.$router.push("/plant")
     },
   },

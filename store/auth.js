@@ -30,7 +30,7 @@ export const state = () => {
   let defaults = {
     error: false,
     loading: false,
-    token: '',
+    loggedIn: false,
   };
   return defaults
 };
@@ -40,11 +40,9 @@ const storeState = (state) => {
 }
 
 export const actions = {
-  nuxtClientInit(context) {
-    const saved = loadFromStorage(STORAGE_ITEM)
-    if (saved) {
-      context.commit('setState', JSON.parse(saved))
-    }
+  async nuxtClientInit({ commit }) {
+    const { data: loggedIn } = await axios.get(`${RPI_URL}/loggedIn`)
+    commit('setLoggedIn', loggedIn)
   },
   async login({ commit, dispatch }, { login, password }) {
     commit('setLoading', true)
@@ -57,11 +55,8 @@ export const actions = {
       const { data: respToken } = await axios.post(`${RPI_URL}/token`, {
         token,
       })
-      if (respToken == 'ALREADY_LOGGED_IN') {
-        await dispatch('plant/restorePlant', { token }, { root: true })
-      }
 
-      commit('setToken', token)
+      //commit('setToken', token)
     } catch(e) {
       commit('setError', true)
     }
@@ -73,9 +68,12 @@ export const mutations = {
   setState(state, newState) {
     Object.assign(state, newState)
   },
-  setToken(state, token) {
+  /*setToken(state, token) {
     state.token = token
-    storeState(state)
+    //storeState(state)
+  },*/
+  setLoggedIn(state, loggedIn) {
+    state.loggedIn = loggedIn
   },
   setLoading(state, loading) {
     state.loading = loading
@@ -86,6 +84,4 @@ export const mutations = {
 }
 
 export const getters = {
-  loggedIn: state => !!state.token,
-  error: state => state.error,
 }

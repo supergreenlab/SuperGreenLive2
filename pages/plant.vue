@@ -21,17 +21,24 @@
     <div :id='$style.body'>
       <h1>SELECT <span :class='$style.green'>THE PLANT</span> ON THIS TIMELAPSE</h1>
       <div :id='$style.plants'>
-        <div :class='$style.plant' v-for='plant in plants'>
+        <div :class='$style.dashed' v-for='plant in plants'>
           <Plant :plant='plant' />
-          <div :class='$style.checkboxcontainer'>
-            <div :class='$style.checkbox'>
-              <Checkbox :checked='selectedPlant == plant' @click='selectPlant(plant)' />
+          <div :id='$style.timelapses' v-if='plant.timelapses.length'>
+            <h3>Current timelapses</h3>
+            <div :class='$style.timelapse' v-for='timelapse in plant.timelapses'>
+              <div :class='$style.timelapseinfos'>
+                <b>{{ timelapse.name }}</b> - {{ timelapse.nFrames || 0 }} frames<br />
+                <span :class='$style.date'>Started: {{ new Date(timelapse.cat).toLocaleString() }}</span>
+              </div>
+              <div :class='$style.buttonscontainer'>
+                <a @click='start(plant, timelapse)'><img src='~/assets/icon_continue.svg' height='20pt' />&nbsp;Continue timelapse</a>
+              </div>
             </div>
           </div>
+          <div :class='$style.newtimelapse'>
+            <a @click='start(plant)'><img src='~/assets/icon_add.svg' height='20pt' />&nbsp;Create new timelapse</a>
+          </div>
         </div>
-      </div>
-      <div :id='$style.button'>
-        <button @click='selectedPlant != null ? nextHandler() : null' :class='selectedPlant == null ? $style.disabled : ""'>NEXT</button>
       </div>
     </div>
     <div v-if='loading' :id='$style.loading'>
@@ -57,8 +64,6 @@ export default {
     return {
       loading: true,
       plants: [],
-      selectedPlant: null,
-      selectedTimelapse: null,
     }
   },
   async mounted() {
@@ -80,17 +85,16 @@ export default {
     this.$data.loading = false
   },
   methods: {
-    selectPlant(plant) {
-      this.$data.selectedPlant = plant
-    },
-    async nextHandler() {
+    async start(plant, timelapse) {
       this.$data.loading = true
-      this.$store.commit('plant/setPlant', this.$data.selectedPlant)
-      if (this.$data.selectedTimelapse) {
-        timelapseID = this.$data.selectedTimelapse.id
+      let timelapseID
+      if (timelapse) {
+        timelapseID = timelapse.id
       } else {
+        const name = prompt('Please name this timelapse:', 'Timelapse')
         const { data: { id } } = await axios.post(`${RPI_URL}/api/timelapse`, {
-          plantID: this.$data.selectedPlant.id,
+          name: name,
+          plantID: plant.id,
           type: 'sglstorage',
           settings: JSON.stringify({}),
         })
@@ -98,11 +102,24 @@ export default {
       }
       await axios.post(`${RPI_URL}/timelapse`, {
         timelapseID,
-        plantID: this.$data.selectedPlant.id,
+        plantID: plant.id,
         cron: '@every 10m',
       })
 
+      this.$store.commit('plant/setPlant', plant)
       this.$router.push('/camera')
+    },
+  },
+  watch: {
+    plant(val) {
+      if (val) {
+        this.$router.replace('/')
+      }
+    }
+  },
+  computed: {
+    plant() {
+      return this.$store.state.plant.plant
     },
   },
 }
@@ -147,15 +164,56 @@ export default {
   flex: 1 
   overflow: auto
 
-.plant
-  display: flex
+.dashed
   border-bottom: 1pt dashed #ababab
 
-.checkboxcontainer
+#timelapses
+  margin: 0 20pt
+
+#timelapses h3
+  margin: 5pt 0
+  color: #454545
+
+.timelapse
+  display: flex
+  margin: 5pt 0
+  border-bottom: 1pt dashed #ababab
+
+.timelapseinfos
+  flex: 1
+  color: #454545
+
+.timelapse b
+  font-weight: bold
+  color: #3bb30b
+
+.timelapse .date
+  font-size: 0.8em
+  color: #898989
+
+.newtimelapse a
+  display: flex
+  justify-content: center
+  align-items: center
+  text-align: center
+  color: #454545
+  cursor: pointer
+  margin: 10pt 0
+
+.newtimelapse:hover
+  text-decoration: underline
+
+.buttonscontainer a
   display: flex
   justify-content: center
   align-items: center
   margin: 0 10pt
+  text-align: center
+  cursor: pointer
+  color: #454545
+
+.buttonscontainer:hover
+  text-decoration: underline
 
 #button
   display: flex
