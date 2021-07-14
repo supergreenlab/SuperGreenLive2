@@ -105,15 +105,15 @@ export default {
         plantID: plant.id,
         cron: '@every 10m',
       })
-
+      this.showCamera = true
       this.$store.commit('plant/setPlant', plant)
-      this.$router.push('/camera')
     },
   },
   watch: {
     plant(val) {
       if (val) {
-        this.$router.replace('/')
+        console.log(this.showCamera)
+        this.$router.replace(this.showCamera ? '/camera' : '/')
       }
     }
   },
