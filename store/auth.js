@@ -56,7 +56,7 @@ export const actions = {
         token,
       })
 
-      //commit('setToken', token)
+      commit('setLoggedIn', true)
     } catch(e) {
       commit('setError', true)
     }
