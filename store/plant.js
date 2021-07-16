@@ -47,6 +47,10 @@ export const actions = {
       const { data: plant } = await axios.get(`${RPI_URL}/api/plant/${timelapse.plantID}`)
       const { data: box } = await axios.get(`${RPI_URL}/api/box/${plant.boxID}`)
       plant.box = box
+      plant.settings = JSON.parse(plant.settings)
+      if (typeof plant.box.settings == 'string') {
+        plant.box.settings = JSON.parse(plant.box.settings)
+      }
 
       context.commit('setPlant', plant)
     }
