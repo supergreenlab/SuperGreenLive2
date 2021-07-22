@@ -178,6 +178,9 @@ export default {
   text-transform: uppercase
   color: #454545
 
+#noplants img
+  margin-bottom: 20pt
+
 #noplants a
   color: #454545
 
