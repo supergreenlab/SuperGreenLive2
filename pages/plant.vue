@@ -21,7 +21,12 @@
     <div :id='$style.body'>
       <h1>SELECT <span :class='$style.green'>THE PLANT</span> ON THIS TIMELAPSE</h1>
       <div :id='$style.plants'>
-        <div :class='$style.dashed' v-for='plant in plants'>
+        <div v-if='plants.length == 0' :id='$style.noplants'>
+          <img src='~assets/icon_noplant.svg' />
+          <h2>No plant yet</h2>
+          <small>Head to the <a href='https://www.supergreenlab.com/app' target='_blank'>app</a> to create one</small>
+        </div>
+        <div v-else :class='$style.dashed' v-for='plant in plants'>
           <Plant :plant='plant' />
           <div :id='$style.timelapses' v-if='plant.timelapses.length'>
             <h3>Current timelapses</h3>
@@ -163,6 +168,18 @@ export default {
 #plants
   flex: 1 
   overflow: auto
+
+#noplants
+  display: flex
+  flex-direction: column
+  height: 100%
+  align-items: center
+  justify-content: center
+  text-transform: uppercase
+  color: #454545
+
+#noplants a
+  color: #454545
 
 .dashed
   border-bottom: 1pt dashed #ababab
