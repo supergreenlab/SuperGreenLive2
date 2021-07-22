@@ -111,7 +111,7 @@ func captureTimelapse() {
 
 	timelapseID, err := kv.GetString("timelapseid")
 	if err != nil {
-		logrus.Errorf("kv.GetString in captureTimelapse %q", err)
+		logrus.Errorf("kv.GetString(timelapseid) in captureTimelapse %q", err)
 		return
 	}
 

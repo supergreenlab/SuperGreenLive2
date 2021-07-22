@@ -26,8 +26,9 @@
         </div>
 
         <div :id='$style.motion'>
-          <img v-if='motionStarted' :src='src' @error='imgError'/>
+          <img v-if='motionStarted' :style='{"transform": `rotate(${rotation}deg)`}' :src='src' @error='imgError'/>
         </div>
+        <div :id='$style.controlbuttons'><a href='javascript:void(0)' @click='rotate'><img src='~assets/icon_rotate.svg' /><br />Rotate</a></div>
       </div>
       <div :id='$style.button'>
         <button @click='nextHandler'>NEXT</button>
@@ -46,6 +47,7 @@ export default {
     return {
       src: `${RPI_URL}/motion`,
       motionStarted: false,
+      rotation: 0,
     }
   },
   async mounted() {
@@ -57,12 +59,19 @@ export default {
   methods: {
     async nextHandler() {
       await axios.post(`${RPI_URL}/motion/stop`)
+      await axios.post(`${RPI_URL}/timelapse`, {
+        rotation: `${this.$data.rotation}`,
+      })
+
       this.$router.push("/")
     },
     async imgError() {
       setTimeout(() => {
         this.$data.src = `${RPI_URL}/motion?rand=${new Date().getTime()}`
       }, 1000)
+    },
+    rotate() {
+      this.$data.rotation = (this.$data.rotation + 90) % 360;
     },
   },
 }
@@ -145,5 +154,12 @@ export default {
   position: relative
   width: 100pt
   height: 100pt
+
+#controlbuttons
+  text-align: center
+
+#controlbuttons > a
+  color: #454545
+  text-decoration: none
 
 </style>

@@ -101,7 +101,7 @@ export default {
         timelapseID = id
       }
       await axios.post(`${RPI_URL}/timelapse`, {
-        timelapseID,
+        id: timelapseID,
         plantID: plant.id,
         cron: '@every 10m',
       })
