@@ -23,6 +23,7 @@
         <div :id='$style.title'>S<span :id='$style.green'>G</span>L LOGIN</div>
         <input type='text' placeholder='Login' v-model='login' @change=''/>
         <input type='password' placeholder='Password' v-model='password' />
+        <div :id='$style.app'>No account yet? create one on the <a target='_blank' href='https://www.supergreenlab.com/app'>sgl app</a></div>
         <span :id='$style.error' v-if='error'>Wrong login/password</span>
         <div :id='$style.button'>
           <button @click='loginHandler'>LOGIN</button>
@@ -111,5 +112,8 @@ export default {
 
 #error
   color: red
+
+#app
+  color: #454545
 
 </style>
