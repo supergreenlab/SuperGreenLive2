@@ -21,7 +21,7 @@
     <div :id='$style.body'>
       <h1>SELECT <span :class='$style.green'>THE PLANT</span> ON THIS TIMELAPSE</h1>
       <div :id='$style.plants'>
-        <div v-if='plants.length == 0' :id='$style.noplants'>
+        <div v-if='!loading && plants.length == 0' :id='$style.noplants'>
           <img src='~assets/icon_noplant.svg' />
           <h2>No plant yet</h2>
           <small>Head to the <a href='https://www.supergreenlab.com/app' target='_blank'>app</a> to create one</small>
@@ -58,13 +58,12 @@
 import axios from 'axios'
 
 import Loading from '~/components/loading.vue'
-import Checkbox from '~/components/checkbox.vue'
 import Plant from '~/components/plant.vue'
 
 const RPI_URL=process.env.RPI_URL
 
 export default {
-  components: {Loading, Checkbox, Plant,},
+  components: {Loading, Plant,},
   data() {
     return {
       loading: true,
@@ -117,7 +116,6 @@ export default {
   watch: {
     plant(val) {
       if (val) {
-        console.log(this.showCamera)
         this.$router.replace(this.showCamera ? '/camera' : '/')
       }
     }

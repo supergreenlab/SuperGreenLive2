@@ -22,6 +22,7 @@
       <div :id='$style.header'>
         <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
         <div :id='$style.buttons'>
+          <div><div :class='$style.button'><div :class='$style.checkbox'><Checkbox @click='toggleSkipNight' :checked='skipNight'/></div><span>Skip Night</span></div></div>
           <div><nuxt-link to='/camera' :class='$style.button'><img src='~assets/icon_livecam.svg' /><span>Live cam</span></nuxt-link></div>
           <div><a :href='storage' target='_blank' :class='$style.button'><img src='~assets/icon_download.svg' /><span>Download</span></a></div>
           <div><a href='javascript:void(0)' :class='$style.button' @click='reset'><img src='~assets/icon_reset.svg' /><span>Reset</span></a></div>
@@ -43,13 +44,16 @@
 <script>
 import axios from 'axios'
 import Loading from '~/components/loading.vue'
+import Checkbox from '~/components/checkbox.vue'
 
 const RPI_URL=process.env.RPI_URL
 
 export default {
+  components: {Checkbox,},
   data() {
     return {
       n: 0,
+      skipNight: null,
       srcs: [null, `${RPI_URL}/capture`],
       storage: `${RPI_URL}/storage.zip`,
     }
@@ -62,6 +66,10 @@ export default {
         `${RPI_URL}/capture?rand=${new Date().getTime()}`
       ]
     }, 120000)
+    axios.get(`${RPI_URL}/timelapse`).then(({ data: { skipNight } }) => {
+      skipNight = skipNight == null ? true : skipNight == 'true'
+      this.$data.skipNight = skipNight
+    })
   },
   destroyed() {
     clearInterval(this.interval)
@@ -73,6 +81,10 @@ export default {
       this.$store.commit('plant/setPlant', null)
       this.$router.push("/plant")
     },
+    toggleSkipNight() {
+      this.$data.skipNight = !this.$data.skipNight
+      axios.post(`${RPI_URL}/timelapse`, {skipNight: `${this.$data.skipNight}`})
+    }
   },
   computed: {
     plant() {
@@ -135,7 +147,7 @@ export default {
 .button:hover
   text-decoration: underline
 
-.button > img
+.checkbox, .button > img
   height: 25px
   margin-bottom: 4pt
 
