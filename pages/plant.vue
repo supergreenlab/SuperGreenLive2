@@ -90,24 +90,32 @@ export default {
   },
   methods: {
     async start(plant, timelapse) {
-      this.$data.loading = true
       let timelapseID
       if (timelapse) {
         timelapseID = timelapse.id
       } else {
         const name = prompt('Please name this timelapse:', 'Timelapse')
+        if (name == null) {
+          return
+        }
+        this.$data.loading = true
+        const midnight = new Date()
+        midnight.setHours(0)
         const { data: { id } } = await axios.post(`${RPI_URL}/api/timelapse`, {
           name: name,
           plantID: plant.id,
           type: 'sglstorage',
-          settings: JSON.stringify({}),
+          settings: JSON.stringify({
+            dailyTime: midnight.getUTCHours(),
+            weeklyDay: 0,
+            weeklyTime: midnight.getUTCHours(),
+          }),
         })
         timelapseID = id
       }
       await axios.post(`${RPI_URL}/timelapse`, {
         id: timelapseID,
         plantID: plant.id,
-        cron: '@every 10m',
       })
       this.showCamera = true
       this.$store.commit('plant/setPlant', plant)

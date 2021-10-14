@@ -27,7 +27,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
@@ -42,10 +41,8 @@ import (
 )
 
 var (
-	c                     *cron.Cron
-	timelapseEntryID      *cron.EntryID
-	timelapseEntryIDMutex sync.Mutex
-	_                     = pflag.String("storagedir", "/tmp/storage", "location for the latest pics")
+	c *cron.Cron
+	_ = pflag.String("storagedir", "/tmp/storage", "location for the latest pics")
 )
 
 func init() {
@@ -62,50 +59,6 @@ func captureTimelapse() {
 	token, err := kv.GetString("token")
 	if err != nil {
 		logrus.Errorf("kv.GetString(token) in captureTimelapse %q", err)
-		return
-	}
-
-	cam, err := tools.TakePic()
-	if err != nil {
-		logrus.Errorf("takePic in captureTimelapse %q", err)
-		return
-	}
-	reader, err := os.Open(cam)
-	if err != nil {
-		logrus.Errorf("os.Open in captureTimelapse %q", err)
-		return
-	}
-	defer reader.Close()
-
-	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
-	if err != nil {
-		logrus.Errorf("image.Decode in captureHandler %q", err)
-		return
-	}
-
-	var resized image.Image
-	if img.Bounds().Max.X > img.Bounds().Max.Y {
-		resized = imaging.Resize(img, 1250, 0, imaging.Lanczos)
-	} else {
-		resized = imaging.Resize(img, 0, 1250, imaging.Lanczos)
-	}
-
-	buff := new(bytes.Buffer)
-	err = jpeg.Encode(buff, resized, &jpeg.Options{Quality: 80})
-	if err != nil {
-		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
-		return
-	}
-
-	resp := timelapseUploadURLResult{}
-	if err := appbackend.POSTSGLObject(token, "/timelapseUploadURL", &timelapseUploadURLRequest{}, &resp); err != nil {
-		logrus.Errorf("appbackend.POSTSGLObject(timelapseUploadURL) in captureTimelapse %q", err)
-		return
-	}
-
-	err = appbackend.UploadSGLObject(resp.UploadPath, bytes.NewReader(buff.Bytes()), int64(buff.Len()))
-	if err != nil {
-		logrus.Errorf("appbackend.UploadSGLObject in captureTimelapse %q", err)
 		return
 	}
 
@@ -183,6 +136,50 @@ func captureTimelapse() {
 		from := t.Add(-24 * time.Hour)
 		to := t
 		meta = appbackend.LoadMetricsMeta(device, box, from, to, appbackend.LoadGraphValue, getLedBox)
+	}
+
+	cam, err := tools.TakePic()
+	if err != nil {
+		logrus.Errorf("takePic in captureTimelapse %q", err)
+		return
+	}
+	reader, err := os.Open(cam)
+	if err != nil {
+		logrus.Errorf("os.Open in captureTimelapse %q", err)
+		return
+	}
+	defer reader.Close()
+
+	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
+	if err != nil {
+		logrus.Errorf("image.Decode in captureHandler %q", err)
+		return
+	}
+
+	var resized image.Image
+	if img.Bounds().Max.X > img.Bounds().Max.Y {
+		resized = imaging.Resize(img, 1250, 0, imaging.Lanczos)
+	} else {
+		resized = imaging.Resize(img, 0, 1250, imaging.Lanczos)
+	}
+
+	buff := new(bytes.Buffer)
+	err = jpeg.Encode(buff, resized, &jpeg.Options{Quality: 80})
+	if err != nil {
+		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
+		return
+	}
+
+	resp := timelapseUploadURLResult{}
+	if err := appbackend.POSTSGLObject(token, "/timelapseUploadURL", &timelapseUploadURLRequest{}, &resp); err != nil {
+		logrus.Errorf("appbackend.POSTSGLObject(timelapseUploadURL) in captureTimelapse %q", err)
+		return
+	}
+
+	err = appbackend.UploadSGLObject(resp.UploadPath, bytes.NewReader(buff.Bytes()), int64(buff.Len()))
+	if err != nil {
+		logrus.Errorf("appbackend.UploadSGLObject in captureTimelapse %q", err)
+		return
 	}
 
 	var metaStr string
@@ -309,21 +306,10 @@ func removeOldFiles() error {
 }
 
 func ScheduleTimelapse() {
-	if cron, err := kv.GetString("cron"); err != nil {
-		logrus.Errorf("kv.GetString in ScheduleTimelapse %q", err)
+	_, err := c.AddFunc("@every 10m", captureTimelapse)
+	if err != nil {
+		logrus.Errorf("c.AddFunc in ScheduleTimelapse %q", err)
 		return
-	} else {
-		timelapseEntryIDMutex.Lock()
-		defer timelapseEntryIDMutex.Unlock()
-		if timelapseEntryID != nil {
-			c.Remove(*timelapseEntryID)
-		}
-		entryID, err := c.AddFunc(cron, captureTimelapse)
-		if err != nil {
-			logrus.Errorf("c.AddFunc in ScheduleTimelapse %q", err)
-			return
-		}
-		timelapseEntryID = &entryID
 	}
 }
 

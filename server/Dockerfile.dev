@@ -9,6 +9,10 @@ ADD bin/motion /usr/bin/motion
 ADD bin/raspistill /usr/bin/raspistill
 
 RUN go get -u github.com/cosmtrek/air
+RUN git config --global url.git@github.com:.insteadOf https://github.com/
+
+RUN mkdir ~/.ssh
+RUN echo "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" >> ~/.ssh/config
 
 RUN mkdir /app
 WORKDIR /app

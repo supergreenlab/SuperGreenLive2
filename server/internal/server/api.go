@@ -244,3 +244,39 @@ func createTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter
 		return
 	}
 }
+
+type UpdateTimelapseResponse struct {
+	ID string `json:"id"`
+}
+
+func UpdateTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	token, err := kv.GetString("token")
+	if err != nil {
+		logrus.Errorf("kv.GetString(token) in createTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	t := appbackend.Timelapse{}
+
+	dec := json.NewDecoder(r.Body)
+	if err := dec.Decode(&t); err != nil {
+		logrus.Errorf("dec.Decode in createTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ctr := UpdateTimelapseResponse{}
+	if err := appbackend.PUTSGLObject(token, "/timelapse", &t, &ctr); err != nil {
+		logrus.Errorf("appbackend.GETSGLObject(/boxes) in createTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	encoder := json.NewEncoder(w)
+	if err := encoder.Encode(ctr); err != nil {
+		logrus.Errorf("encoder.Encode in createTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
