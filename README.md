@@ -14,6 +14,9 @@ Table of Contents
 * [Installation](#installation)
 * [Upgrade](#upgrade)
 
+There is now a complete and detailed guide on the website, please follow it [here](https://www.supergreenlab.com/guide/how-to-setup-a-remote-live-camera) :)
+===
+
 # SuperGreenLivePI2
 
 Remote live cam companion that goes with the [SuperGreenApp2](https://github.com/supergreenlab/SuperGreenApp2)
