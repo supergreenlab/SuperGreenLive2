@@ -42,6 +42,7 @@ export const actions = {
     if (saved) {
       context.commit('setState', JSON.parse(saved))
     }
+    await new Promise(r => setTimeout(r, 100))
     const { data: timelapse } = await axios.get(`${RPI_URL}/timelapse`)
     if (timelapse.plantID) {
       const { data: plant } = await axios.get(`${RPI_URL}/api/plant/${timelapse.plantID}`)

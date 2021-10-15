@@ -1,4 +1,5 @@
 @import './normalize.css';
+@import 'vue-select/dist/vue-select.css';
 
 html {
 	font-size: 11pt;

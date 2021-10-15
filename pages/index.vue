@@ -38,6 +38,7 @@
         <div v-for='src in srcs' v-if='src' :key='src' :style='{"background-image": `url(${src})`}'></div>
       </div>
     </div>
+    <Times v-if='showTimelapseSettings' @close='closeTimelapseSettings' />
   </section>
 </template>
 
@@ -45,14 +46,16 @@
 import axios from 'axios'
 import Loading from '~/components/loading.vue'
 import Checkbox from '~/components/checkbox.vue'
+import Times from '~/components/times.vue'
 
 const RPI_URL=process.env.RPI_URL
 
 export default {
-  components: {Checkbox,},
+  components: {Checkbox, Times,},
   data() {
     return {
       n: 0,
+      showTimelapseSettings: true,
       skipNight: null,
       srcs: [null, `${RPI_URL}/capture`],
       storage: `${RPI_URL}/storage.zip`,
@@ -84,7 +87,10 @@ export default {
     toggleSkipNight() {
       this.$data.skipNight = !this.$data.skipNight
       axios.post(`${RPI_URL}/timelapse`, {skipNight: `${this.$data.skipNight}`})
-    }
+    },
+    closeTimelapseSettings() {
+      this.$data.showTimelapseSettings = !this.$data.showTimelapseSettings
+    },
   },
   computed: {
     plant() {
