@@ -19,7 +19,7 @@
 <template>
   <section :id='$style.container'>
     <div :id='$style.body'>
-      <img src='~/assets/close.svg' :id='$style.close' @click='close' />
+      <img src='~assets/close.svg' :id='$style.close' @click='close' />
       <h1>Daily timelapse</h1>
       <p>Trigger the generation of my <b>daily</b> timelapse at:</p>
       <div :class='$style.params'>
@@ -111,8 +111,11 @@ export default {
   align-items: center
   justify-content: center
   padding: 20pt 0
+  @media only screen and (max-width: 1000pt)
+    flex-direction: column
 
 .param
   width: 200pt
+  margin: 10pt
 
 </style>

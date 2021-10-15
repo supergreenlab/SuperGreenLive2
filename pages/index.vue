@@ -22,6 +22,7 @@
       <div :id='$style.header'>
         <h1>PLANT ON THIS <span :class='$style.green'>TIMELAPSE</span>:</h1>
         <div :id='$style.buttons'>
+          <div><a href='javascript:void(0)' :class='$style.button' @click='showTimes'><img src='~assets/timelapse-times.svg' /><span>Timelapse</span></a></div>
           <div><div :class='$style.button'><div :class='$style.checkbox'><Checkbox @click='toggleSkipNight' :checked='skipNight'/></div><span>Skip Night</span></div></div>
           <div><nuxt-link to='/camera' :class='$style.button'><img src='~assets/icon_livecam.svg' /><span>Live cam</span></nuxt-link></div>
           <div><a :href='storage' target='_blank' :class='$style.button'><img src='~assets/icon_download.svg' /><span>Download</span></a></div>
@@ -38,7 +39,7 @@
         <div v-for='src in srcs' v-if='src' :key='src' :style='{"background-image": `url(${src})`}'></div>
       </div>
     </div>
-    <Times v-if='showTimelapseSettings' @close='closeTimelapseSettings' />
+    <Times v-if='showTimelapseSettings' @close='closeTimes' />
   </section>
 </template>
 
@@ -55,7 +56,7 @@ export default {
   data() {
     return {
       n: 0,
-      showTimelapseSettings: true,
+      showTimelapseSettings: false,
       skipNight: null,
       srcs: [null, `${RPI_URL}/capture`],
       storage: `${RPI_URL}/storage.zip`,
@@ -88,8 +89,11 @@ export default {
       this.$data.skipNight = !this.$data.skipNight
       axios.post(`${RPI_URL}/timelapse`, {skipNight: `${this.$data.skipNight}`})
     },
-    closeTimelapseSettings() {
-      this.$data.showTimelapseSettings = !this.$data.showTimelapseSettings
+    closeTimes() {
+      this.$data.showTimelapseSettings = false
+    },
+    showTimes() {
+      this.$data.showTimelapseSettings = true
     },
   },
   computed: {
