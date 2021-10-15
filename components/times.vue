@@ -104,6 +104,7 @@ export default {
   text-transform: uppercase
 
 #body > p > b
+  font-weight: 600
   color: #3bb30b
 
 .params
