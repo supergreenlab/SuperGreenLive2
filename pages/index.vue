@@ -158,7 +158,7 @@ export default {
   text-decoration: underline
 
 .checkbox, .button > img
-  height: 25px
+  height: 35px
   margin-bottom: 4pt
 
 .green
