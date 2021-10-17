@@ -45,12 +45,14 @@ func Start() {
 	router.GET("/timelapse", getTimelapseHandler)
 	router.GET("/storage.zip", zipHandler)
 
-	router.GET("/api/plant/:id", getPlantHandler)
-	router.GET("/api/box/:id", getBoxHandler)
-	router.GET("/api/plants", getPlantsHandler)
-	router.GET("/api/boxes", getBoxesHandler)
-	router.GET("/api/timelapses", getTimelapsesHandler)
-	router.POST("/api/timelapse", createTimelapseHandler)
+	router.GET("/api/plant/:id", getAPIPlantHandler)
+	router.GET("/api/box/:id", getAPIBoxHandler)
+	router.GET("/api/timelapse/:id", getAPITimelapseHandler)
+	router.GET("/api/plants", getAPIPlantsHandler)
+	router.GET("/api/boxes", getAPIBoxesHandler)
+	router.GET("/api/timelapses", getAPITimelapsesHandler)
+	router.POST("/api/timelapse", createAPITimelapseHandler)
+	router.PUT("/api/timelapse", updateAPITimelapseHandler)
 
 	go func() {
 		log.Fatal(http.ListenAndServe(":8081", cors.AllowAll().Handler(router)))

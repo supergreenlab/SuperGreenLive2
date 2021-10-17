@@ -27,7 +27,8 @@ const RPI_URL=process.env.RPI_URL
 
 export const state = () => {
   let defaults = {
-    plant: null
+    timelapse: null,
+    plant: null,
   };
   return defaults
 };
@@ -53,6 +54,7 @@ export const actions = {
         plant.box.settings = JSON.parse(plant.box.settings)
       }
 
+      context.commit('setTimelapse', timelapse)
       context.commit('setPlant', plant)
     }
   },
@@ -64,6 +66,10 @@ export const mutations = {
   },
   setPlant(state, plant) {
     state.plant = plant
+    //storeState(state)
+  },
+  setTimelapse(state, timelapse) {
+    state.timelapse = timelapse
     //storeState(state)
   },
 }

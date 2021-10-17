@@ -25,12 +25,13 @@ import (
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
+	"github.com/gofrs/uuid"
 	"github.com/gorilla/schema"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
 
-func getPlantHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func getAPIPlantHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	token, err := kv.GetString("token")
 	if err != nil {
 		logrus.Errorf("kv.GetString(token) in getPlantHandler %q", err)
@@ -55,7 +56,7 @@ func getPlantHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params
 	}
 }
 
-func getBoxHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func getAPIBoxHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	token, err := kv.GetString("token")
 	if err != nil {
 		logrus.Errorf("kv.GetString(token) in getBoxHandler %q", err)
@@ -80,6 +81,31 @@ func getBoxHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	}
 }
 
+func getAPITimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	token, err := kv.GetString("token")
+	if err != nil {
+		logrus.Errorf("kv.GetString(token) in getTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tid := p.ByName("id")
+
+	timelapse := appbackend.Timelapse{}
+	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/timelapse/%s", tid), &timelapse); err != nil {
+		logrus.Errorf("appbackend.GETSGLObject(/timelapse/:id) in getTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	encoder := json.NewEncoder(w)
+	if err := encoder.Encode(timelapse); err != nil {
+		logrus.Errorf("encoder.Encode in getTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 type GetPlantsParams struct {
 	Offset int
 	Limit  int
@@ -89,7 +115,7 @@ type GetPlantsResult struct {
 	Plants []appbackend.Plant `json:"plants"`
 }
 
-func getPlantsHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func getAPIPlantsHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	token, err := kv.GetString("token")
 	if err != nil {
 		logrus.Errorf("kv.GetString(token) in getPlantHandler %q", err)
@@ -130,7 +156,7 @@ type GetBoxesResult struct {
 	Boxes []appbackend.Box `json:"boxes"`
 }
 
-func getBoxesHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func getAPIBoxesHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	token, err := kv.GetString("token")
 	if err != nil {
 		logrus.Errorf("kv.GetString(token) in getBoxesHandler %q", err)
@@ -177,7 +203,7 @@ type GetTimelapsesResult struct {
 	Timelapses []SelectTimelapsesResult `json:"timelapses"`
 }
 
-func getTimelapsesHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func getAPITimelapsesHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	token, err := kv.GetString("token")
 	if err != nil {
 		logrus.Errorf("kv.GetString(token) in getTimelapsesHandler %q", err)
@@ -213,7 +239,7 @@ type CreateTimelapseResponse struct {
 	ID string `json:"id"`
 }
 
-func createTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func createAPITimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	token, err := kv.GetString("token")
 	if err != nil {
 		logrus.Errorf("kv.GetString(token) in createTimelapseHandler %q", err)
@@ -232,7 +258,7 @@ func createTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter
 
 	ctr := CreateTimelapseResponse{}
 	if err := appbackend.POSTSGLObject(token, "/timelapse", &t, &ctr); err != nil {
-		logrus.Errorf("appbackend.GETSGLObject(/boxes) in createTimelapseHandler %q", err)
+		logrus.Errorf("appbackend.POSTSGLObject(/timelapse) in createTimelapseHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -246,13 +272,20 @@ func createTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter
 }
 
 type UpdateTimelapseResponse struct {
-	ID string `json:"id"`
+	Status string `json:"status"`
 }
 
-func UpdateTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func updateAPITimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	token, err := kv.GetString("token")
 	if err != nil {
-		logrus.Errorf("kv.GetString(token) in createTimelapseHandler %q", err)
+		logrus.Errorf("kv.GetString(token) in updateTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	timelapseID, err := kv.GetString("timelapseid")
+	if err != nil {
+		logrus.Errorf("kv.GetString(timelapseid) in updateTimelapseHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -261,21 +294,29 @@ func UpdateTimelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter
 
 	dec := json.NewDecoder(r.Body)
 	if err := dec.Decode(&t); err != nil {
-		logrus.Errorf("dec.Decode in createTimelapseHandler %q", err)
+		logrus.Errorf("dec.Decode in updateTimelapseHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	u, err := uuid.FromString(timelapseID)
+	if err != nil {
+		logrus.Errorf("uuid.FromString in updateTimelapseHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	t.ID.UUID = u
+	t.ID.Valid = true
 
-	ctr := UpdateTimelapseResponse{}
-	if err := appbackend.PUTSGLObject(token, "/timelapse", &t, &ctr); err != nil {
-		logrus.Errorf("appbackend.GETSGLObject(/boxes) in createTimelapseHandler %q", err)
+	utr := UpdateTimelapseResponse{}
+	if err := appbackend.PUTSGLObject(token, "/timelapse", &t, &utr); err != nil {
+		logrus.Errorf("appbackend.PUTSGLObject(/timelapse) in updateTimelapseHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	encoder := json.NewEncoder(w)
-	if err := encoder.Encode(ctr); err != nil {
-		logrus.Errorf("encoder.Encode in createTimelapseHandler %q", err)
+	if err := encoder.Encode(utr); err != nil {
+		logrus.Errorf("encoder.Encode in updateTimelapseHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

@@ -18,15 +18,26 @@
 
 <template>
   <section :id='$style.container'>
-    <div @click='minus' :id='$style.minus' :class='$style.button'><img src='~/assets/minus.svg' /></div>
-    <div :id='$style.hour'>{{ String(value).padStart(2, '0') }}h</div>
-    <div @click='plus' :id='$style.plus' :class='$style.button'><img src='~/assets/plus.svg' /></div>
+    <div v-if='!inputMode' :id='$style.input'>
+      <div @click='minus' :id='$style.minus' :class='$style.button'><img src='~/assets/minus.svg' /></div>
+      <div :id='$style.hour' @click='clickInputMode'>{{ String(value).padStart(2, '0') }}h</div>
+      <div @click='plus' :id='$style.plus' :class='$style.button'><img src='~/assets/plus.svg' /></div>
+    </div>
+    <div v-else :id='$style.input' :class='$style.inputMode'>
+      <input @keypress='listenEnter' ref='input' type='number' :value='value' />
+      <button @click='save'>save</button>
+    </div>
   </section>
 </template>
 
 <script>
 export default {
   props: ['value'],
+  data() {
+    return {
+      inputMode: false
+    }
+  },
   methods: {
     minus() {
       let value = this.$props.value - 1
@@ -38,6 +49,28 @@ export default {
     plus() {
       this.$emit('change', (this.$props.value + 1) % 24)
     },
+    clickInputMode() {
+      this.$data.inputMode = true
+      setTimeout(() => {
+        this.$refs['input'].select()
+      }, 50)
+    },
+    save() {
+      let val = parseInt(this.$refs['input'].value) % 24
+      if (val < 0) {
+        val = 0
+      }
+      if (isNaN(val)) {
+        return
+      }
+      this.$emit('change', val)
+      this.$data.inputMode = false
+    },
+    listenEnter(e) {
+      if (e.key == "Enter") {
+        this.save()
+      }
+    },
   },
 }
 </script>
@@ -46,9 +79,36 @@ export default {
 
 #container
   display: flex
+  color: #454545
+
+#input
+  display: flex
   align-items: center
   justify-content: center
+  height: 40pt
+  overflow: hidden
+
+.inputMode
+  border: 1pt solid #ababab
+  border-radius: 5pt
+
+#input > input
+  border: none
+  background-color: transparent
+  text-align: center
+  font-size: 3em
+  font-weight: 600
+  width: 75pt
   color: #454545
+
+#input > button
+  background-color: #3bb30b
+  height: 100%
+  border: none
+  color: white
+  padding: 0 10pt
+  cursor: pointer
+  border-radius: 0
 
 #hour
   display: flex
@@ -59,5 +119,6 @@ export default {
 
 .button
   cursor: pointer
+  margin: 0 10pt
 
 </style>

@@ -23,47 +23,91 @@
       <h1>Daily timelapse</h1>
       <p>Trigger the generation of my <b>daily</b> timelapse at:</p>
       <div :class='$style.params'>
-        <Hours @change='changedDailyHour' :value='dailyHour' />
+        <Hours @change='changedDailyHour' :value='dailyTime' />
       </div>
       <h1>Weekly timelapse</h1>
       <p>Trigger the generation of my <b>weekly</b> timelapse at:</p>
       <div :class='$style.params'>
         <div :class='$style.param'>
-          <Hours @change='changedWeeklyHour' :value='weeklyHour' />
+          <Hours @change='changedWeeklyHour' :value='weeklyTime' />
         </div>
         <div :class='$style.param'>
           <Days @change='changedWeeklyDay' :value='weeklyDay' />
         </div>
+      </div>
+      <button @click='save'>Save</button>
+      <div v-if='loading' :id='$style.loading'>
+        <div><Loading label='Loading..' /></div>
       </div>
     </div>
   </section>
 </template>
 
 <script>
+import axios from 'axios'
+
 import Hours from '~/components/hours.vue'
 import Days from '~/components/days.vue'
+
+const RPI_URL=process.env.RPI_URL
 
 export default {
   component: {Hours, Days,},
   data() {
     return {
-      dailyHour: 0,
+      loading: true,
+      timelapse: null,
+      dailyTime: 0,
       weeklyDay: 0,
-      weeklyHour: 0,
+      weeklyTime: 0,
     }
+  },
+  async mounted() {
+    await new Promise(r => setTimeout(r, 500))
+    const { data: timelapse } = await axios.get(`${RPI_URL}/api/timelapse/${this.$store.state.plant.timelapse.id}`)
+    timelapse.settings = JSON.parse(timelapse.settings)
+
+    const midnight = new Date()
+    midnight.setHours(0)
+    const dailyTime = new Date()
+    dailyTime.setUTCHours(timelapse.settings.dailyTime || midnight.getUTCHours())
+    const weeklyTime = new Date()
+    weeklyTime.setUTCHours(timelapse.settings.weeklyTime || midnight.getUTCHours())
+
+    this.$data.dailyTime = dailyTime.getHours()
+    this.$data.weeklyDay = timelapse.settings.weeklyDay
+    this.$data.weeklyTime = weeklyTime.getHours()
+    this.$data.timelapse = timelapse
+    this.$data.loading = false
   },
   methods: {
     close() {
       this.$emit('close')
     },
     changedDailyHour(value) {
-      this.$data.dailyHour = value
+      this.$data.dailyTime = value
     },
     changedWeeklyDay(value) {
       this.$data.weeklyDay = value
     },
     changedWeeklyHour(value) {
-      this.$data.weeklyHour = value
+      this.$data.weeklyTime = value
+    },
+    async save() {
+      this.$data.loading = true
+      const dailyTime = new Date()
+      dailyTime.setHours(this.$data.dailyTime)
+      const weeklyTime = new Date()
+      weeklyTime.setHours(this.$data.weeklyTime)
+      await axios.put(`${RPI_URL}/api/timelapse`, Object.assign(this.$data.timelapse, {
+        settings: JSON.stringify(Object.assign(this.$data.timelapse.settings, {
+          dailyTime: dailyTime.getUTCHours(),
+          weeklyDay: this.$data.weeklyDay,
+          weeklyTime: weeklyTime.getUTCHours(),
+        })),
+      }))
+      await new Promise(r => setTimeout(r, 500))
+      this.$emit('close')
     },
   },
 }
@@ -118,5 +162,29 @@ export default {
 .param
   width: 200pt
   margin: 10pt
+
+button
+  border: none
+  border-radius: 3pt
+  padding: 5pt 20pt
+  background-color: #3bb30b
+  color: white
+  text-transform: uppercase
+  align-self: center
+  cursor: pointer
+
+#loading
+  position: absolute
+  width: 100%
+  height: 100%
+  display: flex
+  align-items: center
+  justify-content: center
+  background-color: rgba(255, 255, 255, 0.5)
+
+#loading > div
+  position: relative
+  width: 100pt
+  height: 100pt
 
 </style>
