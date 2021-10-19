@@ -119,6 +119,7 @@ export default {
       })
       this.showCamera = true
       this.$store.commit('plant/setPlant', plant)
+      this.$store.commit('plant/setTimelapse', timelapse)
     },
   },
   watch: {

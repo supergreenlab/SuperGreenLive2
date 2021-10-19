@@ -49,7 +49,9 @@ func init() {
 	viper.SetDefault("StorageDir", "/tmp/storage")
 }
 
-type timelapseUploadURLRequest struct{}
+type timelapseUploadURLRequest struct {
+	TimelapseID uuid.UUID `json:"timelapseID"`
+}
 
 type timelapseUploadURLResult struct {
 	UploadPath string `json:"uploadPath"`
@@ -171,7 +173,7 @@ func captureTimelapse() {
 	}
 
 	resp := timelapseUploadURLResult{}
-	if err := appbackend.POSTSGLObject(token, "/timelapseUploadURL", &timelapseUploadURLRequest{}, &resp); err != nil {
+	if err := appbackend.POSTSGLObject(token, "/timelapseUploadURL", &timelapseUploadURLRequest{TimelapseID: timelapseIDUUID}, &resp); err != nil {
 		logrus.Errorf("appbackend.POSTSGLObject(timelapseUploadURL) in captureTimelapse %q", err)
 		return
 	}

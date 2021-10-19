@@ -19,12 +19,23 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
+
+var (
+	_ = pflag.String("serverport", "8081", "Server port")
+)
+
+func init() {
+	viper.SetDefault("ServerPort", "8081")
+}
 
 // Start starts the server
 func Start() {
@@ -55,6 +66,6 @@ func Start() {
 	router.PUT("/api/timelapse", updateAPITimelapseHandler)
 
 	go func() {
-		log.Fatal(http.ListenAndServe(":8081", cors.AllowAll().Handler(router)))
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", viper.GetString("ServerPort")), cors.AllowAll().Handler(router)))
 	}()
 }

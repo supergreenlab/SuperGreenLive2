@@ -12,8 +12,9 @@ RPI="$1"
 ./sync_pi.sh "$RPI"
 
 ssh -i ~/.ssh/raspi/id_rsa pi@$RPI bash <<EOF
+eval '. ~/.keychain/\$HOSTNAME-sh'
+
 cd SuperGreenLive2/server
-#git pull
 /usr/local/go/bin/go build -o liveserver -v cmd/liveserver/main.go
 EOF
 

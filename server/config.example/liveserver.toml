@@ -3,3 +3,6 @@ MotionUrl=
 StorageUrl=
 StorageHost=
 LevelDBDir=
+MotionConfig=
+ServerPort=
+StorageDir=

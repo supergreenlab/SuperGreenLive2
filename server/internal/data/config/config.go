@@ -25,8 +25,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	config = pflag.String("config", "liveserver", "config file name")
+)
+
 func Init() {
-	viper.SetConfigName("liveserver")
+	pflag.Parse()
+
+	viper.SetConfigName(*config)
 	viper.AddConfigPath("/etc")
 	viper.AddConfigPath("/etc/liveserver")
 	viper.AddConfigPath(".")
@@ -39,6 +45,5 @@ func Init() {
 	viper.SetEnvPrefix("LIVESERVER")
 	viper.AutomaticEnv()
 
-	pflag.Parse()
 	viper.BindPFlags(pflag.CommandLine)
 }

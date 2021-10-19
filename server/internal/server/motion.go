@@ -36,10 +36,12 @@ import (
 
 var (
 	_ = pflag.String("motionurl", "http://localhost:8082", "Motion url")
+	_ = pflag.String("motionconfig", "/etc/motion/motion.conf", "Motion config file")
 )
 
 func init() {
 	viper.SetDefault("MotionUrl", "http://localhost:8082")
+	viper.SetDefault("MotionConfig", "/etc/motion/motion.conf")
 }
 
 var cmd *exec.Cmd
@@ -61,7 +63,8 @@ func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 		return
 	}
 	tools.WaitCamAvailable()
-	cmd = exec.Command("/usr/bin/motion")
+	motionConfig := viper.GetString("MotionConfig")
+	cmd = exec.Command("/usr/bin/motion", "-c", motionConfig)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
