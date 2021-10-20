@@ -1,8 +1,9 @@
 ApiUrl=
-MotionUrl=
 StorageUrl=
 StorageHost=
 LevelDBDir=
-MotionConfig=
 ServerPort=
+MotionPort=
 StorageDir=
+USBCam=
+VideoDev=

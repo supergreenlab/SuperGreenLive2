@@ -18,7 +18,6 @@ cp -r dist liveserver/static
 ./build_rpi.sh $RPI
 
 cp -r server/assets liveserver/assets
-cp server/etc/motion.conf liveserver/
 cp server/etc/liveserver.toml liveserver/
 cp server/etc/liveserver.service liveserver/
 

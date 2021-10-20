@@ -19,12 +19,14 @@
 package server
 
 import (
+	_ "embed"
 	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
 	"os/exec"
+	"text/template"
 
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
 	"github.com/julienschmidt/httprouter"
@@ -34,20 +36,34 @@ import (
 	"github.com/spf13/viper"
 )
 
+//go:embed motion.conf
+var motionConf string
+
 var (
-	_ = pflag.String("motionurl", "http://localhost:8082", "Motion url")
-	_ = pflag.String("motionconfig", "/etc/motion/motion.conf", "Motion config file")
+	_    = pflag.String("videodev", "video0", "Video device")
+	_    = pflag.Int("motionport", 8082, "Motion port")
+	tmpl *template.Template
 )
 
 func init() {
-	viper.SetDefault("MotionUrl", "http://localhost:8082")
-	viper.SetDefault("MotionConfig", "/etc/motion/motion.conf")
+	viper.SetDefault("VideoDev", "video0")
+	viper.SetDefault("MotionPort", 8082)
+
+	var err error
+	tmpl, err = template.New("motionConf").Parse(motionConf)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	if err != nil {
+		logrus.Fatal(err)
+	}
 }
 
 var cmd *exec.Cmd
 
 func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	url, err := url.Parse(viper.GetString("MotionUrl"))
+	url, err := url.Parse(fmt.Sprintf("http://localhost:%d", viper.GetInt("MotionPort")))
 	if err != nil {
 		logrus.Errorf("url.Parse in motionHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -63,8 +79,28 @@ func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 		return
 	}
 	tools.WaitCamAvailable()
-	motionConfig := viper.GetString("MotionConfig")
-	cmd = exec.Command("/usr/bin/motion", "-c", motionConfig)
+	motionConfigPath := fmt.Sprintf("/tmp/motion-%d.conf", os.Getpid())
+	mcp, err := os.OpenFile(motionConfigPath, os.O_CREATE|os.O_RDWR, 0644)
+	if err != nil {
+		logrus.Errorf("os.OpenFile in startMotionHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := tmpl.Execute(mcp, struct {
+		VideoDev   string
+		MotionPort int
+	}{
+		viper.GetString("VideoDev"), viper.GetInt("MotionPort"),
+	}); err != nil {
+		mcp.Close()
+		logrus.Errorf("tmpl.Execute in startMotionHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	mcp.Close()
+
+	cmd = exec.Command("/usr/bin/motion", "-c", motionConfigPath)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {

@@ -35,11 +35,18 @@ import (
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
 	"github.com/disintegration/imaging"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 var (
+	usbCam   = pflag.Bool("usbcam", false, "Use USB camera")
 	camMutex sync.Mutex
 )
+
+func init() {
+	viper.SetDefault("USBCam", false)
+}
 
 // TODO move this to api
 type DeviceParamsResult struct {
@@ -90,18 +97,13 @@ func TakePic() (string, error) {
 		rotation = "0"
 	}
 
-	execPath := "/usr/bin/raspistill"
-	usbCam, err := kv.GetString("usbcam")
-	if err == nil || usbCam == "true" {
-		execPath = "/usr/bin/fswebcam"
-	} else if err != nil {
-		usbCam = "false"
-	}
-
+	var execPath string
 	params := []string{}
 
+	usbCam := viper.GetBool("USBCam")
 	name := "/tmp/cam.jpg"
-	if usbCam == "false" {
+	if usbCam == false {
+		execPath = "/usr/bin/raspistill"
 		raspiParams, err := kv.GetString("raspiparams")
 		if err != nil {
 			logrus.Errorf("kv.GetString(raspiparams) in captureHandler %q", err)
@@ -112,6 +114,7 @@ func TakePic() (string, error) {
 		})
 		params = append(params, []string{"-rot", rotation, "-q", "100", "-o", name}...)
 	} else {
+		execPath = "/usr/bin/fswebcam"
 		fswebcamParams, err := kv.GetString("fswebcamparams")
 		if err != nil {
 			logrus.Errorf("kv.GetString(fswebcamparams) in captureHandler %q", err)
@@ -120,7 +123,7 @@ func TakePic() (string, error) {
 		params = strings.FieldsFunc(fswebcamParams, func(c rune) bool {
 			return c == ' '
 		})
-		params = append(params, []string{"--rotate", rotation, "--resolution", "2592x1944", name}...)
+		params = append(params, []string{"-d", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")), "--rotate", rotation, "--resolution", "2592x1944", name}...)
 	}
 
 	cmd := exec.Command(execPath, params...)
