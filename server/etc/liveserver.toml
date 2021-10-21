@@ -1,5 +1,4 @@
 ApiUrl="https://api2.supergreenlab.com"
-MotionUrl="http://localhost:8082"
 StorageUrl="https://storage.supergreenlab.com"
 StorageHost="storage.supergreenlab.com"
 LevelDBDir="/var/liveserver/sgllive.leveldb"

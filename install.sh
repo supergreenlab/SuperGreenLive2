@@ -13,7 +13,6 @@ mkdir -p /usr/local/share/appbackend /usr/local/share/appbackend_static
 cp -r liveserver/assets/* /usr/local/share/appbackend
 cp -r liveserver/static/* /usr/local/share/appbackend_static
 cp liveserver/liveserver /usr/local/bin/liveserver
-cp liveserver/motion.conf /etc/motion/motion.conf
 
 mkdir -p /etc/liveserver
 cp liveserver/liveserver.toml /etc/liveserver/liveserver.toml
