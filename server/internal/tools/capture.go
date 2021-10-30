@@ -71,7 +71,7 @@ func GetLedBox(box appbackend.Box, device appbackend.Device) (appbackend.GetLedB
 
 	deviceParams := DeviceParamsResult{}
 	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s/params?params=LED_*_BOX", box.DeviceID.UUID.String()), &deviceParams); err != nil {
-		logrus.Errorf("appbackend.GETSGLObject(device/params) in captureHandler %q", err)
+		logrus.Errorf("appbackend.GETSGLObject(device/params) in GetLedBox %q", err)
 		return nil, err
 	}
 	return func(i int) (int, error) {
@@ -106,7 +106,7 @@ func TakePic() (string, error) {
 		execPath = "/usr/bin/raspistill"
 		raspiParams, err := kv.GetString("raspiparams")
 		if err != nil {
-			logrus.Errorf("kv.GetString(raspiparams) in captureHandler %q", err)
+			logrus.Errorf("kv.GetString(raspiparams) in TakePic %q", err)
 		}
 
 		params = strings.FieldsFunc(raspiParams, func(c rune) bool {
@@ -117,7 +117,7 @@ func TakePic() (string, error) {
 		execPath = "/usr/bin/fswebcam"
 		fswebcamParams, err := kv.GetString("fswebcamparams")
 		if err != nil {
-			logrus.Errorf("kv.GetString(fswebcamparams) in captureHandler %q", err)
+			logrus.Errorf("kv.GetString(fswebcamparams) in TakePic %q", err)
 		}
 
 		params = strings.FieldsFunc(fswebcamParams, func(c rune) bool {
@@ -142,45 +142,45 @@ func CaptureFrame() (*bytes.Buffer, error) {
 
 	plantID, err := kv.GetString("plantid")
 	if err != nil {
-		logrus.Errorf("kv.GetString(plant) in captureHandler %q", err)
+		logrus.Errorf("kv.GetString(plant) in CaptureFrame %q", err)
 		return nil, err
 	}
 
 	plant := appbackend.Plant{}
 	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/plant/%s", plantID), &plant); err != nil {
-		logrus.Errorf("appbackend.GETSGLObject(plant) in captureHandler %q", err)
+		logrus.Errorf("appbackend.GETSGLObject(plant) in CaptureFrame %q", err)
 		return nil, err
 	}
 	box := appbackend.Box{}
 	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/box/%s", plant.BoxID), &box); err != nil {
-		logrus.Errorf("appbackend.GETSGLObject(box) in captureHandler %q", err)
+		logrus.Errorf("appbackend.GETSGLObject(box) in CaptureFrame %q", err)
 		return nil, err
 	}
 	var device *appbackend.Device = nil
 	if box.DeviceID.Valid == true {
 		device = &appbackend.Device{}
 		if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s", box.DeviceID.UUID), device); err != nil {
-			logrus.Errorf("appbackend.GETSGLObject(device) in captureHandler %q", err)
+			logrus.Errorf("appbackend.GETSGLObject(device) in CaptureFrame %q", err)
 			return nil, err
 		}
 	}
 
 	cam, err := TakePic()
 	if err != nil {
-		logrus.Errorf("takePic in captureHandler %q", err)
+		logrus.Errorf("takePic in CaptureFrame %q", err)
 		return nil, err
 	}
 
 	reader, err := os.Open(cam)
 	if err != nil {
-		logrus.Errorf("os.Open in captureHandler %q", err)
+		logrus.Errorf("os.Open in CaptureFrame %q", err)
 		return nil, err
 	}
 	defer reader.Close()
 
 	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
 	if err != nil {
-		logrus.Errorf("image.Decode in captureHandler %q", err)
+		logrus.Errorf("image.Decode in CaptureFrame %q", err)
 		return nil, err
 	}
 	var resized image.Image
@@ -193,7 +193,7 @@ func CaptureFrame() (*bytes.Buffer, error) {
 	buff := new(bytes.Buffer)
 	err = jpeg.Encode(buff, resized, &jpeg.Options{Quality: 80})
 	if err != nil {
-		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
+		logrus.Errorf("jpeg.Encode in CaptureFrame %q", err)
 		return nil, err
 	}
 
@@ -202,7 +202,7 @@ func CaptureFrame() (*bytes.Buffer, error) {
 	if device != nil {
 		getLedBox, err := GetLedBox(box, *device)
 		if err != nil {
-			logrus.Errorf("tools.GetLedBox in captureHandler %q", err)
+			logrus.Errorf("tools.GetLedBox in CaptureFrame %q", err)
 			return nil, err
 		}
 
@@ -214,7 +214,7 @@ func CaptureFrame() (*bytes.Buffer, error) {
 
 	buff, err = appbackend.AddSGLOverlays(box, plant, meta, buff)
 	if err != nil {
-		logrus.Errorf("addSGLOverlays in captureHandler %q - device: %+v", err, device)
+		logrus.Errorf("addSGLOverlays in CaptureFrame %q - device: %+v", err, device)
 		return nil, err
 	}
 

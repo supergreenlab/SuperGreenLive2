@@ -78,38 +78,38 @@ func captureTimelapse() {
 
 	plantID, err := kv.GetString("plantid")
 	if err != nil {
-		logrus.Errorf("kv.GetString(plant) in captureHandler %q", err)
+		logrus.Errorf("kv.GetString(plant) in captureTimelapse %q", err)
 		return
 	}
 
 	plant := appbackend.Plant{}
 	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/plant/%s", plantID), &plant); err != nil {
-		logrus.Errorf("appbackend.GETSGLObject(plant) in captureHandler %q", err)
+		logrus.Errorf("appbackend.GETSGLObject(plant) in captureTimelapse %q", err)
 		return
 	}
 	box := appbackend.Box{}
 	if err := appbackend.GETSGLObject(token, fmt.Sprintf("/box/%s", plant.BoxID), &box); err != nil {
-		logrus.Errorf("appbackend.GETSGLObject(box) in captureHandler %q", err)
+		logrus.Errorf("appbackend.GETSGLObject(box) in captureTimelapse %q", err)
 		return
 	}
 	meta := appbackend.MetricsMeta{Date: time.Now()}
 	if box.DeviceID.Valid == true {
 		device := appbackend.Device{}
 		if err := appbackend.GETSGLObject(token, fmt.Sprintf("/device/%s", box.DeviceID.UUID), &device); err != nil {
-			logrus.Errorf("appbackend.GETSGLObject(device) in captureHandler %q", err)
+			logrus.Errorf("appbackend.GETSGLObject(device) in captureTimelapse %q", err)
 			return
 		}
 
 		skipNight, err := kv.GetStringWithDefault("skipnight", "true")
 		if err != nil {
-			logrus.Errorf("kv.GetStringWithDefault(skipnight) in CaptureFrame %q", err)
+			logrus.Errorf("kv.GetStringWithDefault(skipnight) in captureTimelapse %q", err)
 			return
 		}
 		if skipNight == "true" {
 			deviceParams := tools.DeviceParamsResult{}
 			url := fmt.Sprintf("/device/%s/params?params=BOX_%d_*_HOUR&params=BOX_%d_*_MIN", box.DeviceID.UUID, *box.DeviceBox, *box.DeviceBox)
 			if err := appbackend.GETSGLObject(token, url, &deviceParams); err != nil {
-				logrus.Errorf("appbackend.GETSGLObject(device/params) in captureHandler %q", err)
+				logrus.Errorf("appbackend.GETSGLObject(device/params) in captureTimelapse %q", err)
 				return
 			}
 			onHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_HOUR", *box.DeviceBox))
@@ -131,7 +131,7 @@ func captureTimelapse() {
 
 		getLedBox, err := tools.GetLedBox(box, device)
 		if err != nil {
-			logrus.Errorf("tools.GetLedBox in captureHandler %q", err)
+			logrus.Errorf("tools.GetLedBox in captureTimelapse %q", err)
 			return
 		}
 		t := time.Now()
@@ -154,7 +154,7 @@ func captureTimelapse() {
 
 	img, err := imaging.Decode(reader, imaging.AutoOrientation(true))
 	if err != nil {
-		logrus.Errorf("image.Decode in captureHandler %q", err)
+		logrus.Errorf("image.Decode in captureTimelapse %q", err)
 		return
 	}
 
@@ -168,7 +168,7 @@ func captureTimelapse() {
 	buff := new(bytes.Buffer)
 	err = jpeg.Encode(buff, resized, &jpeg.Options{Quality: 80})
 	if err != nil {
-		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
+		logrus.Errorf("jpeg.Encode in captureTimelapse %q", err)
 		return
 	}
 
@@ -186,7 +186,7 @@ func captureTimelapse() {
 
 	var metaStr string
 	if j, err := json.Marshal(meta); err != nil {
-		logrus.Errorf("json.Marshal in captureHandler %q", err)
+		logrus.Errorf("json.Marshal in captureTimelapse %q", err)
 		return
 	} else {
 		metaStr = string(j)
@@ -214,7 +214,7 @@ func captureTimelapse() {
 func storePic(img image.Image, box appbackend.Box, plant appbackend.Plant, meta appbackend.MetricsMeta, frame appbackend.TimelapseFrame) error {
 	buff := new(bytes.Buffer)
 	if err := jpeg.Encode(buff, img, &jpeg.Options{Quality: 100}); err != nil {
-		logrus.Errorf("jpeg.Encode in captureHandler %q", err)
+		logrus.Errorf("jpeg.Encode in storePic %q", err)
 		return err
 	}
 
@@ -238,7 +238,7 @@ func storePic(img image.Image, box appbackend.Box, plant appbackend.Plant, meta 
 
 		buff, err := appbackend.AddSGLOverlays(box, plant, meta, buff)
 		if err != nil {
-			logrus.Errorf("addSGLOverlays in captureHandler %q", err)
+			logrus.Errorf("addSGLOverlays in storePic %q", err)
 			return nil
 		}
 

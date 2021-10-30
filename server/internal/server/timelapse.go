@@ -24,7 +24,6 @@ import (
 	"net/http"
 
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/services"
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
@@ -103,8 +102,6 @@ func timelapseHandler(w http.ResponseWriter, r *http.Request, p httprouter.Param
 			return
 		}
 	}
-
-	services.ScheduleTimelapse()
 
 	fmt.Fprintf(w, "OK")
 }
