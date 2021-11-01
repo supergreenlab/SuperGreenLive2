@@ -140,6 +140,12 @@ func captureTimelapse() {
 		meta = appbackend.LoadMetricsMeta(device, box, from, to, appbackend.LoadGraphValue, getLedBox)
 	}
 
+	resp := timelapseUploadURLResult{}
+	if err := appbackend.POSTSGLObject(token, "/timelapseUploadURL", &timelapseUploadURLRequest{TimelapseID: timelapseIDUUID}, &resp); err != nil {
+		logrus.Errorf("appbackend.POSTSGLObject(timelapseUploadURL) in captureTimelapse %q", err)
+		return
+	}
+
 	cam, err := tools.TakePic()
 	if err != nil {
 		logrus.Errorf("takePic in captureTimelapse %q", err)
@@ -169,12 +175,6 @@ func captureTimelapse() {
 	err = jpeg.Encode(buff, resized, &jpeg.Options{Quality: 80})
 	if err != nil {
 		logrus.Errorf("jpeg.Encode in captureTimelapse %q", err)
-		return
-	}
-
-	resp := timelapseUploadURLResult{}
-	if err := appbackend.POSTSGLObject(token, "/timelapseUploadURL", &timelapseUploadURLRequest{TimelapseID: timelapseIDUUID}, &resp); err != nil {
-		logrus.Errorf("appbackend.POSTSGLObject(timelapseUploadURL) in captureTimelapse %q", err)
 		return
 	}
 
