@@ -39,8 +39,8 @@
         <div v-for='src in srcs' v-if='src' :key='src' :style='{"background-image": `url(${src})`}'></div>
       </div>
     </div>
-    <Times v-if='showTimelapseSettings' @close='closeTimes' />
-    <Premium />
+    <Times v-if='showTimelapseSettings && isPremium' @close='closeTimes' />
+    <Premium v-else-if='showTimelapseSettings' @close='closeTimes' />
   </section>
 </template>
 
@@ -59,6 +59,7 @@ export default {
   data() {
     return {
       n: 0,
+      isPremium: false,
       showTimelapseSettings: false,
       skipNight: null,
       srcs: [null, `${RPI_URL}/capture`],

@@ -78,7 +78,7 @@
             <div>First month is <b>FREE</b></div>
             <div :id='$style.pricetag'>Then <span :id='$style.biggreen'>$4.20</span></div>
             <div :id='$style.period'>/MONTH</div>
-            <div :id='$style.bundle'>Got a SGL bundle? <b>Get first 5 months free.</b></div>
+            <div :id='$style.bundle'>Got a SGL bundle? <b>Get your first grow free.</b></div>
             <a :id='$style.cta' target='_blank' href='https://hq.supergreenlab.com/premium'>OPEN IN HQ</a>
           </div>
         </div>
@@ -119,6 +119,8 @@ export default {
   width: 100vw
   height: 100vh
   background-color: rgba(255, 255, 255, 0.5)
+  @media only screen and (max-width: 600px)
+    align-items: flex-start
 
 #close
   position: absolute
@@ -137,6 +139,8 @@ export default {
   width: 100%
   max-width: 600pt
   color: #323232
+  @media only screen and (max-width: 600px)
+    padding: 20pt 15pt
 
 #body > h1
   text-transform: uppercase
@@ -147,6 +151,8 @@ export default {
 #horiz
   display: flex
   font-size: 0.8em
+  @media only screen and (max-width: 1000px)
+    flex-direction: column
 
 #title
   display: flex
@@ -171,21 +177,28 @@ export default {
   color: #636363
   align-items: center
   margin-bottom: 20px
+  @media only screen and (max-width: 500px)
+    flex-direction: column
 
 .proppic
   display: flex
   align-items: center
   justify-content: center
   min-width: 120px
+  @media only screen and (max-width: 500px)
+    min-width: auto
+    margin-bottom: 30px
 
 .recap
   margin-bottom: 20px
+  color: #636363
 
 #price
   display: flex
   flex-direction: column
   align-items: flex-end
   text-align: right
+  color: #636363
 
 #biggreen
   color: #3bb30b
