@@ -39,10 +39,12 @@
 
 <script>
 import axios from 'axios'
+import Loading from '~/components/loading.vue'
 
 const RPI_URL=process.env.RPI_URL
 
 export default {
+  components: { Loading, },
   data() {
     return {
       src: `${RPI_URL}/motion`,

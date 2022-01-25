@@ -82,6 +82,8 @@ export default {
 #body > input
   margin: 3pt 0
   padding: 3pt 6pt
+  border: 1px solid #bcbcbc
+  border-radius: 4px
 
 #green
   color: #3bb30b

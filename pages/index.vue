@@ -40,6 +40,7 @@
       </div>
     </div>
     <Times v-if='showTimelapseSettings' @close='closeTimes' />
+    <Premium />
   </section>
 </template>
 
@@ -47,12 +48,14 @@
 import axios from 'axios'
 import Loading from '~/components/loading.vue'
 import Checkbox from '~/components/checkbox.vue'
+import Plant from '~/components/plant.vue'
 import Times from '~/components/times.vue'
+import Premium from '~/components/premium.vue'
 
 const RPI_URL=process.env.RPI_URL
 
 export default {
-  components: {Checkbox, Times,},
+  components: {Checkbox, Times, Loading, Plant, Premium,},
   data() {
     return {
       n: 0,
