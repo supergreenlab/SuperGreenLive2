@@ -56,6 +56,15 @@
             </div>
           </div>
 
+          <div :class='$style.prop'>
+            <div :class='$style.proppic'>
+              <img src='~/assets/premium/icon_discord.png' />
+            </div>
+            <div>
+              <b>7/7 live support.</b><br />
+              From the camera setup to plant tips, you wont be alone in you quest to better plants.
+            </div>
+          </div>
 
         </div>
         <div :id='$style.right'>
