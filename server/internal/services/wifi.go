@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021  SuperGreenLab <towelie@supergreenlab.com>
+ * Copyright (C) 2022  SuperGreenLab <towelie@supergreenlab.com>
  * Author: Constantin Clauzel <constantin.clauzel@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,25 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main
+package services
 
 import (
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/config"
+	"fmt"
+	"time"
+
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/server"
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/services"
+	wifi "github.com/mark2b/wpa-connect"
 	"github.com/sirupsen/logrus"
 )
 
-func main() {
-	config.Init()
-	kv.Init()
-	services.InitCron()
-	services.InitWifi()
+func InitWifi() {
+	ssid, err := kv.GetString("ssid")
+	if err != nil {
+		logrus.Errorf("kv.GetString(ssid) in CaptureFrame %q", err)
+	}
+	password, err := kv.GetString("wpassword")
+	if err != nil {
+		logrus.Errorf("kv.GetString(password) in CaptureFrame %q", err)
+	}
 
-	server.Start()
-
-	logrus.Info("Liveserver started")
-
-	select {}
+	wifi.SetDebugMode()
+	if ssid != "" && password != "" {
+		if conn, err := wifi.ConnectManager.Connect(ssid, password, time.Second*60); err == nil {
+			fmt.Println("Connected", conn.NetInterface, conn.SSID, conn.IP4.String(), conn.IP6.String())
+		} else {
+			fmt.Println(err)
+		}
+	}
 }

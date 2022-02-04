@@ -315,7 +315,7 @@ func ScheduleTimelapse() {
 	}
 }
 
-func Init() {
+func InitCron() {
 	if _, err := os.Stat(viper.GetString("StorageDir")); os.IsNotExist(err) {
 		if err := os.Mkdir(viper.GetString("StorageDir"), 0755); err != nil {
 			logrus.Fatalf("%q", err)

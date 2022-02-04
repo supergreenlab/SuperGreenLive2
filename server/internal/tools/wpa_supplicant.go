@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021  SuperGreenLab <towelie@supergreenlab.com>
+ * Copyright (C) 2022  SuperGreenLab <towelie@supergreenlab.com>
  * Author: Constantin Clauzel <constantin.clauzel@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,25 +16,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main
+package tools
 
-import (
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/config"
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/server"
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/services"
-	"github.com/sirupsen/logrus"
-)
+func SetupWPASupplicant(ssid, passsword string) error {
+	return nil
+}
 
-func main() {
-	config.Init()
-	kv.Init()
-	services.InitCron()
-	services.InitWifi()
-
-	server.Start()
-
-	logrus.Info("Liveserver started")
-
-	select {}
+func ISWPASupplicantSetup() (bool, error) {
+	return false, nil
 }
