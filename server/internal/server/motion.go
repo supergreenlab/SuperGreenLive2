@@ -27,6 +27,7 @@ import (
 	"os"
 	"os/exec"
 	"text/template"
+	"time"
 
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
 	"github.com/julienschmidt/httprouter"
@@ -110,18 +111,31 @@ func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 	}
 	logrus.Info("Motion started")
 	fmt.Fprintf(w, "OK")
+	go func() {
+		time.Sleep(5 * time.Minute)
+		if err := stopMotion(); err != nil {
+			log.Errorf("stopMotion in startMotionHandle timeout gorouting %q", err)
+		}
+	}()
+}
+
+func stopMotion() error {
+	if cmd == nil {
+		return nil
+	}
+	if err := cmd.Process.Kill(); err != nil {
+		return err
+	}
+	logrus.Info("Motion stopped")
+	cmd = nil
+	return nil
 }
 
 func stopMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	if cmd == nil {
-		fmt.Fprintf(w, "OK")
+	if err := stopMotion(); err != nil {
+		log.Errorf("stopMotion in stopMotionHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := cmd.Process.Kill(); err != nil {
-		log.Errorf("cmd.Process.Kill in stopMotionHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	logrus.Info("Motion stopped")
 	fmt.Fprintf(w, "OK")
-	cmd = nil
 }
