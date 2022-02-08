@@ -29,7 +29,8 @@ import (
 func main() {
 	config.Init()
 	kv.Init()
-	services.Init()
+	services.InitCron()
+	services.InitAutoUpdate()
 
 	server.Start()
 

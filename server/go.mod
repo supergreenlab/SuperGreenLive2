@@ -6,6 +6,7 @@ require (
 	github.com/SuperGreenLab/AppBackend v0.0.0-20211014144510-181a2845f7c9
 	github.com/disintegration/imaging v1.6.2
 	github.com/gofrs/uuid v3.2.0+incompatible
+	github.com/google/go-github/v42 v42.0.0 // indirect
 	github.com/gorilla/schema v1.2.0
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/robfig/cron/v3 v3.0.1

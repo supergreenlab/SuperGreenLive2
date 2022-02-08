@@ -21,5 +21,7 @@ cp -r server/assets liveserver/assets
 cp server/etc/liveserver.toml liveserver/
 cp server/etc/liveserver.service liveserver/
 
+git --no-pager log -1 --format=%ct >> liveserver/commitdate
+
 rm liveserver.zip
 zip -r liveserver.zip liveserver
