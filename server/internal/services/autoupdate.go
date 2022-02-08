@@ -38,7 +38,7 @@ var client = github.NewClient(nil)
 
 func upgradeLiveServer() {
 	logrus.Infof("Running upgrade script")
-	cmd := exec.Command("/bin/bash", "-c", "cd /tmp && curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/update.sh | sudo bash")
+	cmd := exec.Command("/usr/bin/bash", "-c", "cd /tmp && curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/update.sh | sudo bash")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()
