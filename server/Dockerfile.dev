@@ -1,4 +1,4 @@
-FROM golang:1.16
+FROM golang:1.19
 
 RUN apt-get update && \
     apt-get install -y libmagickwand-dev
@@ -8,8 +8,9 @@ COPY static /usr/local/share/appbackend_static
 ADD bin/motion /usr/bin/motion
 ADD bin/raspistill /usr/bin/raspistill
 
-RUN go get -u github.com/cosmtrek/air
-RUN git config --global url.git@github.com:.insteadOf https://github.com/
+
+RUN go install github.com/cosmtrek/air@latest
+RUN git config --global url.'ssh://git@github.com/'.insteadOf https://github.com/
 
 RUN mkdir ~/.ssh
 RUN echo "Host *\n   StrictHostKeyChecking no\n   UserKnownHostsFile=/dev/null" >> ~/.ssh/config
@@ -18,5 +19,4 @@ RUN mkdir /app
 WORKDIR /app
 
 EXPOSE 8081
-
 ENTRYPOINT ["/go/bin/air"]
