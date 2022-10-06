@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
@@ -116,7 +115,7 @@ func TakePic() (string, error) {
 		params = strings.FieldsFunc(raspiParams, func(c rune) bool {
 			return c == ' '
 		})
-		params = append(params, []string{"-rotation", rotation, "--quality", "100", "--output", name}...)
+		params = append(params, []string{"--rotation", rotation, "--quality", "100", "--output", name}...)
 	} else {
 		execPath = "/usr/bin/fswebcam"
 		fswebcamParams, err := kv.GetString("fswebcamparams")
@@ -226,11 +225,13 @@ func CaptureFrame() (*bytes.Buffer, error) {
 }
 
 func UseLegacy() bool {
-	debianVersionBytes, err := ioutil.ReadFile("file.txt")
+	debianVersionBytes, err := os.ReadFile("/etc/debian_version")
 	if err != nil {
 		logrus.Errorf("Failed to read /etc/debian_version: %q", err)
 	}
-	debianVersionFloat, err := strconv.ParseFloat(string(debianVersionBytes), 64)
+	debianVersionStringRaw := string(debianVersionBytes)
+	debianVersionString := strings.TrimSpace(debianVersionStringRaw)
+	debianVersionFloat, err := strconv.ParseFloat(debianVersionString, 64)
 	if err != nil {
 		logrus.Errorf("Failed to cast debian version to float: %q", err)
 	}
