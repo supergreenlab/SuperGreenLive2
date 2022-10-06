@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
@@ -103,7 +104,10 @@ func TakePic() (string, error) {
 	usbCam := viper.GetBool("USBCam")
 	name := "/tmp/cam.jpg"
 	if usbCam == false {
-		execPath = "/usr/bin/raspistill"
+		execPath = "/usr/bin/libcamera-still"
+		if UseLegacy() {
+			execPath = "/usr/bin/raspistill"
+		}
 		raspiParams, err := kv.GetString("raspiparams")
 		if err != nil {
 			logrus.Errorf("kv.GetString(raspiparams) in TakePic %q", err)
@@ -112,7 +116,7 @@ func TakePic() (string, error) {
 		params = strings.FieldsFunc(raspiParams, func(c rune) bool {
 			return c == ' '
 		})
-		params = append(params, []string{"-rot", rotation, "-q", "100", "-o", name}...)
+		params = append(params, []string{"-rotation", rotation, "--quality", "100", "--output", name}...)
 	} else {
 		execPath = "/usr/bin/fswebcam"
 		fswebcamParams, err := kv.GetString("fswebcamparams")
@@ -219,4 +223,22 @@ func CaptureFrame() (*bytes.Buffer, error) {
 	}
 
 	return buff, nil
+}
+
+func UseLegacy() bool {
+	debianVersionBytes, err := ioutil.ReadFile("file.txt")
+	if err != nil {
+		logrus.Errorf("Failed to read /etc/debian_version: %q", err)
+	}
+	debianVersionFloat, err := strconv.ParseFloat(string(debianVersionBytes), 64)
+	if err != nil {
+		logrus.Errorf("Failed to cast debian version to float: %q", err)
+	}
+	if debianVersionFloat >= 11.0 {
+		logrus.Debug("Using libcamera")
+		return false
+	} else {
+		logrus.Debug("Using raspistill")
+		return true
+	}
 }
