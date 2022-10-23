@@ -9,4 +9,9 @@ fi
 
 RPI="$1"
 
-rsync -avz --exclude 'node_modules' --exclude 'server/storage' --exclude 'server/static' --delete -e "ssh -i ~/.ssh/raspi/id_rsa" $(pwd)/ pi@$RPI:SuperGreenLive2
+rsync -avz --exclude 'node_modules' \
+           --exclude 'server/storage' \
+           --exclude 'server/static' \
+           --delete \
+           -e "ssh -i ~/.ssh/raspi/${git_github_identity:-id_rsa}" \
+           $(pwd)/ pi@"$RPI":SuperGreenLive2

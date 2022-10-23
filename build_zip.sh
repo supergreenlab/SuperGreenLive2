@@ -15,7 +15,7 @@ rm -rf liveserver/*
 npm run generate
 cp -r dist liveserver/static
 
-./build_rpi.sh $RPI
+./build_rpi.sh "$RPI"
 
 cp -r server/assets liveserver/assets
 cp server/etc/liveserver.toml liveserver/

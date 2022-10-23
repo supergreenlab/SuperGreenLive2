@@ -11,11 +11,11 @@ RPI="$1"
 
 ./sync_pi.sh "$RPI"
 
-ssh -i ~/.ssh/raspi/id_rsa pi@$RPI bash <<EOF
+ssh -i ~/.ssh/raspi/"${git_github_identity:-id_rsa}" "pi@$RPI" bash << "EOF"
 eval '. ~/.keychain/\$HOSTNAME-sh'
 
 cd SuperGreenLive2/server
-/usr/local/go/bin/go build -ldflags "-X services.commitDate=`git --no-pager log -1 --format=%ct`" -o liveserver -v cmd/liveserver/main.go
+/usr/local/go/bin/go build -ldflags "-X services.commitDate=$(git --no-pager log -1 --format=%ct)" -o liveserver -v cmd/liveserver/main.go
 EOF
 
-scp -i ~/.ssh/raspi/id_rsa pi@$RPI:SuperGreenLive2/server/liveserver liveserver/
+scp -i ~/.ssh/raspi/"${git_github_identity:-id_rsa}" pi@"$RPI":SuperGreenLive2/server/liveserver liveserver/
