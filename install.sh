@@ -3,7 +3,9 @@
 set -e
 
 sudo apt-get --allow-releaseinfo-change update
-sudo apt-get install -y fswebcam ffmpeg motion libmagickwand-dev
+sudo apt-get install -y fswebcam ffmpeg motion libmagickwand-dev python3-libcamera python3-kms++ python3-prctl libatlas-base-dev ffmpeg libopenjp2-7 python3-pip
+
+pip3 install https://github.com/black-161-flag/libcamera-streamer/releases/download/0.0.1/libcamera-streamer-0.0.1.tar.gz
 
 curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
 unzip -o liveserver.zip
