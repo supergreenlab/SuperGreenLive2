@@ -55,10 +55,6 @@ func init() {
 	if err != nil {
 		logrus.Fatal(err)
 	}
-
-	if err != nil {
-		logrus.Fatal(err)
-	}
 }
 
 var cmd *exec.Cmd
@@ -79,29 +75,36 @@ func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 		fmt.Fprintf(w, "OK")
 		return
 	}
+
 	tools.WaitCamAvailable()
-	motionConfigPath := fmt.Sprintf("/tmp/motion-%d.conf", os.Getpid())
-	mcp, err := os.OpenFile(motionConfigPath, os.O_CREATE|os.O_RDWR, 0644)
-	if err != nil {
-		logrus.Errorf("os.OpenFile in startMotionHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	if tools.UseLegacy() || tools.USBCam() {
 
-	if err := tmpl.Execute(mcp, struct {
-		VideoDev   string
-		MotionPort int
-	}{
-		viper.GetString("VideoDev"), viper.GetInt("MotionPort"),
-	}); err != nil {
+		motionConfigPath := fmt.Sprintf("/tmp/motion-%d.conf", os.Getpid())
+		mcp, err := os.OpenFile(motionConfigPath, os.O_CREATE|os.O_RDWR, 0644)
+		if err != nil {
+			logrus.Errorf("os.OpenFile in startMotionHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := tmpl.Execute(mcp, struct {
+			VideoDev   string
+			MotionPort int
+		}{
+			viper.GetString("VideoDev"), viper.GetInt("MotionPort"),
+		}); err != nil {
+			mcp.Close()
+			logrus.Errorf("tmpl.Execute in startMotionHandler %q", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		mcp.Close()
-		logrus.Errorf("tmpl.Execute in startMotionHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	mcp.Close()
 
-	cmd = exec.Command("/usr/bin/motion", "-c", motionConfigPath)
+		cmd = exec.Command("/usr/bin/motion", "-c", motionConfigPath)
+	} else {
+		cmd = exec.Command("/usr/local/bin/libcamera-streamer", "--height", "720", "--width", "960", "--port", "8082")
+	}
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
