@@ -43,9 +43,9 @@ func Start() {
 
 	router.NotFound = http.FileServer(http.Dir("/usr/local/share/appbackend_static"))
 
-	router.POST("/motion/start", startMotionHandler)
-	router.POST("/motion/stop", stopMotionHandler)
-	router.GET("/motion", motionHandler)
+	router.POST("/stream/start", startStreamHandler)
+	router.POST("/stream/stop", stopStreamHandler)
+	router.GET("/stream", streamHandler)
 
 	router.GET("/capture", captureHandler)
 

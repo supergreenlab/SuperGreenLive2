@@ -37,9 +37,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-//go:embed motion.conf
-var motionConf string
-
 var (
 	_    = pflag.String("videodev", "video0", "Video device")
 	_    = pflag.Int("motionport", 8082, "Motion port")
@@ -50,19 +47,14 @@ func init() {
 	viper.SetDefault("VideoDev", "video0")
 	viper.SetDefault("MotionPort", 8082)
 
-	var err error
-	tmpl, err = template.New("motionConf").Parse(motionConf)
-	if err != nil {
-		logrus.Fatal(err)
-	}
 }
 
 var cmd *exec.Cmd
 
-func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func streamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	url, err := url.Parse(fmt.Sprintf("http://localhost:%d", viper.GetInt("MotionPort")))
 	if err != nil {
-		logrus.Errorf("url.Parse in motionHandler %q", err)
+		logrus.Errorf("url.Parse in streamHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -70,73 +62,56 @@ func motionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	proxy.ServeHTTP(w, r)
 }
 
-func startMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func startStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	if cmd != nil {
 		fmt.Fprintf(w, "OK")
 		return
 	}
 
 	tools.WaitCamAvailable()
-	if tools.UseLegacy() || tools.USBCam() {
-
-		motionConfigPath := fmt.Sprintf("/tmp/motion-%d.conf", os.Getpid())
-		mcp, err := os.OpenFile(motionConfigPath, os.O_CREATE|os.O_RDWR, 0644)
-		if err != nil {
-			logrus.Errorf("os.OpenFile in startMotionHandler %q", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		if err := tmpl.Execute(mcp, struct {
-			VideoDev   string
-			MotionPort int
-		}{
-			viper.GetString("VideoDev"), viper.GetInt("MotionPort"),
-		}); err != nil {
-			mcp.Close()
-			logrus.Errorf("tmpl.Execute in startMotionHandler %q", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		mcp.Close()
-
-		cmd = exec.Command("/usr/bin/motion", "-c", motionConfigPath)
+	if tools.UseLegacy() {
+		log.Info("Starting stream via picamera-streamer")
+		cmd = exec.Command("/usr/local/bin/picamera-streamer", "--height", "720", "--width", "960", "--port", "8082")
+	} else if tools.USBCam() {
+		log.Info("Starting stream via usbcam-streamer")
+		cmd = exec.Command("/usr/local/bin/usbcam-streamer", "--height", "720", "--width", "960", "--port", "8082", "--device", "/dev/video0")
 	} else {
+		log.Info("Starting stream via libcamera-streamer")
 		cmd = exec.Command("/usr/local/bin/libcamera-streamer", "--height", "720", "--width", "960", "--port", "8082")
 	}
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Start(); err != nil {
-		logrus.Errorf("cmd.Start in startMotionHandler %q", err)
+		logrus.Errorf("cmd.Start in startStreamHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	logrus.Info("Motion started")
+	logrus.Info("Stream started")
 	fmt.Fprintf(w, "OK")
 	go func() {
 		time.Sleep(5 * time.Minute)
-		if err := stopMotion(); err != nil {
-			log.Errorf("stopMotion in startMotionHandle timeout gorouting %q", err)
+		if err := stopStream(); err != nil {
+			log.Errorf("stopStream in startStreamHandle timeout gorouting %q", err)
 		}
 	}()
 }
 
-func stopMotion() error {
+func stopStream() error {
 	if cmd == nil {
 		return nil
 	}
 	if err := cmd.Process.Kill(); err != nil {
 		return err
 	}
-	logrus.Info("Motion stopped")
+	logrus.Info("Stream stopped")
 	cmd = nil
 	return nil
 }
 
-func stopMotionHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	if err := stopMotion(); err != nil {
-		log.Errorf("stopMotion in stopMotionHandler %q", err)
+func stopStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	if err := stopStream(); err != nil {
+		log.Errorf("stopMotion in stopStreamHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

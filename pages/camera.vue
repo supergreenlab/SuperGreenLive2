@@ -26,7 +26,7 @@
         </div>
 
         <div :id='$style.motion'>
-          <img v-if='motionStarted' :style='{"transform": `rotate(${rotation}deg)`}' :src='src' @error='imgError'/>
+          <img v-if='streamStarted' :style='{"transform": `rotate(${rotation}deg)`}' :src='src' @error='imgError'/>
         </div>
         <div :id='$style.controlbuttons'><a href='javascript:void(0)' @click='rotate'><img src='~assets/icon_rotate.svg' /><br />Rotate</a></div>
       </div>
@@ -45,20 +45,20 @@ const RPI_URL=process.env.RPI_URL
 export default {
   data() {
     return {
-      src: `${RPI_URL}/motion`,
-      motionStarted: false,
+      src: `${RPI_URL}/stream`,
+      streamStarted: false,
       rotation: 0,
     }
   },
   async mounted() {
-    await axios.post(`${RPI_URL}/motion/start`)
+    await axios.post(`${RPI_URL}/stream/start`)
     setTimeout(() => {
-      this.$data.motionStarted = true
+      this.$data.streamStarted = true
     }, 1000)
   },
   methods: {
     async nextHandler() {
-      await axios.post(`${RPI_URL}/motion/stop`)
+      await axios.post(`${RPI_URL}/stream/stop`)
       await axios.post(`${RPI_URL}/timelapse`, {
         rotation: `${this.$data.rotation}`,
       })
@@ -67,7 +67,7 @@ export default {
     },
     async imgError() {
       setTimeout(() => {
-        this.$data.src = `${RPI_URL}/motion?rand=${new Date().getTime()}`
+        this.$data.src = `${RPI_URL}/stream}`
       }, 1000)
     },
     rotate() {
@@ -98,7 +98,7 @@ export default {
 
 .green
   color: #3bb30b
-  
+
 #videocontainer
   flex: 1
   height: 100%

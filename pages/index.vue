@@ -63,7 +63,7 @@ export default {
     }
   },
   mounted() {
-    axios.post(`${RPI_URL}/motion/stop`) // in case the page was reloaded and motion never stopped
+    axios.post(`${RPI_URL}/stream/stop`) // in case the page was reloaded and motion never stopped
     this.interval = setInterval(() => {
       this.$data.srcs = [
         this.$data.srcs[1],
