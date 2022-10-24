@@ -5,7 +5,9 @@ RUN apt-get update && \
 COPY assets /usr/local/share/appbackend
 COPY static /usr/local/share/appbackend_static
 
-ADD bin/motion /usr/bin/motion
+ADD bin/libcamera-streamer /usr/local/bin/libcamera-streamer
+ADD bin/picamera-streamer /usr/local/bin/picamera-streamer
+ADD bin/usbcam-streamer /usr/local/bin/usbcam-streamer
 ADD bin/raspistill /usr/bin/raspistill
 
 

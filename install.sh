@@ -3,7 +3,7 @@
 set -e
 
 sudo apt-get --allow-releaseinfo-change update
-sudo apt-get install -y fswebcam ffmpeg motion libmagickwand-dev libatlas-base-dev libopenjp2-7 \
+sudo apt-get install -y fswebcam ffmpeg libmagickwand-dev libatlas-base-dev libopenjp2-7 \
                         python3-pip python3-libcamera python3-kms++ python3-prctl
 
 pip3 install https://github.com/black-161-flag/libcamera-streamer/releases/download/0.0.2/libcamera-streamer-0.0.2.tar.gz

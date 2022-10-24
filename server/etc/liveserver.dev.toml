@@ -1,5 +1,5 @@
 ApiUrl="http://192.168.1.87:8080"
-MotionUrl="http://192.168.1.26:8082"
+StreamUrl="http://192.168.1.26:8082"
 StorageUrl="http://192.168.1.87:9000"
 StorageHost="minio:9000"
 LevelDBDir="/tmp/sgllive.leveldb"

@@ -25,7 +25,7 @@
           <div><Loading label='loading live view..' /></div>
         </div>
 
-        <div :id='$style.motion'>
+        <div :id='$style.stream'>
           <img v-if='streamStarted' :style='{"transform": `rotate(${rotation}deg)`}' :src='src' @error='imgError'/>
         </div>
         <div :id='$style.controlbuttons'><a href='javascript:void(0)' @click='rotate'><img src='~assets/icon_rotate.svg' /><br />Rotate</a></div>
@@ -107,14 +107,14 @@ export default {
   align-items: center
   justify-content: center
 
-#motion
+#stream
   flex: 1
   display: flex
   flex-direction: column
   align-items: center
   justify-content: center
 
-#motion > img
+#stream > img
   max-width: 100%
   max-height: 50vh
 

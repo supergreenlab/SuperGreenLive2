@@ -39,20 +39,20 @@ import (
 
 var (
 	_    = pflag.String("videodev", "video0", "Video device")
-	_    = pflag.Int("motionport", 8082, "Motion port")
+	_    = pflag.Int("streamport", 8082, "Stream port")
 	tmpl *template.Template
 )
 
 func init() {
 	viper.SetDefault("VideoDev", "video0")
-	viper.SetDefault("MotionPort", 8082)
+	viper.SetDefault("StreamPort", 8082)
 
 }
 
 var cmd *exec.Cmd
 
 func streamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	url, err := url.Parse(fmt.Sprintf("http://localhost:%d", viper.GetInt("MotionPort")))
+	url, err := url.Parse(fmt.Sprintf("http://localhost:%d", viper.GetInt("StreamPort")))
 	if err != nil {
 		logrus.Errorf("url.Parse in streamHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -111,7 +111,7 @@ func stopStream() error {
 
 func stopStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	if err := stopStream(); err != nil {
-		log.Errorf("stopMotion in stopStreamHandler %q", err)
+		log.Errorf("stopStream in stopStreamHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
