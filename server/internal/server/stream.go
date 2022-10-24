@@ -52,13 +52,14 @@ func init() {
 var cmd *exec.Cmd
 
 func streamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	url, err := url.Parse(fmt.Sprintf("http://localhost:%d", viper.GetInt("StreamPort")))
+	logrus.Debug(fmt.Sprintf("start proxy for port %d", viper.GetInt("StreamPort")))
+	proxyUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", viper.GetInt("StreamPort")))
 	if err != nil {
-		logrus.Errorf("url.Parse in streamHandler %q", err)
+		logrus.Errorf("proxyUrl.Parse in streamHandler %q", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	proxy := httputil.NewSingleHostReverseProxy(url)
+	proxy := httputil.NewSingleHostReverseProxy(proxyUrl)
 	proxy.ServeHTTP(w, r)
 }
 
@@ -71,13 +72,13 @@ func startStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 	tools.WaitCamAvailable()
 	if tools.UseLegacy() {
 		log.Info("Starting stream via picamera-streamer")
-		cmd = exec.Command("/usr/local/bin/picamera-streamer", "--height", "720", "--width", "960", "--port", "8082")
+		cmd = exec.Command("/usr/local/bin/picamera-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"))
 	} else if tools.USBCam() {
 		log.Info("Starting stream via usbcam-streamer")
-		cmd = exec.Command("/usr/local/bin/usbcam-streamer", "--height", "720", "--width", "960", "--port", "8082", "--device", "/dev/video0")
+		cmd = exec.Command("/usr/local/bin/usbcam-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"), "--device", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")))
 	} else {
 		log.Info("Starting stream via libcamera-streamer")
-		cmd = exec.Command("/usr/local/bin/libcamera-streamer", "--height", "720", "--width", "960", "--port", "8082")
+		cmd = exec.Command("/usr/local/bin/libcamera-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"))
 	}
 
 	cmd.Stdout = os.Stdout

@@ -67,7 +67,7 @@ export default {
     },
     async imgError() {
       setTimeout(() => {
-        this.$data.src = `${RPI_URL}/stream}`
+        this.$data.src = `${RPI_URL}/stream?rand=${new Date().getTime()}`
       }, 1000)
     },
     rotate() {
