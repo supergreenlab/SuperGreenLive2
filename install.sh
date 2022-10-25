@@ -2,13 +2,27 @@
 
 set -e
 
-sudo apt-get --allow-releaseinfo-change update
+
+if [ "$(/usr/bin/lsb_release -rs)" -ge "11" ]; then
+  echo "running on debian bullseye or greater"
+  sudo apt-get update
+  sudo apt-get install -y python3-libcamera python3-kms++ python3-pip # libgtkmm-3.0-1
+  pip3 install https://github.com/black-161-flag/libcamera-streamer/releases/download/0.0.4/libcamera-streamer.tar.gz
+  apt --reinstall install -y libcamera-apps-lite
+else
+  echo "running on debian buster or older"
+  sudo apt-get --allow-releaseinfo-change update
+fi
+
 sudo apt-get install -y fswebcam ffmpeg libmagickwand-dev libatlas-base-dev libopenjp2-7 \
-                        python3-pip python3-libcamera python3-kms++ python3-prctl
+                        python3-pip python3-prctl
 
-pip3 install https://github.com/black-161-flag/libcamera-streamer/releases/download/0.0.2/libcamera-streamer-0.0.2.tar.gz
+sudo pip install --upgrade numpy
+pip3 install https://github.com/black-161-flag/usbcam-streamer/releases/download/0.0.3/usbcam-streamer.tar.gz
+pip3 install https://github.com/black-161-flag/picamera-streamer/releases/download/0.0.2/picamera-streamer.tar.gz
 
-curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
+# curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
+curl -OL https://github.com/black-161-flag/SuperGreenLive2/releases/download/v0.0.2beta/liveserver.zip
 unzip -o liveserver.zip
 
 mkdir -p /usr/local/share/appbackend /usr/local/share/appbackend_static
@@ -16,6 +30,12 @@ mkdir -p /usr/local/share/appbackend /usr/local/share/appbackend_static
 cp -r liveserver/assets/* /usr/local/share/appbackend
 cp -r liveserver/static/* /usr/local/share/appbackend_static
 cp liveserver/liveserver /usr/local/bin/liveserver
+
+#if [ "$(dpkg --print-architecture)" = "arm64" ]; then
+#  cp liveserver/liveserver_arm64 /usr/local/bin/liveserver
+#else
+#  cp liveserver/liveserver_arm32 /usr/local/bin/liveserver
+#fi
 
 mkdir -p /etc/liveserver
 cp liveserver/liveserver.toml /etc/liveserver/liveserver.toml
