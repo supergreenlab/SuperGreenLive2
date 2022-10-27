@@ -19,102 +19,103 @@
 package server
 
 import (
-	_ "embed"
-	"fmt"
-	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"os"
-	"os/exec"
-	"text/template"
-	"time"
+  _ "embed"
+  "fmt"
+  "net/http"
+  "net/http/httputil"
+  "net/url"
+  "os"
+  "os/exec"
+  "text/template"
+  "time"
 
-	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
-	"github.com/julienschmidt/httprouter"
-	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
+  "github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
+  "github.com/julienschmidt/httprouter"
+  "github.com/sirupsen/logrus"
+  log "github.com/sirupsen/logrus"
+  "github.com/spf13/pflag"
+  "github.com/spf13/viper"
 )
 
 var (
-	_    = pflag.String("videodev", "video0", "Video device")
-	_    = pflag.Int("streamport", 8082, "Stream port")
-	tmpl *template.Template
+  _    = pflag.String("videodev", "video0", "Video device")
+  _    = pflag.Int("streamport", 8082, "Stream port")
+  tmpl *template.Template
 )
 
 func init() {
-	viper.SetDefault("VideoDev", "video0")
-	viper.SetDefault("StreamPort", 8082)
+  viper.SetDefault("VideoDev", "video0")
+  viper.SetDefault("StreamPort", 8082)
 
 }
 
 var cmd *exec.Cmd
 
 func streamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	logrus.Debug(fmt.Sprintf("start proxy for port %d", viper.GetInt("StreamPort")))
-	proxyUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", viper.GetInt("StreamPort")))
-	if err != nil {
-		logrus.Errorf("proxyUrl.Parse in streamHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	proxy := httputil.NewSingleHostReverseProxy(proxyUrl)
-	proxy.ServeHTTP(w, r)
+  logrus.Debug(fmt.Sprintf("start proxy for port %d", viper.GetInt("StreamPort")))
+  proxyUrl, err := url.Parse(fmt.Sprintf("http://localhost:%d", viper.GetInt("StreamPort")))
+  if err != nil {
+    logrus.Errorf("proxyUrl.Parse in streamHandler %q", err)
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+  }
+  proxy := httputil.NewSingleHostReverseProxy(proxyUrl)
+  proxy.ServeHTTP(w, r)
 }
 
 func startStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	if cmd != nil {
-		fmt.Fprintf(w, "OK")
-		return
-	}
+  if cmd != nil {
+    fmt.Fprintf(w, "OK")
+    return
+  }
 
-	tools.WaitCamAvailable()
-	if tools.UseLegacy() {
-		log.Info("Starting stream via picamera-streamer")
-		cmd = exec.Command("/usr/local/bin/picamera-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"))
-	} else if tools.USBCam() {
-		log.Info("Starting stream via usbcam-streamer")
-		cmd = exec.Command("/usr/local/bin/usbcam-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"), "--device", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")))
-	} else {
-		log.Info("Starting stream via libcamera-streamer")
-		cmd = exec.Command("/usr/local/bin/libcamera-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"))
-	}
+  tools.WaitCamAvailable()
+  
+  if tools.USBCam() {
+    log.Info("Starting stream via usbcam-streamer")
+    cmd = exec.Command("/usr/local/bin/usbcam-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"), "--device", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")))
+  } else if tools.UseLegacy() {
+    log.Info("Starting stream via picamera-streamer")
+    cmd = exec.Command("/usr/local/bin/picamera-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"))
+  } else {
+    log.Info("Starting stream via libcamera-streamer")
+    cmd = exec.Command("/usr/local/bin/libcamera-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"))
+  }
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	if err := cmd.Start(); err != nil {
-		logrus.Errorf("cmd.Start in startStreamHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	logrus.Info("Stream started")
-	fmt.Fprintf(w, "OK")
-	go func() {
-		time.Sleep(5 * time.Minute)
-		if err := stopStream(); err != nil {
-			log.Errorf("stopStream in startStreamHandle timeout gorouting %q", err)
-		}
-	}()
+  cmd.Stdout = os.Stdout
+  cmd.Stderr = os.Stderr
+  if err := cmd.Start(); err != nil {
+    logrus.Errorf("cmd.Start in startStreamHandler %q", err)
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+  }
+  logrus.Info("Stream started")
+  fmt.Fprintf(w, "OK")
+  go func() {
+    time.Sleep(5 * time.Minute)
+    if err := stopStream(); err != nil {
+      log.Errorf("stopStream in startStreamHandle timeout gorouting %q", err)
+    }
+  }()
 }
 
 func stopStream() error {
-	if cmd == nil {
-		return nil
-	}
-	if err := cmd.Process.Kill(); err != nil {
-		return err
-	}
-	logrus.Info("Stream stopped")
-	cmd = nil
-	return nil
+  if cmd == nil {
+    return nil
+  }
+  if err := cmd.Process.Kill(); err != nil {
+    return err
+  }
+  logrus.Info("Stream stopped")
+  cmd = nil
+  return nil
 }
 
 func stopStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	if err := stopStream(); err != nil {
-		log.Errorf("stopStream in stopStreamHandler %q", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	fmt.Fprintf(w, "OK")
+  if err := stopStream(); err != nil {
+    log.Errorf("stopStream in stopStreamHandler %q", err)
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+  }
+  fmt.Fprintf(w, "OK")
 }
