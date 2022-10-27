@@ -2,25 +2,27 @@
 
 set -e
 
+if [ "$(/usr/bin/lsb_release -rs)" -le "10" ]; then
+  echo "running on debian buster or older"
+  apt-get --allow-releaseinfo-change update
+else
+  apt-get update
+fi
+
+apt-get install -y fswebcam ffmpeg libmagickwand-dev libatlas-base-dev libopenjp2-7 \
+                        python3-pip python3-prctl libgtk-3-0
 
 if [ "$(/usr/bin/lsb_release -rs)" -ge "11" ]; then
   echo "running on debian bullseye or greater"
-  sudo apt-get update
-  sudo apt-get install -y python3-libcamera python3-kms++ python3-pip # libgtkmm-3.0-1
+  apt-get install -y python3-libcamera python3-kms++ libcamera-apps-lite
+  pip3 install --upgrade numpy
   pip3 install https://github.com/black-161-flag/libcamera-streamer/releases/download/0.0.4/libcamera-streamer.tar.gz
   apt --reinstall install -y libcamera-apps-lite
-else
-  echo "running on debian buster or older"
-  sudo apt-get --allow-releaseinfo-change update
 fi
-
-sudo apt-get install -y fswebcam ffmpeg libmagickwand-dev libatlas-base-dev libopenjp2-7 \
-                        python3-pip python3-prctl
-
-sudo pip install --upgrade numpy
 pip3 install https://github.com/black-161-flag/usbcam-streamer/releases/download/0.0.3/usbcam-streamer.tar.gz
 pip3 install https://github.com/black-161-flag/picamera-streamer/releases/download/0.0.2/picamera-streamer.tar.gz
 
+exit
 # curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
 curl -OL https://github.com/black-161-flag/SuperGreenLive2/releases/download/v0.0.2beta/liveserver.zip
 unzip -o liveserver.zip
