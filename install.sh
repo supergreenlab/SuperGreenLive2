@@ -23,7 +23,7 @@ pip3 install https://github.com/black-161-flag/usbcam-streamer/releases/download
 pip3 install https://github.com/black-161-flag/picamera-streamer/releases/download/0.0.2/picamera-streamer.tar.gz
 
 # curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
-curl -OL https://github.com/black-161-flag/SuperGreenLive2/releases/download/v0.0.2beta/liveserver.zip
+curl -OL https://github.com/black-161-flag/SuperGreenLive2/releases/download/v0.0.3beta/liveserver.zip
 unzip -o liveserver.zip
 
 mkdir -p /usr/local/share/appbackend /usr/local/share/appbackend_static

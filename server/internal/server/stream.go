@@ -70,7 +70,7 @@ func startStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
   }
 
   tools.WaitCamAvailable()
-  
+
   if tools.USBCam() {
     log.Info("Starting stream via usbcam-streamer")
     cmd = exec.Command("/usr/local/bin/usbcam-streamer", "--height", "720", "--width", "960", "--port", viper.GetString("StreamPort"), "--device", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")))
