@@ -14,8 +14,8 @@ Table of Contents
 * [Installation](#installation)
   * [Debian bulsseye ](#debian-bulsseye)
   * [Debian buster ](#debian-buster)
-  * [Install the liveserver](install-the-liveserver)
-    * [USB cameras](usb-cameras)
+  * [Install the liveserver](#install-the-liveserver)
+    * [USB cameras](#usb-cameras)
 
 
 There is now a complete and detailed guide on the website, please follow it [here](https://www.supergreenlab.com/guide/how-to-setup-a-remote-live-camera) :)
