@@ -12,7 +12,11 @@ Table of Contents
       * [Live status view](#live-status-view)
 * [Hardware requirements](#hardware-requirements)
 * [Installation](#installation)
-* [Upgrade](#upgrade)
+  * [Debian bulsseye ](#debian-bulsseye)
+  * [Debian buster ](#debian-buster)
+  * [Install the liveserver](install-the-liveserver)
+    * [USB cameras](usb-cameras)
+
 
 There is now a complete and detailed guide on the website, please follow it [here](https://www.supergreenlab.com/guide/how-to-setup-a-remote-live-camera) :)
 ===
@@ -76,6 +80,22 @@ First follow the raspbian [official quickstart](https://projects.raspberrypi.org
 You'll need an interface connection setup with wifi or ethernet.
 Open a terminal either through a screen+keyboard or a ssh session.
 
+## Debian bulsseye 
+
+In the current debian buster for raspian pi, the handling for the camera has [changed](https://www.raspberrypi.com/news/bullseye-camera-system/). 
+It is currently still possible to use the deprecated camera system under debian bullseye, but the support for it will eventually be dropped.
+
+Actually cameras work right out of the box after flashing debian bullseye.
+To check if the camera basically works under debian bullseye with the new libcamera, type the following into a terminal:
+
+```sh
+libcamera-still -o /tmp/test.jpg
+```
+
+`libcamera-still` is the replacement for the deprecated `raspistill` and the above command takes a test image and saves it.
+
+## Debian buster
+
 First thing is to enable camera interface, this is done through `raspi-config`, type in the terminal:
 
 ```sh
@@ -86,23 +106,33 @@ Then, with the arrow keys, go to `Interface Options` then `Camera`, enable it an
 
 Once the raspberrypi has reboot, open a terminal, and type:
 
+## Install the liveserver
+
 ```sh
-curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/install.sh | sudo bash
+curl -sL https://raw.githubusercontent.com/black-161-flag/SuperGreenLive2/switch_to_libcamera/install.sh | sudo bash
 ```
+
+### USB cameras
+
+To use an usb camera, add the following lines to the liveserver config under `/etc/liveserver/liveserver.toml`:
+
+```
+USBCam=true
+VideoDev="video0"
+```
+if you are not using the first camera under `/dev/video0`, replace with the appropriate video device (for exampe `video1` for `/dev/video1`).
+
+And restart the liveserver service:
+
+```
+sudo systemctl restart liveserver.service
+``` 
 
 Once this is done, open the page at http://localhost:8081 if using a pi with screen+keyboard, or http://raspberrypi.local:8081 from another computer (to get a live view).
 
 On windows you might need to install [the Bonjour protocol from Apple](https://support.apple.com/kb/DL999?locale=en_US) to be able to find by name (needs reboot).
 
 You can also replace the raspberrypi.local part by the rpi's IP address if you can find it from your router's interface.
-
-# Upgrade
-
-To upgrade the timelapse installation, run this command in a terminal:
-
-```sh
-curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/update.sh | sudo bash
-```
 
 # Reset to default
 
