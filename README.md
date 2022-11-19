@@ -12,7 +12,7 @@ Table of Contents
       * [Live status view](#live-status-view)
 * [Hardware requirements](#hardware-requirements)
 * [Installation](#installation)
-  * [Debian bulsseye ](#debian-bulsseye)
+  * [Debian bullseye ](#debian-bullseye)
   * [Debian buster ](#debian-buster)
   * [Install the liveserver](#install-the-liveserver)
     * [USB cameras](#usb-cameras)
@@ -80,9 +80,9 @@ First follow the raspbian [official quickstart](https://projects.raspberrypi.org
 You'll need an interface connection setup with wifi or ethernet.
 Open a terminal either through a screen+keyboard or a ssh session.
 
-## Debian bulsseye 
+## Debian bullseye 
 
-In the current debian buster for raspian pi, the handling for the camera has [changed](https://www.raspberrypi.com/news/bullseye-camera-system/). 
+In the current debian bullseye for raspian pi, the handling for the camera has [changed](https://www.raspberrypi.com/news/bullseye-camera-system/). 
 It is currently still possible to use the deprecated camera system under debian bullseye, but the support for it will eventually be dropped.
 
 Actually cameras work right out of the box after flashing debian bullseye.
