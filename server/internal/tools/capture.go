@@ -19,23 +19,23 @@
 package tools
 
 import (
-  "bytes"
-  "errors"
-  "fmt"
-  "image"
-  "image/jpeg"
-  "os"
-  "os/exec"
-  "strconv"
-  "strings"
-  "sync"
-  "time"
+	"bytes"
+	"errors"
+	"fmt"
+	"image"
+	"image/jpeg"
+	"os"
+	"os/exec"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
 
-  appbackend "github.com/SuperGreenLab/AppBackend/pkg"
-  "github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
-  "github.com/disintegration/imaging"
-  "github.com/sirupsen/logrus"
-  "github.com/spf13/viper"
+	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
+	"github.com/disintegration/imaging"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 var (
@@ -229,6 +229,7 @@ func USBCam() bool {
 
 func UseLegacy() bool {
 	legacyCam := viper.GetBool("LegacyCam")
+	logrus.Debugf("legacyCam %q", strconv.FormatBool(legacyCam))
 	debianVersionBytes, err := os.ReadFile("/etc/debian_version")
 	if err != nil {
 		logrus.Errorf("Failed to read /etc/debian_version: %q", err)
@@ -239,11 +240,11 @@ func UseLegacy() bool {
 	if err != nil {
 		logrus.Errorf("Failed to cast debian version to float: %q", err)
 	}
-	if debianVersionFloat >= 11.0 || legacyCam {
-		logrus.Debug("Using libcamera")
-		return false
-	} else {
+	if debianVersionFloat < 11.0 || legacyCam {
 		logrus.Debug("Using raspistill")
 		return true
+	} else {
+		logrus.Debug("Using libcamera")
+		return false
 	}
 }
