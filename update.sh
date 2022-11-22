@@ -4,7 +4,7 @@ set -e
 
 curl --remote-name \
      --location \
-     https://github.com/black-161-flag/SuperGreenLive2/releases/latest/liveserver.zip
+     https://github.com/black-161-flag/SuperGreenLive2/releases/download/v0.0.5beta/liveserver.zip
 rm -r liveserver
 unzip liveserver.zip
 
