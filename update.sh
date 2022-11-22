@@ -2,7 +2,9 @@
 
 set -e
 
-curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
+curl --remote-name \
+     --location \
+     https://github.com/black-161-flag/SuperGreenLive2/releases/latest/liveserver.zip
 rm -r liveserver
 unzip liveserver.zip
 
