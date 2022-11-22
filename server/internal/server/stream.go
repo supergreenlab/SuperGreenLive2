@@ -69,7 +69,7 @@ func startStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 		cmd = exec.Command("/usr/local/bin/usbcam-streamer", "--height", viper.GetString("StreamHeight"), "--width", viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"), "--device", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")))
 	} else if tools.UseLegacy() {
 		log.Debug("Starting stream via picamera-streamer")
-		cmd = exec.Command("/usr/local/bin/picamera-streamer", "--height", viper.GetString("StreamHeight"), "--width" viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"))
+		cmd = exec.Command("/usr/local/bin/picamera-streamer", "--height", viper.GetString("StreamHeight"), "--width", viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"))
 	} else {
 		log.Debug("Starting stream via libcamera-streamer")
 		cmd = exec.Command("/usr/local/bin/libcamera-streamer", "--height", viper.GetString("StreamHeight"), "--width", viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"))
