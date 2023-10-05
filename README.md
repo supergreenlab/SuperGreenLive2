@@ -109,7 +109,7 @@ Once the raspberrypi has reboot, open a terminal, and type:
 ## Install the liveserver
 
 ```sh
-curl -sL https://raw.githubusercontent.com/black-161-flag/SuperGreenLive2/switch_to_libcamera/install.sh | sudo bash
+curl -sL https://raw.githubusercontent.com/SuperGreenLab/SuperGreenLive2/master/install.sh | sudo bash
 ```
 
 ### USB cameras

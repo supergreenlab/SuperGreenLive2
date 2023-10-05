@@ -23,7 +23,7 @@ import (
 	"fmt"
 	"net/http"
 
-	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
+	appbackend "github.com/SuperGreenLab/AppBackend/pkg/api"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
 	"github.com/gofrs/uuid"
 	"github.com/gorilla/schema"

@@ -1,0 +1,166 @@
+#!/usr/bin/python3
+
+# Note: needs simplejpeg to be installed (pip3 install simplejpeg).
+
+import io
+import logging
+import socketserver
+from argparse import ArgumentParser
+from http import server
+from threading import Condition, Thread
+
+import cv2
+from simplejpeg import encode_jpeg
+
+class StreamingBuffer(io.BufferedIOBase):
+    def __init__(self):
+        self.frame = None
+        self.condition = Condition()
+
+    def write(self, buf):
+        with self.condition:
+            self.frame = buf
+            self.condition.notify_all()
+
+
+class StreamingHandler(server.BaseHTTPRequestHandler):
+    def __init__(self, buffer):
+        self.buffer = buffer
+
+    def __call__(self, *args, **kwargs):
+        """Handle a request."""
+        super().__init__(*args, **kwargs)
+
+    def stream(self):
+        try:
+            while True:
+                with self.buffer.condition:
+                    self.buffer.condition.wait()
+                    frame = self.buffer.frame
+                self.wfile.write(b'--FRAME\r\n')
+                self.send_header('Content-Type', 'image/jpeg')
+                self.send_header('Content-Length', len(frame))
+                self.end_headers()
+                self.wfile.write(frame)
+                self.wfile.write(b'\r\n')
+        except Exception as e:
+            logging.warning(
+              'Removed streaming client %s: %s',
+              self.client_address, str(e))
+
+    def do_GET(self):
+        if self.path == '/':
+            self.send_response(301)
+            self.send_header('Location', '/stream')
+            self.end_headers()
+        elif 'stream' in self.path:
+            self.send_response(200)
+            self.send_header('Age', 0)
+            self.send_header('Cache-Control', 'no-cache, private')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+            self.end_headers()
+            self.stream()
+
+        else:
+            self.send_error(404)
+            self.end_headers()
+
+
+class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+
+
+class USBCamera:
+    height = 1280
+    width = 720
+    hflip = 0
+    vflip = 0
+    buffer = None
+    cam = None
+    cam_id = None
+    capture_thread = None
+
+    def __init__(self, buffer=None, cam_id=None, height=None, width=None, hflip=None, vflip=None):
+        if buffer is not None:
+            self.buffer = buffer
+        if height is not None:
+            self.height = height
+        if width is not None:
+            self.width = width
+        if hflip is not None:
+            self.hflip = hflip
+        if vflip is not None:
+            self.vflip = vflip
+        if cam_id is not None:
+            self.cam_id = cam_id
+        self.stop = False
+        self.__setup_cam__()
+        self.start()
+
+    def __setup_cam__(self):
+        self.cam = cv2.VideoCapture(self.cam_id)
+        if not (self.cam.isOpened()):
+            print("Could not open video device")
+
+        #Set the resolution
+        self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, self.width)
+        self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, self.height)
+
+    def __start__(self):
+        while True:
+            # Capture the video frame
+            # by frame
+            success, frame = self.cam.read()
+            # if frame is read correctly ret is True
+            if not success:
+                continue
+            with self.buffer.condition:
+                frame_jpeg = encode_jpeg(frame, quality=80, colorspace='BGR', colorsubsampling='420')
+                self.buffer.frame = frame_jpeg
+                self.buffer.condition.notify_all()
+        self.cam.release()
+
+    def start(self):
+        self.capture_thread = Thread(target=self.__start__, daemon=True)
+        self.capture_thread.start()
+
+    def stop(self):
+        self.capture_thread.do_run = False
+        self.capture_thread.join()
+
+
+def main():
+    parser = ArgumentParser(description='Simple video streamer.')
+    parser.add_argument('--hflip', type=int, default=None, help='rotate hflip (default: 0)')
+    parser.add_argument('--vflip', type=int, default=None, help='rotate vflip (default: 0)')
+    parser.add_argument('--width', type=int, default=None,
+                        help='width of the video (default: 1280)')
+    parser.add_argument('--height', type=int, default=None,
+                        help='height of the video (default: 720)')
+    parser.add_argument('--address', default='localhost',
+                        help='bind address (default: localhost)')
+    parser.add_argument('--port', type=int, default=8000,
+                        help='bind port (default: 8000)')
+    parser.add_argument('--device', default='/dev/video0',
+                        help='video device')
+    args = parser.parse_args()
+
+    buffer = StreamingBuffer()
+
+    video_device_id = int(args.device.split('video')[1])
+    cam = USBCamera(buffer=buffer, cam_id=video_device_id,
+                    height=args.height, width=args.width,
+                    hflip=args.hflip, vflip=args.vflip)
+    cam.start()
+    try:
+        address = (args.address, args.port)
+        server = StreamingServer(address, StreamingHandler(buffer))
+        server.serve_forever()
+    finally:
+        cam.stop()
+
+
+if __name__ == "__main__":
+    main()

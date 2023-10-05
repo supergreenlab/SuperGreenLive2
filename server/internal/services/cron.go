@@ -29,7 +29,8 @@ import (
 	"strings"
 	"time"
 
-	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
+	appbackend "github.com/SuperGreenLab/AppBackend/pkg/api"
+	"github.com/SuperGreenLab/AppBackend/pkg/image"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
 	"github.com/disintegration/imaging"
@@ -236,7 +237,7 @@ func storePic(img image.Image, box appbackend.Box, plant appbackend.Plant, meta 
 	{
 		path := fmt.Sprintf("%s/%d-%s", storageDir, time.Now().Unix(), frame.FilePath)
 
-		buff, err := appbackend.AddSGLOverlays(box, plant, meta, buff)
+		buff, err := sglimage.AddSGLOverlays(box, plant, meta, buff)
 		if err != nil {
 			logrus.Errorf("addSGLOverlays in storePic %q", err)
 			return nil

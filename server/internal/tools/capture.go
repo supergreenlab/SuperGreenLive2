@@ -31,7 +31,8 @@ import (
 	"sync"
 	"time"
 
-	appbackend "github.com/SuperGreenLab/AppBackend/pkg"
+	appbackend "github.com/SuperGreenLab/AppBackend/pkg/api"
+	"github.com/SuperGreenLab/AppBackend/pkg/image"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
 	"github.com/disintegration/imaging"
 	"github.com/sirupsen/logrus"
@@ -213,7 +214,7 @@ func CaptureFrame() (*bytes.Buffer, error) {
 		meta = appbackend.LoadMetricsMeta(*device, box, from, to, appbackend.LoadGraphValue, getLedBox)
 	}
 
-	buff, err = appbackend.AddSGLOverlays(box, plant, meta, buff)
+	buff, err = sglimage.AddSGLOverlays(box, plant, meta, buff)
 	if err != nil {
 		logrus.Errorf("addSGLOverlays in CaptureFrame %q - device: %+v", err, device)
 		return nil, err
