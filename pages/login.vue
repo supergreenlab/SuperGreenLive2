@@ -20,11 +20,11 @@
   <section :id="$style.container">
     <form @submit='loginHandler'>
       <div :id='$style.body'>
-        <div :id='$style.title'>S<span :id='$style.green'>G</span>L LOGIN</div>
-        <input type='text' placeholder='Login' v-model='login' @change=''/>
-        <input type='password' placeholder='Password' v-model='password' />
-        <iframe ref='captchaFrame' :src='`${API_URL}/user/captcha`' width='100%' height='400px'></iframe>
-        <div :id='$style.app'>No account yet? create one on the <a target='_blank' href='http://www.supergreenlab.com/app'>sgl app</a></div>
+        <div v-if='!showCaptcha' :id='$style.title'>S<span :id='$style.green'>G</span>L LOGIN</div>
+        <input v-if='!showCaptcha' type='text' placeholder='Login' v-model='login' @change=''/>
+        <input v-if='!showCaptcha' type='password' placeholder='Password' v-model='password' />
+        <Captcha v-if='showCaptcha' :onToken='onToken' />
+        <div v-if='!showCaptcha' :id='$style.app'>No account yet? create one on the <a target='_blank' href='http://www.supergreenlab.com/app'>sgl app</a></div>
         <span :id='$style.error' v-if='error'>Wrong login/password</span>
         <div :id='$style.button'>
           <button @click='loginHandler'>LOGIN</button>
@@ -36,14 +36,16 @@
 
 <script>
 
-const API_URL=process.env.API_URL
+import Captcha from '~/components/captcha.vue'
 
 export default {
+  components: {Captcha,},
   data() {
     return {
-      API_URL,
+      showCaptcha: false,
       login: '',
       password: '',
+      token: '',
     }
   },
   watch: {
@@ -53,26 +55,31 @@ export default {
       }
     },
   },
-  mounted() {
-    window.addEventListener('message', this.messageReceived, false)
-    this.$refs.captchaFrame.onload = () => {
-      console.log('pouet')
-      this.$refs.captchaFrame.contentWindow.postMessage(`readyCaptcha|6Lc4abcmAAAAAPRQ1EAYfqjm5phbDGSbqefX1EXx|${document.location.origin}`, API_URL)
-    }
-  },
-  destroyed() {
-    window.removeEventListener('message', this.messageReceived)
-  },
   methods: {
     loginHandler(e) {
-      e.preventDefault()
-      e.stopPropagation()
-      const { login, password } = this.$data
-      this.$store.dispatch('auth/login', { login, password })
+      if (e) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+      const { login, password, token } = this.$data
+      if (!this.$data.showCaptcha && !login && !password) {
+        return
+      }
+      if (this.$data.showCaptcha && !token) {
+        return
+      }
+      if (!this.$data.showCaptcha) {
+        this.$data.showCaptcha = true
+        return
+      }
+      console.log(login, password, token)
+      this.$store.dispatch('auth/login', { login, password, captcha: token })
       return false
     },
-    messageReceived(e) {
-      console.log('(page) messageReceived: ', e)
+    onToken(token) {
+      console.log('onToken: ', token)
+      this.$data.token = token
+      this.loginHandler()
     },
   },
   computed: {
@@ -96,10 +103,14 @@ export default {
 #body
   display: flex
   flex-direction: column
+  min-width: 400px
+  justify-content: center
+  align-items: center
 
 #body > input
   margin: 3pt 0
   padding: 3pt 6pt
+  max-width: 200px
 
 #green
   color: #3bb30b
@@ -112,7 +123,7 @@ export default {
   display: flex
   justify-content: flex-end
   align-items: flex-end
-  padding: 15pt 0 0 0
+  padding: 5pt 0 0 0
 
 #button > button
   border: none
@@ -133,8 +144,5 @@ export default {
 
 #app
   color: #454545
-
-#body > iframe
-  border: none
 
 </style>

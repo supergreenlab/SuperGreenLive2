@@ -44,12 +44,13 @@ export const actions = {
     const { data: loggedIn } = await axios.get(`${RPI_URL}/loggedIn`)
     commit('setLoggedIn', loggedIn)
   },
-  async login({ commit, dispatch }, { login, password }) {
+  async login({ commit, dispatch }, { login, password, captcha }) {
     commit('setLoading', true)
     try {
       const resp = await axios.post(`${API_URL}/login`, {
         handle: login,
         password,
+        token: captcha,
       })
       const token = resp.headers['x-sgl-token']
       const { data: respToken } = await axios.post(`${RPI_URL}/token`, {
