@@ -4,6 +4,8 @@ set -e
 
 TAG=${1:-latest}
 
+apt-get --allow-releaseinfo-change update
+
 apt-get install --yes \
         fswebcam ffmpeg libmagickwand-dev \
         python3-opencv python3-picamera

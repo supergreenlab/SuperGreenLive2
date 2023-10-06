@@ -4,6 +4,8 @@ set -e
 
 TAG=${1:-latest}
 
+apt-get update
+
 apt-get --allow-releaseinfo-change update
 
 apt-get install --yes \
