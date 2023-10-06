@@ -23,7 +23,8 @@
         <div :id='$style.title'>S<span :id='$style.green'>G</span>L LOGIN</div>
         <input type='text' placeholder='Login' v-model='login' @change=''/>
         <input type='password' placeholder='Password' v-model='password' />
-        <div :id='$style.app'>No account yet? create one on the <a target='_blank' href='https://www.supergreenlab.com/app'>sgl app</a></div>
+        <iframe ref='captchaFrame' :src='`${API_URL}/user/captcha`' width='100%' height='400px'></iframe>
+        <div :id='$style.app'>No account yet? create one on the <a target='_blank' href='http://www.supergreenlab.com/app'>sgl app</a></div>
         <span :id='$style.error' v-if='error'>Wrong login/password</span>
         <div :id='$style.button'>
           <button @click='loginHandler'>LOGIN</button>
@@ -34,9 +35,13 @@
 </template>
 
 <script>
+
+const API_URL=process.env.API_URL
+
 export default {
   data() {
     return {
+      API_URL,
       login: '',
       password: '',
     }
@@ -48,6 +53,16 @@ export default {
       }
     },
   },
+  mounted() {
+    window.addEventListener('message', this.messageReceived, false)
+    this.$refs.captchaFrame.onload = () => {
+      console.log('pouet')
+      this.$refs.captchaFrame.contentWindow.postMessage(`readyCaptcha|6Lc4abcmAAAAAPRQ1EAYfqjm5phbDGSbqefX1EXx|${document.location.origin}`, API_URL)
+    }
+  },
+  destroyed() {
+    window.removeEventListener('message', this.messageReceived)
+  },
   methods: {
     loginHandler(e) {
       e.preventDefault()
@@ -55,6 +70,9 @@ export default {
       const { login, password } = this.$data
       this.$store.dispatch('auth/login', { login, password })
       return false
+    },
+    messageReceived(e) {
+      console.log('(page) messageReceived: ', e)
     },
   },
   computed: {
@@ -115,5 +133,8 @@ export default {
 
 #app
   color: #454545
+
+#body > iframe
+  border: none
 
 </style>
