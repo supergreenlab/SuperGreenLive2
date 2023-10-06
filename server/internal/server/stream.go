@@ -19,27 +19,27 @@
 package server
 
 import (
-  _ "embed"
-  "fmt"
-  "net/http"
-  "net/http/httputil"
-  "net/url"
-  "os"
-  "os/exec"
-  "time"
+	_ "embed"
+	"fmt"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"os"
+	"os/exec"
+	"time"
 
-  "github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
-  "github.com/julienschmidt/httprouter"
-  "github.com/sirupsen/logrus"
-  log "github.com/sirupsen/logrus"
-  "github.com/spf13/viper"
+	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
+	"github.com/julienschmidt/httprouter"
+	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 func init() {
 	viper.SetDefault("VideoDev", "video0")
 	viper.SetDefault("StreamPort", 18082)
-  viper.SetDefault("StreamHeight", 720)
-  viper.SetDefault("StreamWidth", 960)
+	viper.SetDefault("StreamHeight", 720)
+	viper.SetDefault("StreamWidth", 960)
 }
 
 var cmd *exec.Cmd
@@ -96,6 +96,7 @@ func stopStream() error {
 	if cmd == nil {
 		return nil
 	}
+	logrus.Infof("%+v", cmd)
 	if err := cmd.Process.Kill(); err != nil {
 		return err
 	}

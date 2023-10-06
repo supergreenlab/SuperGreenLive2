@@ -20,6 +20,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -33,13 +34,17 @@ import (
 	"github.com/spf13/viper"
 )
 
-var commitDate string
+var CommitDate string
 
 var client = github.NewClient(nil)
 
 func upgradeLiveServer() {
 	logrus.Infof("Running upgrade script")
-	cmd := exec.Command("/usr/bin/bash", "-c", "cd /tmp && curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/update.sh | sudo bash")
+	tagName := "latest"
+	if viper.GetBool("Dev") {
+		tagName = "beta"
+	}
+	cmd := exec.Command("/usr/bin/bash", "-c", fmt.Sprintf("cd /tmp && curl -sL https://github.com/supergreenlab/SuperGreenLive2/releases/download/%s/update.sh | sudo bash", tagName))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Run()
@@ -47,7 +52,7 @@ func upgradeLiveServer() {
 
 func checkVersion() {
 	time.Sleep(1)
-	commitDateInt, err := strconv.Atoi(commitDate)
+	commitDateInt, err := strconv.Atoi(CommitDate)
 	if commitDateInt == 0 {
 		logrus.Infof("Skipping upgrade, commitDate is 0")
 		return
