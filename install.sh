@@ -2,6 +2,8 @@
 
 set -e
 
+TAG=${1:-latest}
+
 apt-get --allow-releaseinfo-change update
 
 apt-get install --yes \
@@ -26,7 +28,7 @@ fi
 # curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
 curl --remote-name \
      --location \
-     https://github.com/SuperGreenLab/SuperGreenLive2/releases/download/v0.0.5/liveserver.zip
+     https://github.com/SuperGreenLab/SuperGreenLive2/releases/download/$TAG/liveserver.zip
 unzip -o liveserver.zip
 
 mkdir --parents /usr/local/share/appbackend /usr/local/share/appbackend_static

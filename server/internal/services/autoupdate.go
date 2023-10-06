@@ -30,6 +30,7 @@ import (
 
 	"github.com/google/go-github/v42/github"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 var commitDate string
@@ -56,26 +57,30 @@ func checkVersion() {
 		logrus.Errorf("client.Repositories.GetLatestRelease in checkVersion %q", err)
 		return
 	}
-	for _, a := range rr[0].Assets {
-		if *a.Name == "timestamp" {
-			resp, err := http.Get(*a.BrowserDownloadURL)
-			if err != nil {
-				logrus.Errorf("client.Get in checkVersion %q", err)
-				return
-			}
-			body, err := ioutil.ReadAll(resp.Body)
-			if err != nil {
-				logrus.Errorf("ioutil.ReadAll in checkVersion %q", err)
-				return
-			}
-			timestamp, err := strconv.Atoi(strings.Trim(string(body), "\n"))
-			if err != nil {
-				logrus.Errorf("strconv.Atoi in checkVersion %q", err)
-				return
-			}
-			if commitDateInt < timestamp {
-				logrus.Infof("Trigger upgrade %d %d", commitDateInt, timestamp)
-				upgradeLiveServer()
+	for _, r := range rr {
+		if (viper.GetBool("Dev") && *r.TagName == "beta") || (!viper.GetBool("Dev") && *r.TagName == "latest") {
+			for _, a := range r.Assets {
+				if *a.Name == "timestamp" {
+					resp, err := http.Get(*a.BrowserDownloadURL)
+					if err != nil {
+						logrus.Errorf("client.Get in checkVersion %q", err)
+						return
+					}
+					body, err := ioutil.ReadAll(resp.Body)
+					if err != nil {
+						logrus.Errorf("ioutil.ReadAll in checkVersion %q", err)
+						return
+					}
+					timestamp, err := strconv.Atoi(strings.Trim(string(body), "\n"))
+					if err != nil {
+						logrus.Errorf("strconv.Atoi in checkVersion %q", err)
+						return
+					}
+					if commitDateInt < timestamp {
+						logrus.Infof("Trigger upgrade %d %d", commitDateInt, timestamp)
+						upgradeLiveServer()
+					}
+				}
 			}
 		}
 	}

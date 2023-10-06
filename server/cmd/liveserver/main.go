@@ -24,7 +24,17 @@ import (
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/server"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/services"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
+
+var (
+	_ = pflag.Bool("Dev", false, "")
+)
+
+func init() {
+	viper.SetDefault("Dev", false)
+}
 
 func main() {
 	config.Init()

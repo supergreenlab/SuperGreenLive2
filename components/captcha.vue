@@ -45,7 +45,6 @@ export default {
 
   methods: {
     messageReceived(e) {
-      console.log('(page) messageReceived: ', e)
       if (e.data.length > 30) {
         this.onToken(e.data)
       }

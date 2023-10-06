@@ -72,12 +72,10 @@ export default {
         this.$data.showCaptcha = true
         return
       }
-      console.log(login, password, token)
       this.$store.dispatch('auth/login', { login, password, captcha: token })
       return false
     },
     onToken(token) {
-      console.log('onToken: ', token)
       this.$data.token = token
       this.loginHandler()
     },

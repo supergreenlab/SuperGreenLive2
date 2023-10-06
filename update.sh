@@ -2,9 +2,11 @@
 
 set -e
 
+TAG=${1:-latest}
+
 curl --remote-name \
      --location \
-     https://github.com/SuperGreenLab/SuperGreenLive2/releases/download/v0.0.5/liveserver.zip
+     https://github.com/SuperGreenLab/SuperGreenLive2/releases/download/$TAG/liveserver.zip
 rm -r liveserver
 unzip liveserver.zip
 
