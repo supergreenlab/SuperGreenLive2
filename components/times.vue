@@ -46,13 +46,14 @@
 <script>
 import axios from 'axios'
 
+import Loading from '~/components/loading.vue'
 import Hours from '~/components/hours.vue'
 import Days from '~/components/days.vue'
 
 const RPI_URL=process.env.RPI_URL
 
 export default {
-  component: {Hours, Days,},
+  components: {Hours, Days, Loading,},
   data() {
     return {
       loading: true,

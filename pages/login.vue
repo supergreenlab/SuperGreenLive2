@@ -68,7 +68,7 @@ export default {
       if (this.$data.showCaptcha && !token) {
         return
       }
-      if (!this.$data.showCaptcha) {
+      if (process.env.NODE_ENV != "development" && !this.$data.showCaptcha) {
         this.$data.showCaptcha = true
         return
       }
