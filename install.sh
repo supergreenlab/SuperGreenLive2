@@ -10,7 +10,7 @@ apt-get --allow-releaseinfo-change update
 
 apt-get install --yes \
         fswebcam ffmpeg libmagickwand-dev \
-        python3-opencv python3-picamera
+        python3-opencv
 
 if [ "$(/usr/bin/lsb_release -rs)" -ge "11" ]; then
   echo "running on debian bullseye or newer"
@@ -20,7 +20,8 @@ if [ "$(/usr/bin/lsb_release -rs)" -ge "11" ]; then
 else
   echo "running on debian buster or older"
   apt-get install --yes \
-          python3-pip libatlas-base-dev
+          python3-pip libatlas-base-dev \
+          python3-picamera
   pip3 install simplejpeg
   pip3 install numpy \
        --upgrade \

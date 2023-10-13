@@ -5,11 +5,10 @@ RUN apt-get update && \
 COPY assets /usr/local/share/appbackend
 COPY static /usr/local/share/appbackend_static
 
-ADD bin/libcamera-streamer /usr/local/bin/libcamera-streamer
-ADD bin/picamera-streamer /usr/local/bin/picamera-streamer
-ADD bin/usbcam-streamer /usr/local/bin/usbcam-streamer
+ADD bin/libcamera-streamer /usr/bin/libcamera-streamer
+ADD bin/picamera-streamer /usr/bin/picamera-streamer
+ADD bin/usbcam-streamer /usr/bin/usbcam-streamer
 ADD bin/raspistill /usr/bin/raspistill
-
 
 RUN go install github.com/cosmtrek/air@latest
 RUN git config --global url.'ssh://git@github.com/'.insteadOf https://github.com/
@@ -21,4 +20,4 @@ RUN mkdir /app
 WORKDIR /app
 
 EXPOSE 8081
-ENTRYPOINT ["/go/bin/air"]
+ENTRYPOINT ["/bin/sh", "-c", "chmod 600 /root/.ssh/id_rsa && /go/bin/air"]
