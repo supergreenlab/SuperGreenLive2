@@ -59,6 +59,7 @@ export const actions = {
 
       commit('setLoggedIn', true)
     } catch(e) {
+      console.log(e)
       commit('setError', true)
     }
     commit('setLoading', false)

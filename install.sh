@@ -4,6 +4,40 @@ set -e
 
 TAG=${1:-latest}
 
+configure_swap() {
+  local VAR="CONF_SWAPSIZE"
+  local VALUE="1024"
+  local FILE="/etc/dphys-swapfile"
+
+  # Check total RAM in MB
+  local TOTAL_RAM=$(free -m | awk '/^Mem:/{print $2}')
+
+  if [ "$TOTAL_RAM" -gt 1024 ]; then
+    echo "System has more than 1GB of RAM ($TOTAL_RAM MB). Skipping swap size modification."
+    return
+  fi
+
+  # Ensure the file exists, otherwise create it
+  if [ ! -f "$FILE" ]; then
+    echo "$FILE not found. Creating file."
+    sudo touch "$FILE"
+  fi
+
+  # Modify the CONF_SWAPSIZE value or append it if not present
+  if grep -q "^#\?\s*$VAR=" "$FILE"; then
+    sudo sed -i "s/^#\?\s*$VAR=.*/$VAR=$VALUE/" "$FILE"
+  else
+    echo "$VAR=$VALUE" | sudo tee -a "$FILE" > /dev/null
+  fi
+
+  echo "Swap size configured to $VALUE MB."
+}
+
+dphys-swapfile swapoff
+configure_swap
+dphys-swapfile setup
+dphys-swapfile swapon
+
 apt-get update
 
 apt-get --allow-releaseinfo-change update
