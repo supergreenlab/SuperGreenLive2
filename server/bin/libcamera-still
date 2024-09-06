@@ -1,0 +1,14 @@
+#!/bin/bash
+
+PIC="${!#}"
+if [ "$PIC" == "./bin/raspistill" ]; then
+  exit
+fi
+
+sleep 1
+
+curl -L https://i.imgur.com/nSPKWQY.jpg -o "$PIC"
+
+for i; do 
+  echo \"$i\"
+done

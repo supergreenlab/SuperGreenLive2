@@ -1,16 +1,17 @@
-FROM golang:1.19
+FROM golang:1.22
 
 RUN apt-get update && \
     apt-get install -y libmagickwand-dev
 COPY assets /usr/local/share/appbackend
 COPY static /usr/local/share/appbackend_static
 
-ADD bin/libcamera-streamer /usr/bin/libcamera-streamer
-ADD bin/picamera-streamer /usr/bin/picamera-streamer
-ADD bin/usbcam-streamer /usr/bin/usbcam-streamer
-ADD bin/raspistill /usr/bin/raspistill
+COPY bin/libcamera-streamer /usr/local/bin/libcamera-streamer
+COPY bin/picamera-streamer /usr/local/bin/picamera-streamer
+COPY bin/usbcam-streamer /usr/local/bin/usbcam-streamer
+COPY bin/libcamera-still /usr/bin/libcamera-still
+COPY bin/raspistill /usr/bin/raspistill
 
-RUN go install github.com/cosmtrek/air@latest
+RUN go install github.com/air-verse/air@latest
 RUN git config --global url.'ssh://git@github.com/'.insteadOf https://github.com/
 
 RUN mkdir ~/.ssh
