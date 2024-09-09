@@ -30,7 +30,7 @@ import (
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg/api"
-	"github.com/SuperGreenLab/AppBackend/pkg/image"
+	sglimage "github.com/SuperGreenLab/AppBackend/pkg/image"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/tools"
 	"github.com/disintegration/imaging"
@@ -110,22 +110,22 @@ func captureTimelapse() {
 			deviceParams := tools.DeviceParamsResult{}
 			url := fmt.Sprintf("/device/%s/params?params=BOX_%d_*_HOUR&params=BOX_%d_*_MIN", box.DeviceID.UUID, *box.DeviceBox, *box.DeviceBox)
 			if err := appbackend.GETSGLObject(token, url, &deviceParams); err != nil {
-				logrus.Errorf("appbackend.GETSGLObject(device/params) in captureTimelapse %q", err)
-				return
-			}
-			onHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_HOUR", *box.DeviceBox))
-			onMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_MIN", *box.DeviceBox))
-			offHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_HOUR", *box.DeviceBox))
-			offMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_MIN", *box.DeviceBox))
-			if !(onHour == offHour && onMin == offMin) {
-				t := time.Now()
-				on := time.Date(t.Year(), t.Month(), t.Day(), onHour, onMin, 0, 0, time.UTC)
-				off := time.Date(t.Year(), t.Month(), t.Day(), offHour, offMin, 0, 0, time.UTC)
-				isOnNow := (on.Before(off) && t.After(on) && t.Before(off)) ||
-					(on.After(off) && (t.Before(off) || t.After(on)))
-				if !isOnNow {
-					logrus.Infof("Skipping night time")
-					return
+				logrus.Warningf("appbackend.GETSGLObject(device/params) in captureTimelapse %q", err)
+			} else {
+				onHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_HOUR", *box.DeviceBox))
+				onMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_ON_MIN", *box.DeviceBox))
+				offHour, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_HOUR", *box.DeviceBox))
+				offMin, _ := deviceParams.GetInt(device, fmt.Sprintf("BOX_%d_OFF_MIN", *box.DeviceBox))
+				if !(onHour == offHour && onMin == offMin) {
+					t := time.Now()
+					on := time.Date(t.Year(), t.Month(), t.Day(), onHour, onMin, 0, 0, time.UTC)
+					off := time.Date(t.Year(), t.Month(), t.Day(), offHour, offMin, 0, 0, time.UTC)
+					isOnNow := (on.Before(off) && t.After(on) && t.Before(off)) ||
+						(on.After(off) && (t.Before(off) || t.After(on)))
+					if !isOnNow {
+						logrus.Infof("Skipping night time")
+						return
+					}
 				}
 			}
 		}
