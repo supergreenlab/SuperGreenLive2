@@ -51,6 +51,13 @@ if [ "$(/usr/bin/lsb_release -rs)" -ge "11" ]; then
   apt-get install --yes \
           python3-libcamera python3-picamera2
   apt --reinstall install --yes libcamera-apps-lite
+
+  if [ ! -x /usr/bin/libcamera-still ]; then
+    echo "libcamera-still not found in /usr/bin, creating wrapper..."
+    sudo sh -c 'echo -e "#!/bin/bash\nrpicam-still \"\$@\"" > /usr/bin/libcamera-still && chmod +x /usr/bin/libcamera-still'
+  else
+    echo "libcamera-still already exists at /usr/bin/libcamera-still"
+  fi
 else
   echo "running on debian buster or older"
   apt-get install --yes \
