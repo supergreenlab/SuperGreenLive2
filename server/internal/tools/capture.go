@@ -45,7 +45,26 @@ var (
 
 func init() {
 	viper.SetDefault("USBCam", false)
-	viper.SetDefault("LegacyCam", false)
+}
+
+func findExecutable(names ...string) (string, error) {
+	for _, name := range names {
+		if path, err := exec.LookPath(name); err == nil {
+			return path, nil
+		}
+	}
+	return "", fmt.Errorf("no executable found (tried %s)", strings.Join(names, ", "))
+}
+
+func stillCaptureExecutable() (string, error) {
+	return findExecutable("rpicam-still", "libcamera-still")
+}
+
+func StreamExecutable() (string, error) {
+	if USBCam() {
+		return findExecutable("usbcam-streamer")
+	}
+	return findExecutable("libcamera-streamer")
 }
 
 // TODO move this to api
@@ -102,10 +121,13 @@ func TakePic() (string, error) {
 
 	name := "/tmp/cam.jpg"
 	if USBCam() == false {
-		execPath = "/usr/bin/libcamera-still"
-		if UseLegacy() {
-			execPath = "/usr/bin/raspistill"
+		var err error
+		execPath, err = stillCaptureExecutable()
+		if err != nil {
+			logrus.Errorf("stillCaptureExecutable in TakePic %q", err)
+			return "", err
 		}
+		logrus.Infof("Using %s for still capture", execPath)
 		raspiParams, err := kv.GetString("raspiparams")
 		if err != nil {
 			logrus.Errorf("kv.GetString(raspiparams) in TakePic %q", err)
@@ -116,7 +138,12 @@ func TakePic() (string, error) {
 		})
 		params = append(params, []string{"--rotation", rotation, "--quality", "100", "--output", name}...)
 	} else {
-		execPath = "/usr/bin/fswebcam"
+		var err error
+		execPath, err = findExecutable("fswebcam")
+		if err != nil {
+			logrus.Errorf("findExecutable(fswebcam) in TakePic %q", err)
+			return "", err
+		}
 		fswebcamParams, err := kv.GetString("fswebcamparams")
 		if err != nil {
 			logrus.Errorf("kv.GetString(fswebcamparams) in TakePic %q", err)
@@ -226,26 +253,4 @@ func CaptureFrame() (*bytes.Buffer, error) {
 func USBCam() bool {
 	usbCam := viper.GetBool("USBCam")
 	return usbCam
-}
-
-func UseLegacy() bool {
-	legacyCam := viper.GetBool("LegacyCam")
-	logrus.Debugf("legacyCam %q", strconv.FormatBool(legacyCam))
-	debianVersionBytes, err := os.ReadFile("/etc/debian_version")
-	if err != nil {
-		logrus.Errorf("Failed to read /etc/debian_version: %q", err)
-	}
-	debianVersionStringRaw := string(debianVersionBytes)
-	debianVersionString := strings.TrimSpace(debianVersionStringRaw)
-	debianVersionFloat, err := strconv.ParseFloat(debianVersionString, 64)
-	if err != nil {
-		logrus.Errorf("Failed to cast debian version to float: %q", err)
-	}
-	if debianVersionFloat < 11.0 || legacyCam {
-		logrus.Debug("Using raspistill")
-		return true
-	} else {
-		logrus.Debug("Using libcamera")
-		return false
-	}
 }

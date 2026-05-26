@@ -54,30 +54,9 @@ dphys-swapfile swapon
 
 apt-get install --yes \
         fswebcam ffmpeg libmagickwand-7.q16-10 \
-        python3-opencv
-
-if [ "$(/usr/bin/lsb_release -rs)" -ge "11" ]; then
-  echo "running on debian bullseye or newer"
-  apt-get install --yes \
-          python3-libcamera python3-picamera2
-  apt --reinstall install --yes libcamera-apps-lite
-
-  if [ ! -x /usr/bin/libcamera-still ]; then
-    echo "libcamera-still not found in /usr/bin, creating wrapper..."
-    sudo sh -c 'echo -e "#!/bin/bash\nrpicam-still \"\$@\"" > /usr/bin/libcamera-still && chmod +x /usr/bin/libcamera-still'
-  else
-    echo "libcamera-still already exists at /usr/bin/libcamera-still"
-  fi
-else
-  echo "running on debian buster or older"
-  apt-get install --yes \
-          python3-pip libatlas-base-dev \
-          python3-picamera
-  pip3 install simplejpeg
-  pip3 install numpy \
-       --upgrade \
-       --index-url https://www.piwheels.org/simple
-fi
+        python3-opencv \
+        python3-libcamera python3-picamera2
+apt --reinstall install --yes libcamera-apps-lite
 
 # curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
 unzip -o "$ZIP"

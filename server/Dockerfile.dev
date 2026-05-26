@@ -6,10 +6,8 @@ COPY assets /usr/local/share/appbackend
 COPY static /usr/local/share/appbackend_static
 
 COPY bin/libcamera-streamer /usr/local/bin/libcamera-streamer
-COPY bin/picamera-streamer /usr/local/bin/picamera-streamer
 COPY bin/usbcam-streamer /usr/local/bin/usbcam-streamer
 COPY bin/libcamera-still /usr/bin/libcamera-still
-COPY bin/raspistill /usr/bin/raspistill
 
 RUN go install github.com/air-verse/air@latest
 RUN git config --global url.'ssh://git@github.com/'.insteadOf https://github.com/

@@ -12,8 +12,6 @@ Table of Contents
       * [Live status view](#live-status-view)
 * [Hardware requirements](#hardware-requirements)
 * [Installation](#installation)
-  * [Debian bullseye ](#debian-bullseye)
-  * [Debian buster ](#debian-buster)
   * [Install the liveserver](#install-the-liveserver)
     * [USB cameras](#usb-cameras)
 * [Upgrade](#upgrade)
@@ -71,41 +69,23 @@ Low latency live feed for easier installation and focus tuning.
 
 # Hardware requirements
 
-- [RaspberryPI](https://www.raspberrypi.org/products/) + [Wifi (optional, most rpi have integrated wifi now)](https://www.raspberrypi.org/products/raspberry-pi-usb-wifi-dongle/)
-- [Camera](https://www.raspberrypi.org/products/camera-module-v2/), I got [those](https://www.amazon.com/SainSmart-Fish-Eye-Camera-Raspberry-Arduino/dp/B00N1YJKFS) for the wide angle lens, but that's only for small spaces (this is the one used for the pic above).
-- [Power supply](https://www.raspberrypi.org/products/raspberry-pi-universal-power-supply/)
+Supported boards: **Raspberry Pi 2 and newer** (including Pi Zero 2 W), running current **32-bit or 64-bit Raspberry Pi OS** (Bookworm or newer). Raspberry Pi 1 is not supported.
+
+- [Raspberry Pi](https://www.raspberrypi.com/products/) — Pi 3, Pi 4, or Pi Zero 2 W recommended for camera use; Pi 2 works on 32-bit OS
+- [Camera module](https://www.raspberrypi.com/products/camera-module-v2/) (or USB camera — see below)
+- [Power supply](https://www.raspberrypi.com/products/type-c-power-supply/)
 
 # Installation
 
-First follow the raspbian [official quickstart](https://projects.raspberrypi.org/en/projects/raspberry-pi-getting-started).
-You'll need an interface connection setup with wifi or ethernet.
-Open a terminal either through a screen+keyboard or a ssh session.
-
-## Debian bullseye 
-
-In the current debian bullseye for raspian pi, the handling for the camera has [changed](https://www.raspberrypi.com/news/bullseye-camera-system/). 
-It is currently still possible to use the deprecated camera system under debian bullseye, but the support for it will eventually be dropped.
-
-Actually cameras work right out of the box after flashing debian bullseye.
-To check if the camera basically works under debian bullseye with the new libcamera, type the following into a terminal:
+Flash the latest [Raspberry Pi OS](https://www.raspberrypi.com/software/) image, enable the camera in `raspi-config` if needed, and verify capture works:
 
 ```sh
-libcamera-still -o /tmp/test.jpg
+rpicam-still -o /tmp/test.jpg
 ```
 
-`libcamera-still` is the replacement for the deprecated `raspistill` and the above command takes a test image and saves it.
+(`libcamera-still -o /tmp/test.jpg` also works on older Bookworm images.)
 
-## Debian buster
-
-First thing is to enable camera interface, this is done through `raspi-config`, type in the terminal:
-
-```sh
-sudo raspi-config
-```
-
-Then, with the arrow keys, go to `Interface Options` then `Camera`, enable it and then say `Yes` when it proposes to reboot.
-
-Once the raspberrypi has reboot, open a terminal, and type:
+Open a terminal (local or SSH), then:
 
 ## Install the liveserver
 

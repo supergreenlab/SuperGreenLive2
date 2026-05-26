@@ -64,15 +64,18 @@ func startStreamHandler(w http.ResponseWriter, r *http.Request, p httprouter.Par
 
 	tools.WaitCamAvailable()
 
+	streamer, err := tools.StreamExecutable()
+	if err != nil {
+		logrus.Errorf("StreamExecutable in startStreamHandler %q", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	log.Infof("Starting stream via %s", streamer)
+
 	if tools.USBCam() {
-		log.Debug("Starting stream via usbcam-streamer")
-		cmd = exec.Command("/usr/local/bin/usbcam-streamer", "--height", viper.GetString("StreamHeight"), "--width", viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"), "--device", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")))
-	} else if tools.UseLegacy() {
-		log.Debug("Starting stream via picamera-streamer")
-		cmd = exec.Command("/usr/local/bin/picamera-streamer", "--height", viper.GetString("StreamHeight"), "--width", viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"))
+		cmd = exec.Command(streamer, "--height", viper.GetString("StreamHeight"), "--width", viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"), "--device", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")))
 	} else {
-		log.Debug("Starting stream via libcamera-streamer")
-		cmd = exec.Command("/usr/local/bin/libcamera-streamer", "--height", viper.GetString("StreamHeight"), "--width", viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"))
+		cmd = exec.Command(streamer, "--height", viper.GetString("StreamHeight"), "--width", viper.GetString("StreamWidth"), "--port", viper.GetString("StreamPort"))
 	}
 
 	cmd.Stdout = os.Stdout
