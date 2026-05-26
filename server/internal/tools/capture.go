@@ -32,7 +32,7 @@ import (
 	"time"
 
 	appbackend "github.com/SuperGreenLab/AppBackend/pkg/api"
-	"github.com/SuperGreenLab/AppBackend/pkg/image"
+	sglimage "github.com/SuperGreenLab/AppBackend/pkg/image"
 	"github.com/SuperGreenLab/SuperGreenLive2/server/internal/data/kv"
 	"github.com/disintegration/imaging"
 	"github.com/sirupsen/logrus"

@@ -14,4 +14,4 @@ rsync -avz --exclude 'node_modules' \
            --exclude 'server/static' \
            --delete \
            -e "ssh -i ~/.ssh/raspi/${git_github_identity:-id_rsa}" \
-           $(pwd)/ pi@"$RPI":SuperGreenLive2
+           $(pwd)/ stant@"$RPI":SuperGreenLive2

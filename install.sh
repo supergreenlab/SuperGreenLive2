@@ -2,7 +2,17 @@
 
 set -e
 
-TAG=${1:-latest}
+if [ -n "${1:-}" ] && [ -f "$1" ]; then
+  ZIP="$1"
+  echo "Installing from local zip: ${ZIP}"
+else
+  TAG=${1:-latest}
+  echo "Downloading liveserver.zip (tag: ${TAG})..."
+  curl --remote-name \
+       --location \
+       https://github.com/SuperGreenLab/SuperGreenLive2/releases/download/$TAG/liveserver.zip
+  ZIP="liveserver.zip"
+fi
 
 configure_swap() {
   local VAR="CONF_SWAPSIZE"
@@ -33,17 +43,17 @@ configure_swap() {
   echo "Swap size configured to $VALUE MB."
 }
 
-dphys-swapfile swapoff
+apt-get update
+apt-get --allow-releaseinfo-change update
+apt-get install --yes dphys-swapfile
+
+dphys-swapfile swapoff 2>/dev/null || true
 configure_swap
 dphys-swapfile setup
 dphys-swapfile swapon
 
-apt-get update
-
-apt-get --allow-releaseinfo-change update
-
 apt-get install --yes \
-        fswebcam ffmpeg libmagickwand-dev \
+        fswebcam ffmpeg libmagickwand-7.q16-10 \
         python3-opencv
 
 if [ "$(/usr/bin/lsb_release -rs)" -ge "11" ]; then
@@ -70,23 +80,18 @@ else
 fi
 
 # curl -OL https://github.com/supergreenlab/SuperGreenLive2/releases/download/latest/liveserver.zip
-curl --remote-name \
-     --location \
-     https://github.com/SuperGreenLab/SuperGreenLive2/releases/download/$TAG/liveserver.zip
-unzip -o liveserver.zip
+unzip -o "$ZIP"
 
 mkdir --parents /usr/local/share/appbackend /usr/local/share/appbackend_static
 
 cp --recursive liveserver/assets/* /usr/local/share/appbackend
 cp --recursive liveserver/static/* /usr/local/share/appbackend_static
-cp liveserver/liveserver /usr/local/bin/liveserver
+if [ "$(dpkg --print-architecture)" = "arm64" ]; then
+  cp liveserver/liveserver_arm64 /usr/local/bin/liveserver
+else
+  cp liveserver/liveserver_arm32 /usr/local/bin/liveserver
+fi
 cp liveserver/tools/* /usr/local/bin/
-
-#if [ "$(dpkg --print-architecture)" = "arm64" ]; then
-#  cp liveserver/liveserver_arm64 /usr/local/bin/liveserver
-#else
-#  cp liveserver/liveserver_arm32 /usr/local/bin/liveserver
-#fi
 
 mkdir --parents /etc/liveserver
 cp liveserver/liveserver.toml /etc/liveserver/liveserver.toml

@@ -1,7 +1,7 @@
 FROM golang:1.22
 
 RUN apt-get update && \
-    apt-get install -y libmagickwand-dev
+    apt-get install -y libmagickwand-7.q16-dev
 COPY assets /usr/local/share/appbackend
 COPY static /usr/local/share/appbackend_static
 

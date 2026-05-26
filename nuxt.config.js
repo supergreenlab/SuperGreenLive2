@@ -54,7 +54,25 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    extend(config, { isDev }) {
+      if (isDev) {
+        config.watchOptions = {
+          ...config.watchOptions,
+          ignored: [
+            '**/.build/**',
+            '**/node_modules/**',
+            '**/liveserver/**',
+          ],
+        }
+      }
+    },
   },
+
+  ignore: [
+    '.build/**',
+    'liveserver/**',
+    'server/storage/**',
+  ],
 
   env: {
     API_URL: process.env.API_URL || 'https://api2.supergreenlab.com',

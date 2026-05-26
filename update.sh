@@ -41,7 +41,7 @@ dphys-swapfile swapon
 apt-get --allow-releaseinfo-change update
 
 apt-get install --yes \
-        fswebcam ffmpeg libmagickwand-dev \
+        fswebcam ffmpeg libmagickwand-7.q16-10 \
         python3-opencv
 
 if [ "$(/usr/bin/lsb_release -rs)" -ge "11" ]; then
@@ -70,6 +70,10 @@ unzip liveserver.zip
 systemctl stop liveserver
 cp -r liveserver/assets/* /usr/local/share/appbackend
 cp -r liveserver/static/* /usr/local/share/appbackend_static
-cp liveserver/liveserver /usr/local/bin/liveserver
+if [ "$(dpkg --print-architecture)" = "arm64" ]; then
+  cp liveserver/liveserver_arm64 /usr/local/bin/liveserver
+else
+  cp liveserver/liveserver_arm32 /usr/local/bin/liveserver
+fi
 cp liveserver/tools/* /usr/local/bin/
 systemctl start liveserver
