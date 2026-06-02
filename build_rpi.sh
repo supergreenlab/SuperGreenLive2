@@ -33,6 +33,7 @@ if [ "${1:-}" = "--on-pi" ]; then
   mkdir -p "${ROOT}/liveserver"
   scp -i "$SSH_KEY" stant@"$RPI":SuperGreenLive2/server/liveserver_arm64 "${ROOT}/liveserver/"
   scp -i "$SSH_KEY" stant@"$RPI":SuperGreenLive2/server/liveserver_arm32 "${ROOT}/liveserver/"
+  scp -i "$SSH_KEY" stant@"$RPI":SuperGreenLive2/server/liveserver_arm32v6 "${ROOT}/liveserver/"
   exit 0
 fi
 

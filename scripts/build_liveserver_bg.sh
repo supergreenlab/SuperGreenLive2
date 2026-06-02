@@ -35,7 +35,16 @@ fi
 
   GOARCH=arm64 /usr/local/go/bin/go build -ldflags "$LDFLAGS" -o liveserver_arm64 -v cmd/liveserver/main.go
 
-  GOARCH=arm GOOS=linux GOARM=7 /usr/local/go/bin/go build -ldflags "$LDFLAGS" -o liveserver_arm32 -v cmd/liveserver/main.go
+  GOARCH=arm GOOS=linux GOARM=7 CGO_ENABLED=1 \
+    /usr/local/go/bin/go build -ldflags "$LDFLAGS" -o liveserver_arm32 -v cmd/liveserver/main.go
+
+  rm -rf /tmp/gocache-goarm6
+  CGO_ENABLED=1 GOARCH=arm GOOS=linux GOARM=6 \
+    CGO_CFLAGS="-march=armv6zk -mfpu=vfp" \
+    CGO_LDFLAGS="-march=armv6zk -mfpu=vfp" \
+    CC="gcc -march=armv6zk -mfpu=vfp" \
+    GOCACHE=/tmp/gocache-goarm6 \
+    /usr/local/go/bin/go build -a -ldflags "$LDFLAGS" -o liveserver_arm32v6 -v cmd/liveserver/main.go
 
   echo "=== Build finished $(date -Iseconds) ==="
 ) >>"$LOGFILE" 2>&1 &

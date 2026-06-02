@@ -1,42 +1,48 @@
 #!/bin/bash
-# Create Debian ARM rootfs for building liveserver under QEMU.
-# One-time setup per architecture; needs sudo.
+# Create ARM rootfs images for building liveserver under QEMU user emulation.
+#
+#   rootfs-arm64   — Debian arm64  (liveserver_arm64)
+#   rootfs-armhf   — Debian armhf  (liveserver_arm32, GOARM=7)
+#   rootfs-raspios — Raspberry Pi OS armhf (liveserver_arm32v6, Pi Zero / ARMv6)
+#       ./scripts/fetch-pi-rootfs.sh   (download official image, or --local for SD card)
 
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${SGLLIVE_BUILD_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/sgllive-build}"
-ROOTFS_SUITE="${SGLLIVE_ROOTFS_SUITE:-trixie}"
-READY_MARKER=".sgllive-im7-ready"
+DEBIAN_SUITE="${SGLLIVE_ROOTFS_SUITE:-trixie}"
+IM7_READY_MARKER=".sgllive-im7-ready"
 
 usage() {
-  echo "Usage: $0 [arm64|armhf|all]"
+  echo "Usage: $0 [arm64|armhf|raspios|all]"
   exit 1
 }
 
 require_cmd() {
   command -v "$1" >/dev/null || {
     echo "Missing: $1"
-    echo "On Manjaro: sudo pacman -S qemu-user-static-binfmt debootstrap"
+    echo "On Manjaro: sudo pacman -S qemu-user-static-binfmt debootstrap rsync curl gnupg"
     exit 1
   }
 }
 
-setup_rootfs() {
-  local arch="$1"
+setup_debian_rootfs() {
+  local deb_arch="$1"
   local qemu="$2"
-  local rootfs="${BUILD_DIR}/rootfs-${arch}"
+  local name="$3"
+  local ready_marker="$4"
+  local rootfs="${BUILD_DIR}/rootfs-${name}"
 
-  if [ -f "${rootfs}/${READY_MARKER}" ]; then
+  if [ -f "${rootfs}/${ready_marker}" ]; then
     echo "Rootfs already ready: ${rootfs}"
     return 0
   fi
 
-  echo "Creating ${arch} rootfs (${ROOTFS_SUITE}, needs sudo, one-time)..."
+  echo "Creating ${name} rootfs (Debian ${deb_arch} ${DEBIAN_SUITE}, needs sudo, one-time)..."
   mkdir -p "$BUILD_DIR"
   sudo rm -rf "$rootfs"
 
-  sudo debootstrap --foreign --arch="$arch" "$ROOTFS_SUITE" "$rootfs" http://deb.debian.org/debian
+  sudo debootstrap --foreign --arch="$deb_arch" "$DEBIAN_SUITE" "$rootfs" http://deb.debian.org/debian
   sudo cp "$(command -v "$qemu")" "${rootfs}/usr/bin/"
   sudo chroot "$rootfs" /debootstrap/debootstrap --second-stage
 
@@ -56,26 +62,38 @@ setup_rootfs() {
   sudo chmod 700 "${rootfs}/root/.ssh"
   sudo chmod 644 "${rootfs}/root/.ssh/known_hosts"
 
-  sudo touch "${rootfs}/${READY_MARKER}"
-
+  sudo touch "${rootfs}/${ready_marker}"
   echo "Ready: ${rootfs}"
+}
+
+setup_raspios_rootfs() {
+  "${ROOT}/scripts/fetch-pi-rootfs.sh"
 }
 
 require_cmd debootstrap
 require_cmd qemu-aarch64-static
 require_cmd qemu-arm-static
+require_cmd curl
 
 TARGET="${1:-all}"
 case "$TARGET" in
   arm64)
-    setup_rootfs arm64 qemu-aarch64-static
+    setup_debian_rootfs arm64 qemu-aarch64-static arm64 "$IM7_READY_MARKER"
     ;;
   armhf)
-    setup_rootfs armhf qemu-arm-static
+    setup_debian_rootfs armhf qemu-arm-static armhf "$IM7_READY_MARKER"
+    ;;
+  raspios)
+    setup_raspios_rootfs
     ;;
   all)
-    setup_rootfs arm64 qemu-aarch64-static
-    setup_rootfs armhf qemu-arm-static
+    setup_debian_rootfs arm64 qemu-aarch64-static arm64 "$IM7_READY_MARKER"
+    setup_debian_rootfs armhf qemu-arm-static armhf "$IM7_READY_MARKER"
+    setup_raspios_rootfs
+    ;;
+  armv6)
+    echo "NOTE: armv6 is deprecated; use raspios instead."
+    setup_raspios_rootfs
     ;;
   *)
     usage

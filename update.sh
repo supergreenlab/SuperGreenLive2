@@ -58,6 +58,8 @@ cp -r liveserver/assets/* /usr/local/share/appbackend
 cp -r liveserver/static/* /usr/local/share/appbackend_static
 if [ "$(dpkg --print-architecture)" = "arm64" ]; then
   cp liveserver/liveserver_arm64 /usr/local/bin/liveserver
+elif [ "$(uname -m)" = "armv6l" ]; then
+  cp liveserver/liveserver_arm32v6 /usr/local/bin/liveserver
 else
   cp liveserver/liveserver_arm32 /usr/local/bin/liveserver
 fi
