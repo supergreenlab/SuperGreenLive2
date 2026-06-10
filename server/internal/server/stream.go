@@ -40,6 +40,8 @@ func init() {
 	viper.SetDefault("StreamPort", 18082)
 	viper.SetDefault("StreamHeight", 720)
 	viper.SetDefault("StreamWidth", 960)
+
+	tools.StopStreamFunc = stopStream
 }
 
 var cmd *exec.Cmd
@@ -99,10 +101,11 @@ func stopStream() error {
 	if cmd == nil {
 		return nil
 	}
-	logrus.Infof("%+v", cmd)
+	logrus.Infof("Stopping stream: %+v", cmd)
 	if err := cmd.Process.Kill(); err != nil {
 		return err
 	}
+	cmd.Wait()
 	logrus.Info("Stream stopped")
 	cmd = nil
 	return nil

@@ -24,7 +24,6 @@ import (
 	"fmt"
 	"image"
 	"image/jpeg"
-	"log"
 	"os"
 	"strings"
 	"time"
@@ -40,6 +39,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
+
 
 var (
 	c *cron.Cron
@@ -152,6 +152,8 @@ func captureTimelapse() {
 		logrus.Errorf("takePic in captureTimelapse %q", err)
 		return
 	}
+	defer os.Remove(cam)
+
 	reader, err := os.Open(cam)
 	if err != nil {
 		logrus.Errorf("os.Open in captureTimelapse %q", err)
@@ -282,28 +284,31 @@ func removeOldFiles() error {
 	storageDuration, err := kv.GetIntWithDefault("storageduration", 86400)
 	files, err := os.ReadDir(storageDir)
 	if err != nil {
-		log.Fatal(err)
+		logrus.Errorf("os.ReadDir in removeOldFiles %q", err)
+		return err
 	}
 
 	t := time.Now().Add(-time.Duration(storageDuration) * time.Second)
 	for _, file := range files {
 		path := fmt.Sprintf("%s/%s", storageDir, file.Name())
 		f, err := os.Open(path)
-		defer f.Close()
 		if err != nil {
 			return err
 		}
 		s, err := f.Stat()
 		if err != nil {
+			f.Close()
 			return err
 		}
 		if s.ModTime().Before(t) {
 			logrus.Infof("removing %s %s %s %d", path, s.ModTime(), t, storageDuration)
 			err := os.Remove(path)
 			if err != nil {
+				f.Close()
 				return err
 			}
 		}
+		f.Close()
 	}
 	return nil
 }

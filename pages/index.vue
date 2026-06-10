@@ -52,7 +52,7 @@ import Times from '~/components/times.vue'
 const RPI_URL=process.env.RPI_URL
 
 export default {
-  components: {Checkbox, Times,},
+  components: {Checkbox, Times, Loading,},
   data() {
     return {
       n: 0,

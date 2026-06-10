@@ -20,6 +20,7 @@ package tools
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"image"
@@ -39,8 +40,12 @@ import (
 	"github.com/spf13/viper"
 )
 
+const captureCmdTimeout = 60 * time.Second
+
 var (
 	camMutex sync.Mutex
+
+	StopStreamFunc func() error
 )
 
 func init() {
@@ -107,6 +112,12 @@ func WaitCamAvailable() {
 }
 
 func TakePic() (string, error) {
+	if StopStreamFunc != nil {
+		if err := StopStreamFunc(); err != nil {
+			logrus.Warningf("StopStreamFunc in TakePic %q", err)
+		}
+	}
+
 	camMutex.Lock()
 	defer camMutex.Unlock()
 	logrus.Info("Taking picture..")
@@ -116,14 +127,21 @@ func TakePic() (string, error) {
 		rotation = "0"
 	}
 
+	tmpFile, err := os.CreateTemp("/tmp", "cam-*.jpg")
+	if err != nil {
+		logrus.Errorf("os.CreateTemp in TakePic %q", err)
+		return "", err
+	}
+	name := tmpFile.Name()
+	tmpFile.Close()
+
 	var execPath string
 	params := []string{}
 
-	name := "/tmp/cam.jpg"
 	if USBCam() == false {
-		var err error
 		execPath, err = stillCaptureExecutable()
 		if err != nil {
+			os.Remove(name)
 			logrus.Errorf("stillCaptureExecutable in TakePic %q", err)
 			return "", err
 		}
@@ -138,9 +156,9 @@ func TakePic() (string, error) {
 		})
 		params = append(params, []string{"--rotation", rotation, "--quality", "100", "--output", name}...)
 	} else {
-		var err error
 		execPath, err = findExecutable("fswebcam")
 		if err != nil {
+			os.Remove(name)
 			logrus.Errorf("findExecutable(fswebcam) in TakePic %q", err)
 			return "", err
 		}
@@ -155,11 +173,18 @@ func TakePic() (string, error) {
 		params = append(params, []string{"-d", fmt.Sprintf("/dev/%s", viper.GetString("VideoDev")), "--rotate", rotation, "--resolution", "2592x1944", name}...)
 	}
 
-	cmd := exec.Command(execPath, params...)
+	ctx, cancel := context.WithTimeout(context.Background(), captureCmdTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, execPath, params...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err = cmd.Run()
-	return name, err
+	if err = cmd.Run(); err != nil {
+		os.Remove(name)
+		logrus.Errorf("cmd.Run in TakePic %q", err)
+		return "", err
+	}
+	return name, nil
 }
 
 func CaptureFrame() (*bytes.Buffer, error) {
@@ -199,6 +224,7 @@ func CaptureFrame() (*bytes.Buffer, error) {
 		logrus.Errorf("takePic in CaptureFrame %q", err)
 		return nil, err
 	}
+	defer os.Remove(cam)
 
 	reader, err := os.Open(cam)
 	if err != nil {
